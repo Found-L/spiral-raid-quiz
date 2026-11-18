@@ -70,7 +70,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
         token(125, 111, 'A', 'map-hazard', 21), token(125, 186, 'B', 'map-ally', 21),
         token(435, 111, 'B', 'map-hazard', 21), token(435, 186, 'A', 'map-ally', 21),
         arrow(154, 111, 400, 111), arrow(154, 186, 400, 186, 'map-ally-line'),
-        label(280, 98, '隔离内'), label(280, 172, '外场'), label(280, 232, 'A 出场后 · 约 30 秒抵抗')].join('');
+        label(280, 98, '隔离内'), label(280, 172, '外场'), label(280, 232, 'A 出场后 · 约 30 秒后遗症')].join('');
       break;
     case 'witch-line':
       art = [arena(), boss(305, 154, '首领'), line('M280 135L184 90 M280 135L323 38', 'map-red-line'),

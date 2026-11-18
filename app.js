@@ -26,7 +26,17 @@
   let candidate = identity;
   let profile = read(':profile');
   let draft = read(':draft',{});
-  if (draft.version !== bank.version || !draft.answers || typeof draft.answers !== 'object') draft={version:bank.version,index:0,answers:{}};
+  if (draft.version !== bank.version || !draft.answers || typeof draft.answers !== 'object') {
+    const changed = bank.draft_migrations?.[draft.version];
+    if (Array.isArray(changed) && draft.answers && typeof draft.answers === 'object' && !Array.isArray(draft.answers)) {
+      const changedIds = new Set(changed);
+      const previousAnswers = draft.answers;
+      const answers = Object.fromEntries(Object.entries(previousAnswers).filter(([id]) => !changedIds.has(id)));
+      const cleared = Object.keys(previousAnswers).filter(id => changedIds.has(id)).length;
+      draft={version:bank.version,index:draft.index,answers,migrationCleared:cleared};
+      save(':draft',draft);
+    } else draft={version:bank.version,index:0,answers:{}};
+  }
   let index = Math.max(0,Math.min(qs.length-1,Number(draft.index)||0));
   let result = null;
   let onlyWrong = false;
@@ -54,7 +64,8 @@
     const pending = read(':pending');
     return Array.isArray(pending) ? pending : pending ? [pending] : [];
   }
-  function nextPendingAttempt() { return pendingAttempts().find(attempt => attempt.version === bank.version); }
+  function supportedAttempt(attempt) { return attempt.version === bank.version || Object.prototype.hasOwnProperty.call(bank.draft_migrations || {}, attempt.version); }
+  function nextPendingAttempt() { return pendingAttempts().find(supportedAttempt); }
   function setView(which) {
     view = which;
     if (which === 'home' && location.hash.startsWith('#guide-')) window.history.replaceState(null, '', '#guide');
@@ -168,6 +179,9 @@
   function start() { if(!profile) showProfile('start'); else beginExam(); }
   function beginExam() {
     if (location.hash.startsWith('#guide-')) window.history.replaceState(null, '', location.pathname + location.search);
+    const notice = $('draft-update-notice');
+    notice.hidden = !draft.migrationCleared;
+    notice.textContent = draft.migrationCleared ? `题库已更新，其他作答已保留；${draft.migrationCleared} 道调整过的题目需要重新作答。` : '';
     setView('exam'); updateProfileLabel(); renderQuestion();
   }
   function questionDiagram(question) {
@@ -334,11 +348,15 @@
       time.textContent = attemptDate.format(entry.submittedAt);
     } else time.textContent = '本机记录';
     const context = document.createElement('small');
-    context.textContent = `${entry.pending ? '待上传' : entry.currentVersion ? '当前题库' : '旧版题库'} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
+    let kind = '旧版题库';
+    if (entry.pending) kind = '待上传';
+    else if (entry.currentVersion) kind = '当前题库';
+    context.textContent = entry.pending && !entry.currentVersion ? '旧版成绩待上传'
+      : `${kind} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
     const details = document.createElement('div');
     details.append(time, context);
     const score = document.createElement('strong');
-    score.textContent = `${formatScore(entry.score)} 分`;
+    score.textContent = entry.score == null ? '待上传' : `${formatScore(entry.score)} 分`;
     row.append(details, score);
     return row;
   }
@@ -379,9 +397,10 @@
       more.hidden = !historyCursor;
     } catch (error) {
       if (requestId !== historyRequest || view !== 'history') return;
-      const local = pendingAttempts().filter(attempt => attempt.version === bank.version);
+      const local = pendingAttempts().filter(supportedAttempt);
       if (!append && error.unavailable && local.length) {
         const rows = local.slice().reverse().map(attempt => {
+          if (attempt.version !== bank.version) return {currentVersion:false, pending:true, submittedAt:attempt.localSubmittedAt || null};
           const item = grade(attempt.answers);
           return {...item, currentVersion:true, pending:true, submittedAt:attempt.localSubmittedAt || null};
         });

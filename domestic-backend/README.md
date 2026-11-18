@@ -6,7 +6,7 @@
 
 `spiral-raid-quiz-backup.timer` 每天创建 SQLite 一致性快照，保留最近 14 份，目录为 `/var/lib/spiral-raid-quiz/backups/`。备份位于同一台服务器，应另行定期复制到其他受保护的位置；身份哈希及答题记录不可公开。手动备份可运行 `systemctl start spiral-raid-quiz-backup.service`。
 
-更新题库时，在项目根目录运行 `python build_questions.py` 和 `python build_page.py`，使网页和 `domestic-backend/questions.json` 版本一致。部署时先备份数据库，将新的网页与题库分别安装到上述位置并重启 `spiral-raid-quiz.service`；再更新 GitHub Pages。变更 Nginx 时先执行 `nginx -t`，通过后才 reload，并检查现有网站和 API 的健康状态。原网站的 Nginx 配置含有 `include /etc/nginx/snippets/spiral-raid-quiz.conf;`，重新生成配置时需保留该行。
+更新题库时，在项目根目录运行 `python build_questions.py` 和 `python build_page.py`，使网页和 `domestic-backend/questions.json` 版本一致。`banks/` 保留旧题库，服务按提交的版本评分，历史记录保留所有版本，排行榜仅统计当前版本。部署时先备份数据库，将服务、新题库与旧题库归档安装到服务目录并重启 `spiral-raid-quiz.service`，再更新网页和 GitHub Pages。变更 Nginx 时先执行 `nginx -t`，通过后才 reload，并检查现有网站和 API 的健康状态。原网站的 Nginx 配置含有 `include /etc/nginx/snippets/spiral-raid-quiz.conf;`，重新生成配置时需保留该行。
 
 本地校验：
 
