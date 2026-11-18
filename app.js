@@ -388,17 +388,15 @@
     const requestId = ++rankingRequest;
     const list=$('ranking-list'); list.replaceChildren(); const loading=document.createElement('p'); loading.className='empty-state'; loading.textContent='正在读取榜单…'; list.append(loading);
     try {
-      const selectedVersion = $('ranking-version').value || 'latest';
-      const query = selectedVersion === 'latest' ? '?view=latest' : '?version=' + encodeURIComponent(selectedVersion);
-      const data=await request('/api/leaderboard' + query);
+      const data=await request('/api/leaderboard?view=latest');
       if (requestId !== rankingRequest) return;
       list.replaceChildren();
       if(!data.entries?.length){loading.textContent='还没有成绩，来做第一个上榜的人。';list.append(loading);return;}
       for(const entry of data.entries){
         const row=document.createElement('div');row.className='ranking-row';
         const number = formatPlayerNumber(entry.playerNumber);
-        const label = [number, versionLabel(entry.quizVersion)].filter(Boolean).join(' · ');
-        row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong><small>${escape(label)}</small></div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
+        const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
+        row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
       }
     } catch(err){
       if(requestId !== rankingRequest) return;
@@ -406,21 +404,6 @@
       list.replaceChildren(loading);
       if(err.unavailable) setConnectionUnavailable(true);
     }
-  }
-  function versionLabel(version) {
-    if (version === bank.version) return '当前题库';
-    const suffix = /-v(\d+)$/.exec(version || '');
-    return suffix ? `旧版题库 v${suffix[1]}` : '旧版题库';
-  }
-  function setupRankingVersions() {
-    const selector = $('ranking-version');
-    const versions = ['latest', bank.version, ...Object.keys(bank.draft_migrations || {}).reverse()];
-    for (const version of versions) {
-      const option = document.createElement('option');
-      option.value = version; option.textContent = version === 'latest' ? '综合榜单' : versionLabel(version); selector.append(option);
-    }
-    selector.value = 'latest';
-    selector.addEventListener('change', refreshRanking);
   }
   function openHistory() {
     if ($('profile-dialog').open) closeProfile();
@@ -443,11 +426,9 @@
       time.textContent = attemptDate.format(entry.submittedAt);
     } else time.textContent = '本机记录';
     const context = document.createElement('small');
-    let kind = versionLabel(entry.quizVersion);
-    if (entry.pending) kind = '待上传';
-    else if (entry.currentVersion) kind = '当前题库';
-    context.textContent = entry.pending && !entry.currentVersion ? '旧版成绩待上传'
-      : `${kind} · 答对 ${entry.correctCount} / ${entry.totalCount} · 用时 ${formatDuration(entry.elapsedSeconds)}`;
+    const kind = entry.currentVersion ? '新题库' : '旧题库';
+    context.textContent = entry.pending && !entry.currentVersion ? `${kind} · 待上传`
+      : `${kind}${entry.pending ? ' · 待上传' : ''} · 答对 ${entry.correctCount} / ${entry.totalCount} · 用时 ${formatDuration(entry.elapsedSeconds)}`;
     const details = document.createElement('div');
     details.append(time, context);
     const score = document.createElement('strong');
@@ -821,7 +802,7 @@
   });
   window.addEventListener('online', () => { if (!$('connection-notice').hidden) void retryConnection(); });
   readGuideHash();
-  $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); setupRankingVersions(); initializeTransfer(); void refreshRanking();
+  $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); initializeTransfer(); void refreshRanking();
   if (profile?.localOnly) setConnectionUnavailable(true);
   if(nextPendingAttempt() && profile) uploadPending();
 })();
