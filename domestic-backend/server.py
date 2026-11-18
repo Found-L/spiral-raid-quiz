@@ -14,7 +14,7 @@ import unicodedata
 from contextlib import closing
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlsplit
+from urllib.parse import parse_qs, urlsplit
 
 ROOT = Path(__file__).resolve().parent
 BANK = json.loads((ROOT / 'questions.json').read_text(encoding='utf-8'))
@@ -66,6 +66,10 @@ def initialize():
                 id TEXT PRIMARY KEY, participant_id TEXT NOT NULL REFERENCES participants(id),
                 quiz_version TEXT NOT NULL, correct_count INTEGER NOT NULL,
                 total_count INTEGER NOT NULL, submitted_at INTEGER NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS attempt_timings (
+                attempt_id TEXT PRIMARY KEY REFERENCES attempts(id) ON DELETE CASCADE,
+                elapsed_seconds INTEGER NOT NULL
             );
             CREATE INDEX IF NOT EXISTS attempts_version_participant ON attempts(quiz_version, participant_id);
             CREATE INDEX IF NOT EXISTS attempts_participant_time ON attempts(participant_id, submitted_at, id);
@@ -155,53 +159,77 @@ def submit(db, body):
     attempt_id = body.get('attemptId')
     if not isinstance(attempt_id, str) or not re.fullmatch(r'[a-f0-9]{32}', attempt_id):
         raise ApiError('成绩编号无效。')
+    elapsed = body.get('elapsedSeconds')
+    if elapsed is not None and (type(elapsed) is not int or not 0 <= elapsed <= 365 * 24 * 3600):
+        raise ApiError('答题用时无效。')
     db.execute('BEGIN IMMEDIATE')
     try:
         authenticated(db, device, secret_hash, '请先保存昵称，或恢复原来的身份。')
-        previous = db.execute('SELECT * FROM attempts WHERE id = ?', (attempt_id,)).fetchone()
+        previous = db.execute('''SELECT a.*, t.elapsed_seconds FROM attempts a
+            LEFT JOIN attempt_timings t ON t.attempt_id = a.id WHERE a.id = ?''', (attempt_id,)).fetchone()
         if previous:
             if (previous['participant_id'] != device or previous['quiz_version'] != submitted_version
                     or previous['correct_count'] != result['correctCount']
-                    or previous['total_count'] != result['totalCount']):
+                    or previous['total_count'] != result['totalCount']
+                    or (previous['elapsed_seconds'] is not None and previous['elapsed_seconds'] != elapsed)):
                 raise ApiError('成绩编号已被使用。', 409)
             now = previous['submitted_at']
+            elapsed = previous['elapsed_seconds']
         else:
             now = int(time.time() * 1000)
             db.execute('INSERT INTO attempts VALUES (?, ?, ?, ?, ?, ?)',
                        (attempt_id, device, submitted_version, result['correctCount'], result['totalCount'], now))
+            if elapsed is not None:
+                db.execute('INSERT INTO attempt_timings VALUES (?, ?)', (attempt_id, elapsed))
         db.execute('COMMIT')
-        return {'ok': True, **result, 'submittedAt': now}
+        return {'ok': True, **result, 'submittedAt': now, 'elapsedSeconds': elapsed}
     except Exception:
         db.execute('ROLLBACK')
         raise
 
 
-def leaderboard(db):
+def version_order(version):
+    match = re.search(r'(\d{4}-\d{2}-\d{2})-v(\d+)$', version)
+    return (match.group(1), int(match.group(2))) if match else ('', 0)
+
+
+def leaderboard(db, requested_version=None, latest=False):
+    selected_version = VERSION if requested_version is None and not latest else requested_version
+    if selected_version is not None and selected_version not in BANKS:
+        raise ApiError('题库版本不存在。')
+    order = sorted((version for version in BANKS if version != VERSION), key=version_order) + [VERSION]
+    priorities = {version: index for index, version in enumerate(order)}
+    db.create_function('quiz_version_rank', 1, lambda version: priorities.get(version, -1), deterministic=True)
     db.execute('BEGIN IMMEDIATE')
     try:
         # Older profiles can have scores but no public number.
         db.execute('''INSERT INTO participant_numbers (participant_id)
                       SELECT DISTINCT p.id FROM participants p JOIN attempts a ON a.participant_id = p.id
-                      WHERE a.quiz_version = ? AND NOT EXISTS
-                      (SELECT 1 FROM participant_numbers n WHERE n.participant_id = p.id)''', (VERSION,))
+                      WHERE NOT EXISTS
+                      (SELECT 1 FROM participant_numbers n WHERE n.participant_id = p.id)''')
         rows = db.execute('''WITH ranked AS (
-                SELECT participant_id, correct_count, total_count, submitted_at,
-                  ROW_NUMBER() OVER (PARTITION BY participant_id
-                    ORDER BY (1.0 * correct_count / total_count) DESC, submitted_at ASC, id ASC) AS rn
-                FROM attempts WHERE quiz_version = ?
-            ) SELECT n.number, p.nickname, r.correct_count, r.total_count, r.submitted_at
+                SELECT a.participant_id, a.quiz_version, a.correct_count, a.total_count, a.submitted_at, t.elapsed_seconds,
+                  ROW_NUMBER() OVER (PARTITION BY a.participant_id
+                    ORDER BY quiz_version_rank(a.quiz_version) DESC, ROUND(10000.0 * a.correct_count / a.total_count) DESC,
+                      (t.elapsed_seconds IS NULL), t.elapsed_seconds ASC, a.submitted_at ASC, a.id ASC) AS rn
+                FROM attempts a LEFT JOIN attempt_timings t ON t.attempt_id = a.id
+                WHERE (? IS NULL OR a.quiz_version = ?)
+            ) SELECT n.number, p.nickname, r.quiz_version, r.correct_count, r.total_count, r.submitted_at, r.elapsed_seconds
               FROM ranked r JOIN participants p ON p.id = r.participant_id
               LEFT JOIN participant_numbers n ON n.participant_id = p.id WHERE r.rn = 1
-              ORDER BY (1.0 * r.correct_count / r.total_count) DESC, r.submitted_at ASC, p.id ASC LIMIT 100''', (VERSION,)).fetchall()
+              ORDER BY ROUND(10000.0 * r.correct_count / r.total_count) DESC,
+                (r.elapsed_seconds IS NULL), r.elapsed_seconds ASC, r.submitted_at ASC, p.id ASC LIMIT 100''',
+                (selected_version, selected_version)).fetchall()
         db.execute('COMMIT')
     except Exception:
         db.execute('ROLLBACK')
         raise
     entries = [{'rank': index + 1, 'playerNumber': row['number'], 'nickname': row['nickname'],
                 'correctCount': row['correct_count'], 'totalCount': row['total_count'],
+                'quizVersion': row['quiz_version'], 'elapsedSeconds': row['elapsed_seconds'],
                 'submittedAt': row['submitted_at'], 'score': score(row['correct_count'], row['total_count'])}
                for index, row in enumerate(rows)]
-    return {'version': VERSION, 'entries': entries}
+    return {'version': selected_version or VERSION, 'view': 'latest' if latest else 'version', 'entries': entries}
 
 
 def history(db, body):
@@ -211,15 +239,16 @@ def history(db, body):
     if cursor is not None and not match:
         raise ApiError('历史记录页码无效。')
     authenticated(db, device, secret_hash, '请保存昵称，或恢复原来的身份后再查看记录。')
-    clause = ' AND (submitted_at, id) < (?, ?)' if match else ''
+    clause = ' AND (a.submitted_at, a.id) < (?, ?)' if match else ''
     params = [device, int(match[1]), match[2]] if match else [device]
-    rows = db.execute('''SELECT id, quiz_version, correct_count, total_count, submitted_at FROM attempts
-                         WHERE participant_id = ?''' + clause + ' ORDER BY submitted_at DESC, id DESC LIMIT 21', params).fetchall()
+    rows = db.execute('''SELECT a.id, a.quiz_version, a.correct_count, a.total_count, a.submitted_at, t.elapsed_seconds
+                         FROM attempts a LEFT JOIN attempt_timings t ON t.attempt_id = a.id
+                         WHERE a.participant_id = ?''' + clause + ' ORDER BY a.submitted_at DESC, a.id DESC LIMIT 21', params).fetchall()
     stats = db.execute('''SELECT COUNT(*) AS count,
                          MAX(CASE WHEN quiz_version = ? THEN 1.0 * correct_count / total_count END) AS best
                          FROM attempts WHERE participant_id = ?''', (VERSION, device)).fetchone()
-    entries = [{'currentVersion': row['quiz_version'] == VERSION, 'correctCount': row['correct_count'],
-                'totalCount': row['total_count'], 'submittedAt': row['submitted_at'],
+    entries = [{'currentVersion': row['quiz_version'] == VERSION, 'quizVersion': row['quiz_version'], 'correctCount': row['correct_count'],
+                'totalCount': row['total_count'], 'submittedAt': row['submitted_at'], 'elapsedSeconds': row['elapsed_seconds'],
                 'score': score(row['correct_count'], row['total_count'])} for row in rows[:20]]
     next_cursor = f"{rows[19]['submitted_at']}.{rows[19]['id']}" if len(rows) > 20 else None
     return {'attemptCount': stats['count'], 'bestScore': None if stats['best'] is None else math.floor(stats['best'] * 10000 + 0.5) / 100,
@@ -269,11 +298,20 @@ class Handler(BaseHTTPRequestHandler):
         self.respond(204)
 
     def do_GET(self):
-        if urlsplit(self.path).path != '/api/leaderboard':
+        url = urlsplit(self.path)
+        if url.path != '/api/leaderboard':
             return self.respond(404, {'error': '页面不存在。'})
         try:
+            requested = parse_qs(url.query, keep_blank_values=True).get('version')
+            view = parse_qs(url.query, keep_blank_values=True).get('view')
+            if requested and len(requested) != 1:
+                raise ApiError('题库版本无效。')
+            if view and (view != ['latest'] or requested):
+                raise ApiError('榜单类型无效。')
             with closing(database()) as db:
-                self.respond(200, leaderboard(db))
+                self.respond(200, leaderboard(db, requested[0] if requested else None, latest=bool(view)))
+        except ApiError as error:
+            self.respond(error.status, {'error': str(error)})
         except Exception:
             logging.exception('Leaderboard request failed')
             self.respond(503, {'error': '排行榜暂时不可用，请稍后重试。'})

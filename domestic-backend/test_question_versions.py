@@ -48,14 +48,19 @@ class QuestionVersionsTest(unittest.TestCase):
             first = server.submit(db, old)
             self.assertEqual(server.submit(db, old), first)
             self.assertEqual(server.leaderboard(db)['entries'], [])
+            self.assertEqual(server.leaderboard(db, OLD_VERSION)['entries'][0]['score'], 100)
             self.assertFalse(server.history(db, identity)['entries'][0]['currentVersion'])
+            self.assertEqual(server.history(db, identity)['entries'][0]['quizVersion'], OLD_VERSION)
             server.submit(db, new)
             self.assertEqual(len(server.leaderboard(db)['entries']), 1)
+            self.assertEqual(len(server.leaderboard(db, OLD_VERSION)['entries']), 1)
             history = server.history(db, identity)
             self.assertEqual(history['attemptCount'], 2)
             self.assertEqual(sorted(entry['currentVersion'] for entry in history['entries']), [False, True])
             with self.assertRaises(server.ApiError):
                 server.submit(db, {**new, 'attemptId': old['attemptId']})
+            with self.assertRaises(server.ApiError):
+                server.leaderboard(db, 'unrecognised')
 
     def test_migration_clears_every_changed_question_only(self):
         current = {q['id']: q for q in server.BANK['questions']}
@@ -90,6 +95,15 @@ class QuestionVersionsTest(unittest.TestCase):
             self.assertEqual(sorted(entry['currentVersion'] for entry in history['entries']), [False, True])
             with urllib.request.urlopen(base + '/api/leaderboard', timeout=5) as response:
                 self.assertEqual(json.load(response)['entries'][0]['score'], 100)
+            with urllib.request.urlopen(base + '/api/leaderboard?version=' + OLD_VERSION, timeout=5) as response:
+                old_board = json.load(response)
+                self.assertEqual(old_board['version'], OLD_VERSION)
+                self.assertEqual(old_board['entries'][0]['score'], 100)
+            with urllib.request.urlopen(base + '/api/leaderboard?view=latest', timeout=5) as response:
+                combined = json.load(response)
+                self.assertEqual(combined['view'], 'latest')
+                self.assertEqual(combined['entries'][0]['quizVersion'], server.VERSION)
+                self.assertIsNone(combined['entries'][0]['elapsedSeconds'])
         finally:
             httpd.shutdown()
             httpd.server_close()
