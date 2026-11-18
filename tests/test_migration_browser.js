@@ -2,17 +2,15 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const vm = require('node:vm');
-const { webcrypto } = require('node:crypto');
 
 const root = path.resolve(__dirname, '..');
 const bank = JSON.parse(fs.readFileSync(path.join(root, 'questions.json'), 'utf8'));
-const old = JSON.parse(fs.readFileSync(path.join(root, 'domestic-backend/banks/peak-spiral-2026-11-18-v3.json'), 'utf8'));
+const old = JSON.parse(fs.readFileSync(path.join(root, 'domestic-backend/banks/peak-spiral-2026-11-18-v4.json'), 'utf8'));
 const key = 'spiral-temple-quiz-v1';
 const storage = new Map([
   [key + ':identity', JSON.stringify({deviceId:'a'.repeat(32), secret:'b'.repeat(64)})],
   [key + ':profile', JSON.stringify({nickname:'测试', playerNumber:7})],
-  [key + ':draft', JSON.stringify({version:old.version, index:10, answers:{q001:['a'], q011:['b'], q038:['a']}})],
+  [key + ':draft', JSON.stringify({version:old.version, index:17, answers:{q001:['a'], q018:['b'], q045:['a']}})],
   [key + ':pending', JSON.stringify([{attemptId:'c'.repeat(32), version:old.version,
     answers:Object.fromEntries(old.questions.map(q => [q.id, q.answer])), localSubmittedAt:1234}])],
 ]);
@@ -32,16 +30,15 @@ function getElement(id) {
 }
 getElement('question-bank').textContent = JSON.stringify(bank);
 const submissions = [];
-const context = {
-  console, crypto:webcrypto, Intl, URLSearchParams, AbortController, setTimeout, clearTimeout,
-  location:{hostname:'example.com', search:'', hash:'', pathname:'/'},
-  localStorage:{getItem:k=>storage.get(k) || null, setItem:(k,v)=>storage.set(k,v), removeItem:k=>storage.delete(k)},
-  document:{getElementById:getElement, createElement:element, querySelector:element,
-    addEventListener:(name, fn)=>{listeners[name]=fn;}},
-  window:{history:{replaceState(){}}, scrollTo(){}, addEventListener(){}},
-  navigator:{}, QUESTION_DIAGRAMS:{}, drawRaidDiagram(){return '';},
-  requestAnimationFrame(fn){fn();},
-  fetch:async (url, options) => {
+global.location = {hostname:'example.com', search:'', hash:'', pathname:'/'};
+global.localStorage = {getItem:k=>storage.get(k) || null, setItem:(k,v)=>storage.set(k,v), removeItem:k=>storage.delete(k)};
+global.document = {getElementById:getElement, createElement:element, querySelector:element,
+  addEventListener:(name, fn)=>{listeners[name]=fn;}};
+global.window = {history:{replaceState(){}}, scrollTo(){}, addEventListener(){}};
+global.QUESTION_DIAGRAMS = {};
+global.drawRaidDiagram = () => '';
+global.requestAnimationFrame = fn => fn();
+global.fetch = async (url, options) => {
     let payload = {entries:[]};
     if (url.endsWith('/api/profile')) payload = {nickname:'测试', playerNumber:7};
     if (url.endsWith('/api/submit')) {
@@ -50,9 +47,8 @@ const context = {
       payload = {correctCount:old.questions.length, totalCount:old.questions.length, score:100};
     }
     return {ok:true, status:200, json:async()=>payload};
-  },
 };
-vm.runInNewContext(fs.readFileSync(path.join(root, 'app.js'), 'utf8'), context);
+require('../app.js');
 
 (async () => {
   await new Promise(resolve => setTimeout(resolve, 20));

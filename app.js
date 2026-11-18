@@ -348,8 +348,11 @@
       time.textContent = attemptDate.format(entry.submittedAt);
     } else time.textContent = '本机记录';
     const context = document.createElement('small');
+    let kind = '旧版题库';
+    if (entry.pending) kind = '待上传';
+    else if (entry.currentVersion) kind = '当前题库';
     context.textContent = entry.pending && !entry.currentVersion ? '旧版成绩待上传'
-      : `${entry.pending ? '待上传' : entry.currentVersion ? '当前题库' : '旧版题库'} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
+      : `${kind} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
     const details = document.createElement('div');
     details.append(time, context);
     const score = document.createElement('strong');

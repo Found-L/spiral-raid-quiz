@@ -44,7 +44,8 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 @media(max-width:680px){.topbar{height:68px;padding:0 18px}.brand-mark{width:34px;height:34px;font-size:16px}.brand strong{font-size:13px}.brand small{font-size:9px}.nav-links{display:none}.profile-trigger{margin-left:auto;padding:6px 8px;font-size:11px}.profile-trigger>span:last-child{display:none}.hero{display:flex;flex-direction:column;align-items:start;min-height:0;padding:65px 22px 38px}.hero h1{font-size:38px}.hero-description{font-size:13px}.desktop-only{display:none}.hero-art{align-self:center;margin:10px 0 -10px;width:min(90%,390px)}.hero-index{right:24px;bottom:18px}.overview{grid-template-columns:repeat(2,1fr);row-gap:22px;padding:26px 22px}.overview>div{padding:0 0 0 18px}.overview>div:nth-child(3){border:0;padding-left:0}.overview strong{font-size:24px}.section{padding:70px 22px}.section-heading{display:block}.section-heading>p{margin-top:14px}.guide-grid{grid-template-columns:1fr;gap:14px}.guide-card{padding:22px 22px 0}.guide-card h3{font-size:22px}.diagram{max-height:180px}.how-section{grid-template-columns:1fr;gap:35px}.sources-section{grid-template-columns:1fr;gap:25px}.leaderboard-header,.ranking-row{grid-template-columns:minmax(0,1fr) 62px 66px;padding:15px 13px;gap:8px}.ranking-score{font-size:17px}.rank-number{width:20px}.ranking-player{gap:8px}footer{padding:24px 22px;display:block}footer p{margin:8px 0}footer>span{display:none}.exam-top{padding:20px;flex-wrap:wrap}.exam-meta{order:3;width:100%;justify-content:space-between}.exam-layout{display:block;padding:28px 18px 70px}.exam-sidebar h2{font-size:18px}.exam-sidebar .eyebrow{margin-bottom:9px}.progress-number{margin:10px 0 6px}.progress-number strong{font-size:30px}.section-list{display:flex;gap:8px;margin:15px 0}.section-button{border:1px solid var(--line);padding:9px;font-size:11px;display:block}.section-button span{display:block}.sidebar-submit{margin-bottom:25px}.question-card{padding:25px 18px}.question-card h2{font-size:20px}.question-bar{margin-bottom:12px}.option{padding:12px}.result-view{padding:50px 20px 70px}.score-display strong{font-size:64px}.review-head{align-items:start}.review-card{padding:16px}.nav-number{min-height:34px}.profile-trigger #header-profile{max-width:110px;overflow:hidden;text-overflow:ellipsis}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
 .question-label{flex-wrap:wrap}.question-label a{padding:4px 9px;border:1px solid #414d4a;color:#a6b9af;font-size:10px}.question-label a:hover,.review-meta a:hover{color:#f4cf8e;text-decoration:underline}
-.draft-update-notice { margin: 1.5rem 0 0; padding: .9rem 1.1rem; color: #eed29f; background: #382c1d; border: 1px solid #856b46; line-height: 1.6; }
+.draft-update-notice { display: block; margin: 1.5rem 0 0; padding: .9rem 1.1rem; color: #eed29f; background: #382c1d; border: 1px solid #856b46; line-height: 1.6; }
+.draft-update-notice[hidden] { display: none; }
 
 .guide-view,
 .history-view {
@@ -266,7 +267,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 
       <section id="exam-view" class="exam-view hidden" aria-label="机制考核">
         <div class="exam-top"><button class="back-button" type="button" data-action="leave-exam">← 返回首页</button><div class="exam-meta"><span>螺旋寺院 · 机制考核</span><strong id="exam-profile"></strong></div><button class="link-button" type="button" data-action="profile">修改资料</button></div>
-        <p id="draft-update-notice" class="draft-update-notice" role="status" hidden></p>
+        <output id="draft-update-notice" class="draft-update-notice" hidden></output>
         <div class="exam-layout"><aside class="exam-sidebar"><p class="eyebrow">YOUR PROGRESS</p><h2>考核进度</h2><div class="progress-number"><strong id="answered-count">0</strong><span id="total-count"></span></div><div class="progress-track"><div id="progress-fill"></div></div><p class="muted small">答案自动保存在当前浏览器。</p><div id="section-list" class="section-list"></div><button class="btn btn-secondary sidebar-submit" type="button" data-action="submit">交卷并查看成绩</button></aside>
           <div class="question-area"><div class="question-bar"><span id="question-chapter">01 / 双剑</span><span id="question-number"></span></div><div class="question-card"><div class="question-label"><span id="question-type">单选题</span><span id="question-role">岗位</span></div><h2 id="question-text"></h2><p id="question-help" class="question-help"></p><div id="question-diagram" hidden></div><div id="question-options" class="options"></div><div class="question-controls"><button class="btn btn-ghost" type="button" data-action="previous">← 上一题</button><button id="next-button" class="btn btn-primary" type="button" data-action="next">下一题 →</button></div></div><div class="navigator-title"><span>题目导航</span><span class="muted small">选择数字可快速跳题</span></div><div id="question-nav" class="question-nav" aria-label="题目导航"></div></div>
         </div>
@@ -280,7 +281,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭">×</button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码是以前备份的完整代码，第一次使用只需填写上方昵称。身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="profile-history" class="link-button" type="button" data-action="open-history" hidden>我的答题记录 →</button><br><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script id="question-bank" type="application/json">{
-  "version": "peak-spiral-2026-11-18-v4",
+  "version": "peak-spiral-2026-11-18-v5",
   "title": "剑灵巅峰服螺旋寺院机制考核",
   "draft_migrations": {
     "peak-spiral-2026-11-18-v2": [
@@ -384,12 +385,17 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "q038",
       "q039",
       "q040",
+      "q045",
       "q049",
       "q057",
       "q058",
       "q072",
       "q082",
       "q086"
+    ],
+    "peak-spiral-2026-11-18-v4": [
+      "q018",
+      "q045"
     ]
   },
   "questions": [
@@ -891,29 +897,29 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "section": "twins",
       "role": "全员",
       "type": "single",
-      "question": "双剑球花阶段，持有球体状态的玩家误踩与自身状态异色的花点，可能出现什么问题？",
+      "question": "双剑球花阶段，持有球体状态的玩家误踩与自身状态异色的花点，会有什么影响？",
       "options": [
         {
           "id": "a",
-          "text": "自动获得三层同色状态"
+          "text": "自己的球体状态必定被清除"
         },
         {
           "id": "b",
-          "text": "自己的状态被清除，打乱后续分工"
+          "text": "可能受到伤害，原有球体状态不会仅因踩到异色花点被清除"
         },
         {
           "id": "c",
-          "text": "不产生任何影响"
+          "text": "完全不会受到伤害"
         },
         {
           "id": "d",
-          "text": "必定增加主 T 仇恨"
+          "text": "自动获得三层同色状态"
         }
       ],
       "answer": [
         "b"
       ],
-      "explanation": "持有异色状态的人员不要站在该花点上输出，以免状态被清除。"
+      "explanation": "误踩异色花点会受到伤害，不应将其直接判定为球体状态被清除。负责踩花的玩家应处理同色花点。"
     },
     {
       "id": "q019",
@@ -1668,29 +1674,29 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "section": "spirit",
       "role": "主 T",
       "type": "single",
-      "question": "超魔灵通常在首领血量约到哪几段时进入染灯流程？",
+      "question": "超魔灵约 90% 血量进入染灯阶段后，主 T 应如何处理染灯？",
       "options": [
         {
           "id": "a",
-          "text": "约 90%、60%、30%"
+          "text": "按机制持续引导染灯，直到后期染灯阶段结束"
         },
         {
           "id": "b",
-          "text": "只有 50% 一次"
+          "text": "第一次染完后整场不再关注灯"
         },
         {
           "id": "c",
-          "text": "约 71%、41%、10%"
+          "text": "只在 60% 和 30% 分别重新进入染灯"
         },
         {
           "id": "d",
-          "text": "只有开场一次"
+          "text": "染灯期间让所有人站在主 T 的引导路线上"
         }
       ],
       "answer": [
         "a"
       ],
-      "explanation": "染灯阶段通常按约 90%、60%、30% 的血量准备，高输出团队的实际节奏可能不同。"
+      "explanation": "约 90% 进入染灯阶段后，要按机制持续处理灯；不能把 60% 和 30% 当成新的必然触发点。"
     },
     {
       "id": "q046",
@@ -2930,7 +2936,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         timing: '球花出现至第四刀', title: '踩花、捡治疗珠、保主 T', diagram: 'twins-heal',
         caption: '图按实际处理顺序展开。点位由团队提前标记，两侧独立执行。',
         roles: [
-          ['踩花位', '三层同色状态就绪后处理分配到的同色花点。没有对应状态的队员避开点位，以免清掉自己的状态。'],
+          ['踩花位', '三层同色状态就绪后处理分配到的同色花点。误踩异色花点可能受到伤害，注意站位。'],
           ['治疗位', '花点处理后拾取治疗珠，绿色治疗指示对准本侧主 T。前两刀用小加稳血，第三、第四刀提前安排大加，末刀尤其要留够治疗。'],
           ['主 T', '留意自己的血量和治疗朝向。花点与治疗珠的位置出现变化时，和治疗位沟通，给队友留下瞄准与读条时间。'],
         ],
@@ -2972,14 +2978,14 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         check: '开控前报“谁进、谁留”。不要把所有队员的面向统一成同一个方向。',
       },
       {
-        timing: '约 90%、60%、30% 血量', title: '主 T 引导攻击给六盏灯染色', diagram: 'spirit-lamps',
+        timing: '约 90% 后，持续至染灯阶段结束', title: '主 T 引导攻击给六盏灯染色', diagram: 'spirit-lamps',
         caption: '六盏灯是机制目标。图中的路线表示一轮引导的方向示意，实际起点和次序按团队标记。',
         roles: [
-          ['主 T', '接近血量门槛时提前报染灯起点。引导首领攻击覆盖灯位，逐一检查灯的状态，确认六盏都处理完成。'],
+          ['主 T', '约 90% 进入染灯阶段后，按机制持续引导首领攻击覆盖灯位。提前报路线，逐一检查灯的状态，确认各轮处理完成。'],
           ['外场输出', '站在团队约定侧，躲惩罚圈和染灯攻击。不用位移技能穿过主 T 与待染灯之间的线路。'],
           ['隔离内', '染灯时仍要躲斩击、波动炸弹和地面风扇状区域。优先走安全区，再继续输出。'],
         ],
-        check: '血量是预警。到门槛附近先找六个灯位与主 T 的面向，准备好后按实际动作走。',
+        check: '进入阶段后留意六个灯位与主 T 的面向，持续处理至后期染灯结束；不要把 60% 和 30% 当作新的必然触发点。',
       },
       {
         timing: '出隔离后约 30 秒', title: '用两组轮换避开后遗症', diagram: 'spirit-rotation',
@@ -3515,8 +3521,11 @@ function drawRaidDiagram(key, caption, questionId = null) {
       time.textContent = attemptDate.format(entry.submittedAt);
     } else time.textContent = '本机记录';
     const context = document.createElement('small');
+    let kind = '旧版题库';
+    if (entry.pending) kind = '待上传';
+    else if (entry.currentVersion) kind = '当前题库';
     context.textContent = entry.pending && !entry.currentVersion ? '旧版成绩待上传'
-      : `${entry.pending ? '待上传' : entry.currentVersion ? '当前题库' : '旧版题库'} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
+      : `${kind} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
     const details = document.createElement('div');
     details.append(time, context);
     const score = document.createElement('strong');
