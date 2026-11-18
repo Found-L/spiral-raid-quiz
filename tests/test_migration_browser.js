@@ -35,6 +35,8 @@ global.localStorage = {getItem:k=>storage.get(k) || null, setItem:(k,v)=>storage
 global.document = {getElementById:getElement, createElement:element, querySelector:element,
   addEventListener:(name, fn)=>{listeners[name]=fn;}};
 global.window = {history:{replaceState(){}}, scrollTo(){}, addEventListener(){}};
+global.setInterval = () => 1;
+global.clearInterval = () => {};
 global.QUESTION_DIAGRAMS = {};
 global.drawRaidDiagram = () => '';
 global.requestAnimationFrame = fn => fn();
