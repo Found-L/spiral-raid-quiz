@@ -44,6 +44,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 @media(max-width:680px){.topbar{height:68px;padding:0 18px}.brand-mark{width:34px;height:34px;font-size:16px}.brand strong{font-size:13px}.brand small{font-size:9px}.nav-links{display:none}.profile-trigger{margin-left:auto;padding:6px 8px;font-size:11px}.profile-trigger>span:last-child{display:none}.hero{display:flex;flex-direction:column;align-items:start;min-height:0;padding:65px 22px 38px}.hero h1{font-size:38px}.hero-description{font-size:13px}.desktop-only{display:none}.hero-art{align-self:center;margin:10px 0 -10px;width:min(90%,390px)}.hero-index{right:24px;bottom:18px}.overview{grid-template-columns:repeat(2,1fr);row-gap:22px;padding:26px 22px}.overview>div{padding:0 0 0 18px}.overview>div:nth-child(3){border:0;padding-left:0}.overview strong{font-size:24px}.section{padding:70px 22px}.section-heading{display:block}.section-heading>p{margin-top:14px}.guide-grid{grid-template-columns:1fr;gap:14px}.guide-card{padding:22px 22px 0}.guide-card h3{font-size:22px}.diagram{max-height:180px}.how-section{grid-template-columns:1fr;gap:35px}.sources-section{grid-template-columns:1fr;gap:25px}.leaderboard-header,.ranking-row{grid-template-columns:minmax(0,1fr) 62px 66px;padding:15px 13px;gap:8px}.ranking-score{font-size:17px}.rank-number{width:20px}.ranking-player{gap:8px}footer{padding:24px 22px;display:block}footer p{margin:8px 0}footer>span{display:none}.exam-top{padding:20px;flex-wrap:wrap}.exam-meta{order:3;width:100%;justify-content:space-between}.exam-layout{display:block;padding:28px 18px 70px}.exam-sidebar h2{font-size:18px}.exam-sidebar .eyebrow{margin-bottom:9px}.progress-number{margin:10px 0 6px}.progress-number strong{font-size:30px}.section-list{display:flex;gap:8px;margin:15px 0}.section-button{border:1px solid var(--line);padding:9px;font-size:11px;display:block}.section-button span{display:block}.sidebar-submit{margin-bottom:25px}.question-card{padding:25px 18px}.question-card h2{font-size:20px}.question-bar{margin-bottom:12px}.option{padding:12px}.result-view{padding:50px 20px 70px}.score-display strong{font-size:64px}.review-head{align-items:start}.review-card{padding:16px}.nav-number{min-height:34px}.profile-trigger #header-profile{max-width:110px;overflow:hidden;text-overflow:ellipsis}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
 .question-label{flex-wrap:wrap}.question-label a{padding:4px 9px;border:1px solid #414d4a;color:#a6b9af;font-size:10px}.question-label a:hover,.review-meta a:hover{color:#f4cf8e;text-decoration:underline}
+.draft-update-notice { margin: 1.5rem 0 0; padding: .9rem 1.1rem; color: #eed29f; background: #382c1d; border: 1px solid #856b46; line-height: 1.6; }
 
 .guide-view,
 .history-view {
@@ -232,7 +233,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         <section class="section how-section"><div class="how-copy"><p class="eyebrow">HOW IT WORKS <span class="slash">/</span> 考核方式</p><h2>练的是判断，<br>也是配合。</h2><p>单选、多选、判断和选择式填空。每题等权，多选需要全部选对。完成后立即查看分数与每题解析。</p><button class="text-action" type="button" data-action="start">进入考核 <span>→</span></button></div>
           <div class="steps"><div><span>01</span><div><strong>填写昵称</strong><p>输入你的昵称，无需注册。</p></div></div><div><span>02</span><div><strong>完成考题</strong><p>可分段答题，进度保存在当前浏览器。</p></div></div><div><span>03</span><div><strong>查看解析与排名</strong><p>排行榜保留每位玩家的最高成绩。</p></div></div></div>
         </section>
-        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button" type="button" data-action="refresh-ranking">刷新榜单 ↻</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>正确题数</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div><p class="muted ranking-foot">同名玩家以榜单编号区分。同分按首次达到该成绩的时间排序。</p></section>
+        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button" type="button" data-action="refresh-ranking">刷新榜单 ↻</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>正确题数</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div><p class="muted ranking-foot">榜单仅显示当前题库的最高成绩，旧版成绩可在“我的答题记录”查看。同名玩家以榜单编号区分，同分按首次达到该成绩的时间排序。</p></section>
         <section class="section sources-section"><div><p class="eyebrow">BEFORE YOU START <span class="slash">/</span> 资料说明</p><h2>版本与资料</h2></div><div><p>题库根据巅峰服螺旋寺院上线后的实战资料和提供的魔女试卷整理。</p><p>团队站位、控制顺序和人员分配可按配置调整，实际操作请结合当前版本和团长安排。</p><div class="source-links"><a href="https://www.bilibili.com/video/BV15uny6qENV/" target="_blank" rel="noopener noreferrer">双剑教学 · 10 月 22 日 ↗</a><a href="https://www.bilibili.com/video/BV1d9n265EyM/" target="_blank" rel="noopener noreferrer">双剑换边补充 ↗</a><a href="https://www.bilibili.com/video/BV1rFWY6REex/" target="_blank" rel="noopener noreferrer">超魔灵教学 · 11 月 13 日 ↗</a><a href="https://www.bilibili.com/video/BV1rQHP6zE56/" target="_blank" rel="noopener noreferrer">超魔灵机制补充 ↗</a><a href="https://www.bilibili.com/video/BV1Gh4x6wEAt/" target="_blank" rel="noopener noreferrer">魔女教学 · 11 月 8 日 ↗</a><a href="https://www.bilibili.com/video/BV1o1x36hEC6/" target="_blank" rel="noopener noreferrer">魔女主 T 实战 ↗</a></div></div></section>
       </div>
 
@@ -265,6 +266,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 
       <section id="exam-view" class="exam-view hidden" aria-label="机制考核">
         <div class="exam-top"><button class="back-button" type="button" data-action="leave-exam">← 返回首页</button><div class="exam-meta"><span>螺旋寺院 · 机制考核</span><strong id="exam-profile"></strong></div><button class="link-button" type="button" data-action="profile">修改资料</button></div>
+        <p id="draft-update-notice" class="draft-update-notice" role="status" hidden></p>
         <div class="exam-layout"><aside class="exam-sidebar"><p class="eyebrow">YOUR PROGRESS</p><h2>考核进度</h2><div class="progress-number"><strong id="answered-count">0</strong><span id="total-count"></span></div><div class="progress-track"><div id="progress-fill"></div></div><p class="muted small">答案自动保存在当前浏览器。</p><div id="section-list" class="section-list"></div><button class="btn btn-secondary sidebar-submit" type="button" data-action="submit">交卷并查看成绩</button></aside>
           <div class="question-area"><div class="question-bar"><span id="question-chapter">01 / 双剑</span><span id="question-number"></span></div><div class="question-card"><div class="question-label"><span id="question-type">单选题</span><span id="question-role">岗位</span></div><h2 id="question-text"></h2><p id="question-help" class="question-help"></p><div id="question-diagram" hidden></div><div id="question-options" class="options"></div><div class="question-controls"><button class="btn btn-ghost" type="button" data-action="previous">← 上一题</button><button id="next-button" class="btn btn-primary" type="button" data-action="next">下一题 →</button></div></div><div class="navigator-title"><span>题目导航</span><span class="muted small">选择数字可快速跳题</span></div><div id="question-nav" class="question-nav" aria-label="题目导航"></div></div>
         </div>
@@ -278,8 +280,118 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭">×</button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码是以前备份的完整代码，第一次使用只需填写上方昵称。身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="profile-history" class="link-button" type="button" data-action="open-history" hidden>我的答题记录 →</button><br><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script id="question-bank" type="application/json">{
-  "version": "peak-spiral-2026-11-18-v3",
+  "version": "peak-spiral-2026-11-18-v4",
   "title": "剑灵巅峰服螺旋寺院机制考核",
+  "draft_migrations": {
+    "peak-spiral-2026-11-18-v2": [
+      "q001",
+      "q002",
+      "q003",
+      "q004",
+      "q005",
+      "q006",
+      "q007",
+      "q008",
+      "q009",
+      "q010",
+      "q011",
+      "q012",
+      "q013",
+      "q014",
+      "q015",
+      "q016",
+      "q017",
+      "q018",
+      "q019",
+      "q020",
+      "q021",
+      "q022",
+      "q023",
+      "q024",
+      "q025",
+      "q026",
+      "q027",
+      "q028",
+      "q029",
+      "q030",
+      "q031",
+      "q032",
+      "q033",
+      "q034",
+      "q035",
+      "q036",
+      "q037",
+      "q038",
+      "q039",
+      "q040",
+      "q041",
+      "q042",
+      "q043",
+      "q044",
+      "q045",
+      "q046",
+      "q047",
+      "q048",
+      "q049",
+      "q050",
+      "q051",
+      "q052",
+      "q053",
+      "q054",
+      "q055",
+      "q056",
+      "q057",
+      "q058",
+      "q059",
+      "q060",
+      "q061",
+      "q062",
+      "q063",
+      "q064",
+      "q065",
+      "q066",
+      "q067",
+      "q068",
+      "q069",
+      "q070",
+      "q071",
+      "q072",
+      "q073",
+      "q074",
+      "q075",
+      "q076",
+      "q077",
+      "q078",
+      "q079",
+      "q080",
+      "q081",
+      "q082",
+      "q083",
+      "q084",
+      "q085",
+      "q086",
+      "q087"
+    ],
+    "peak-spiral-2026-11-18-v3": [
+      "q009",
+      "q010",
+      "q011",
+      "q012",
+      "q013",
+      "q018",
+      "q019",
+      "q022",
+      "q038",
+      "q039",
+      "q040",
+      "q049",
+      "q057",
+      "q058",
+      "q072",
+      "q082",
+      "q086"
+    ]
+  },
   "questions": [
     {
       "id": "q001",
@@ -540,14 +652,14 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "answer": [
         "b"
       ],
-      "explanation": "两人共同分球时各得到一层，站位仍要避免蹭到异色球。"
+      "explanation": "两人共同分挡时通常各分到一层。误分异色球可能改变原有状态，应留意站位。"
     },
     {
       "id": "q010",
       "section": "twins",
       "role": "挡球位",
       "type": "single",
-      "question": "角色已有三层冰球状态时，误碰火球有什么风险？",
+      "question": "双剑挡球阶段，已有三层冰状态的玩家误挡火球或参与火球分挡，有什么风险？",
       "options": [
         {
           "id": "a",
@@ -569,43 +681,43 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "answer": [
         "b"
       ],
-      "explanation": "角色已有三层状态时误碰异色球可能直接死亡，应注意颜色和站位。"
+      "explanation": "三层状态时误挡或误分异色球可能直接死亡，非本轮挡球人员应避开球路和分挡范围。"
     },
     {
       "id": "q011",
       "section": "twins",
-      "role": "加血位",
+      "role": "全员",
       "type": "single",
-      "question": "双剑挡球阶段，角色已有两层火状态时，误碰冰球可能发生什么？",
+      "question": "双剑挡球阶段，已有两层火状态的玩家碰到飞行中的冰球，但没有挡球或分球，应如何判断？",
       "options": [
         {
           "id": "a",
-          "text": "原火状态永久锁定"
+          "text": "必定获得三层火状态"
         },
         {
           "id": "b",
-          "text": "首领立即被击败"
+          "text": "必定直接死亡"
         },
         {
           "id": "c",
-          "text": "自动成为三层火"
+          "text": "必定变成一层冰状态"
         },
         {
           "id": "d",
-          "text": "状态变成一层冰，需要马上报告并按团队安排处理"
+          "text": "可能受伤或受到冰冻等控制，不能仅凭碰球就认定已换色"
         }
       ],
       "answer": [
         "d"
       ],
-      "explanation": "低层状态时误碰另一种颜色会改变状态，影响后续分工。"
+      "explanation": "飞行球碰撞与挡球、分球是不同情形。碰球可能受伤或受控；挡球、分球获得状态才可能改变颜色，应检查自己的状态。"
     },
     {
       "id": "q012",
       "section": "twins",
       "role": "踩点位",
       "type": "single",
-      "question": "双剑进入球花机制后，同色位应如何处理对应的地面点？",
+      "question": "双剑球花阶段，承担踩花任务且已有三层同色状态的玩家，应如何处理对应花点？",
       "options": [
         {
           "id": "a",
@@ -627,14 +739,14 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "answer": [
         "c"
       ],
-      "explanation": "按状态颜色处理对应地面点：火状态踩火点，冰状态踩冰点。"
+      "explanation": "踩花位准备三层同色状态，按颜色处理花点：火状态踩火点，冰状态踩冰点。"
     },
     {
       "id": "q013",
       "section": "twins",
       "role": "加血位",
       "type": "single",
-      "question": "双剑球花机制中，同色位处理地面点后，治疗位接下来应做什么？",
+      "question": "双剑球花阶段，已有三层异色状态的治疗位，等待同色位处理花点后应做什么？",
       "options": [
         {
           "id": "a",
@@ -656,7 +768,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "answer": [
         "a"
       ],
-      "explanation": "同色点处理后拾取出现的治疗珠，再为本侧主 T 加血。"
+      "explanation": "治疗位提前准备三层异色状态，在花点处理后拾取治疗珠，再为本侧主 T 加血。"
     },
     {
       "id": "q014",
@@ -779,7 +891,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "section": "twins",
       "role": "全员",
       "type": "single",
-      "question": "双剑球花阶段，没有对应同色状态的人踩到机制点，可能出现什么问题？",
+      "question": "双剑球花阶段，持有球体状态的玩家误踩与自身状态异色的花点，可能出现什么问题？",
       "options": [
         {
           "id": "a",
@@ -801,7 +913,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "answer": [
         "b"
       ],
-      "explanation": "没有对应同色状态的人员不要站在该点上输出，以免状态被清除。"
+      "explanation": "持有异色状态的人员不要站在该花点上输出，以免状态被清除。"
     },
     {
       "id": "q019",
@@ -824,7 +936,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         },
         {
           "id": "d",
-          "text": "状态层数与误蹭异色球的风险"
+          "text": "状态层数与误挡、误分异色球的风险"
         },
         {
           "id": "e",
@@ -836,7 +948,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         "d",
         "e"
       ],
-      "explanation": "开怪前应确认两侧主 T 距离、同色球分工，以及三层后误碰异色球的风险。"
+      "explanation": "开怪前应确认两侧主 T 距离和挡球分工；三层后误挡或误分异色球有死亡风险。"
     },
     {
       "id": "q020",
@@ -899,7 +1011,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "section": "twins",
       "role": "挡球位",
       "type": "judge",
-      "question": "已有三层冰状态时，再误碰火球仍然安全，可以忽略颜色。",
+      "question": "已有三层冰状态时，误挡火球或参与火球分挡仍然安全，可以忽略颜色。",
       "options": [
         {
           "id": "a",
@@ -913,7 +1025,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "answer": [
         "b"
       ],
-      "explanation": "三层状态时误碰异色球可能直接死亡，不能忽略颜色。"
+      "explanation": "三层状态时误挡或误分异色球可能直接死亡，不能忽略颜色。"
     },
     {
       "id": "q023",
@@ -1357,7 +1469,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "options": [
         {
           "id": "a",
-          "text": "伤害和暴击伤害降低的报应状态"
+          "text": "获得报应状态，攻击力降低 800"
         },
         {
           "id": "b",
@@ -1375,14 +1487,14 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "answer": [
         "a"
       ],
-      "explanation": "未带业火进入隔离会获得报应状态，降低伤害和暴击伤害。"
+      "explanation": "未带业火进入隔离可能获得报应状态，攻击力降低 800。"
     },
     {
       "id": "q039",
       "section": "spirit",
       "role": "隔离位",
       "type": "single",
-      "question": "超魔灵隔离阶段，离开隔离后的隔离抵抗状态约持续多久？",
+      "question": "超魔灵隔离阶段，离开隔离后的后遗症状态约持续多久？",
       "options": [
         {
           "id": "a",
@@ -1404,14 +1516,14 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "answer": [
         "c"
       ],
-      "explanation": "隔离抵抗期间无法再次进入，应提前安排人员轮换。"
+      "explanation": "后遗症持续期间再次进入隔离有死亡风险，应提前安排人员轮换。"
     },
     {
       "id": "q040",
       "section": "spirit",
       "role": "隔离指挥",
       "type": "single",
-      "question": "超魔灵隔离阶段，队员离开后会有隔离抵抗，应如何安排业火人员？",
+      "question": "超魔灵隔离阶段，队员离开后会有后遗症，应如何安排业火人员？",
       "options": [
         {
           "id": "a",
@@ -1433,7 +1545,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "answer": [
         "a"
       ],
-      "explanation": "准备两组业火人员交替进入，避开离开后的隔离抵抗时间。"
+      "explanation": "准备两组业火人员交替进入，避开离开后的后遗症时间。"
     },
     {
       "id": "q041",
@@ -1676,7 +1788,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "options": [
         {
           "id": "a",
-          "text": "离开后留意隔离抵抗并轮换"
+          "text": "离开后留意后遗症并轮换"
         },
         {
           "id": "b",
@@ -1692,7 +1804,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         },
         {
           "id": "e",
-          "text": "隔离抵抗期间可无限立即重复进入"
+          "text": "后遗症期间可无限立即重复进入"
         }
       ],
       "answer": [
@@ -1700,7 +1812,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         "c",
         "d"
       ],
-      "explanation": "业火处理需要连续关注点名、倒计时、面向和隔离轮换。"
+      "explanation": "业火处理需要连续关注点名、倒计时、面向和离开后的后遗症。"
     },
     {
       "id": "q050",
@@ -1900,58 +2012,58 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "section": "witch",
       "role": "主 T",
       "type": "single",
-      "question": "黑风魔女说出“你还是避开为好”时，主 T 应准备应对哪种冲锋？",
+      "question": "黑风魔女击倒后准备向前冲锋，主 T 应重点观察什么？",
       "options": [
         {
           "id": "a",
-          "text": "停止所有攻击"
+          "text": "等待危险线自动消失"
         },
         {
           "id": "b",
-          "text": "向后冲锋"
+          "text": "只看自己的输出数字"
         },
         {
           "id": "c",
-          "text": "向前冲锋"
+          "text": "首领面向、冲锋落点与不祥气息的位置"
         },
         {
           "id": "d",
-          "text": "直接落地"
+          "text": "只看队友的治疗珠"
         }
       ],
       "answer": [
         "c"
       ],
-      "explanation": "这句台词对应向前冲锋；主 T 也应结合首领动作判断。"
+      "explanation": "判断前冲落点并避开不祥气息，冲锋结束后还要把扇形扫描带向空地。"
     },
     {
       "id": "q058",
       "section": "witch",
       "role": "主 T",
       "type": "single",
-      "question": "黑风魔女说出“烦人的家伙”时，主 T 应准备应对哪种冲锋？",
+      "question": "黑风魔女击倒后准备向后冲锋，主 T 应如何处理？",
       "options": [
         {
           "id": "a",
-          "text": "自动清除危险线"
+          "text": "让队友集中站到后冲路径上"
         },
         {
           "id": "b",
-          "text": "向前冲锋"
+          "text": "站在原地忽略首领面向"
         },
         {
           "id": "c",
-          "text": "直接进入双剑阶段"
+          "text": "把首领带到危险线上"
         },
         {
           "id": "d",
-          "text": "向后冲锋"
+          "text": "预判后冲落点，调整站位并避免首领碰到不祥气息"
         }
       ],
       "answer": [
         "d"
       ],
-      "explanation": "这句台词对应向后冲锋；应提前练习带位。"
+      "explanation": "后冲应结合首领面向和不祥气息位置预判落点，避免首领碰线。"
     },
     {
       "id": "q059",
@@ -2333,31 +2445,31 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
     {
       "id": "q072",
       "section": "witch",
-      "role": "蜘蛛控制位",
+      "role": "蜘蛛位",
       "type": "single",
-      "question": "黑风魔女蜘蛛阶段，大蜘蛛成功为首领回血时，单次回血约为多少？",
+      "question": "黑风魔女蜘蛛阶段，大蜘蛛准备为首领回血时，小蜘蛛仍在附近，团队应如何配合？",
       "options": [
         {
           "id": "a",
-          "text": "20%"
+          "text": "所有人只追首领，不处理蜘蛛"
         },
         {
           "id": "b",
-          "text": "2%"
+          "text": "控制位打断回血，清怪位继续按分工处理小蜘蛛"
         },
         {
           "id": "c",
-          "text": "50%"
+          "text": "让大蜘蛛回血后再开始分配位置"
         },
         {
           "id": "d",
-          "text": "完全不会回血"
+          "text": "把小蜘蛛带到炸弹位身边"
         }
       ],
       "answer": [
         "b"
       ],
-      "explanation": "大蜘蛛单次回血约为首领血量的 2%，应及时控制打断。"
+      "explanation": "控制位及时打断大蜘蛛回血，清怪位同时按分工聚怪和输出。"
     },
     {
       "id": "q073",
@@ -2649,7 +2761,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "section": "witch",
       "role": "主 T",
       "type": "judge",
-      "question": "黑风魔女说出“烦人的家伙”时，主 T 应按后冲方向准备。",
+      "question": "黑风魔女被击倒后，主 T 应结合首领动作、面向和不祥气息的位置判断冲锋落点。",
       "options": [
         {
           "id": "a",
@@ -2663,7 +2775,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "answer": [
         "a"
       ],
-      "explanation": "这句台词对应后冲，主 T 也可结合首领动作判断。"
+      "explanation": "击倒后可能出现前冲或后冲，主 T 应提前判断落点并避开不祥气息。"
     },
     {
       "id": "q083",
@@ -2733,29 +2845,29 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "section": "witch",
       "role": "主 T",
       "type": "fill",
-      "question": "选择填空：黑风魔女说出“你还是避开为好”时，提示首领向____冲锋。",
+      "question": "选择填空：黑风魔女被击倒后，主 T 应根据首领动作判断冲锋____，并留意不祥气息。",
       "options": [
         {
           "id": "a",
-          "text": "后"
+          "text": "治疗量"
         },
         {
           "id": "b",
-          "text": "地下"
+          "text": "球体颜色"
         },
         {
           "id": "c",
-          "text": "前"
+          "text": "方向"
         },
         {
           "id": "d",
-          "text": "上"
+          "text": "业火层数"
         }
       ],
       "answer": [
         "c"
       ],
-      "explanation": "这句台词对应首领向前冲锋。"
+      "explanation": "击倒后留意首领动作和面向，判断前冲或后冲，并预留安全落点。"
     },
     {
       "id": "q087",
@@ -2809,8 +2921,8 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         caption: '图中的颜色代表球的属性。先认首领颜色，再确认自己的岗位和当前状态。',
         roles: [
           ['两侧主 T 与挡球协助位', '火侧挡火球，冰侧挡冰球。单人挡球通常获得 2 层，两人同挡通常各分 1 层。按团长安排轮换，让负责踩花的人提前叠好对应状态。'],
-          ['治疗位', '冰侧治疗位接火球，火侧治疗位接冰球。层数与颜色都要看，误碰后立即报当前状态。'],
-          ['全员', '两层时误碰另一色，状态可能变成另一色的一层。已有三层时误碰异色球可能直接死亡。非本轮挡球人员不要为了输出蹭球。'],
+          ['治疗位', '冰侧治疗位挡火球，火侧治疗位挡冰球，提前准备三层异色状态。层数和颜色都要看，误参与分挡后检查并报告状态。'],
+          ['全员', '飞行球碰到人可能造成伤害或控制，不能仅凭碰球就认定状态换色。挡球、分挡获得异色状态时可能换色；已有三层时误挡或误分异色球可能直接死亡。非本轮挡球人员应避开球路和分挡范围。'],
         ],
         check: '开怪前把挡球位、踩花位和治疗位排清楚，临时补球先报颜色与层数。',
       },
@@ -2855,7 +2967,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         roles: [
           ['控制位', '按指挥接控制。采用先眩晕再击倒的队伍，可让业火组先确认状态，随后在约定的击倒窗口换场。漏控时，外场留意额外惩罚圈。'],
           ['带业火且要进隔离', '在击倒切换时面向首领，确认进场后留意脚下攻击与血量。'],
-          ['没有业火且要留外场', '切换时背对首领。无业火误进会受到报应状态，伤害和暴击伤害降低。'],
+          ['没有业火且要留外场', '切换时背对首领。无业火误进可能获得报应状态，攻击力降低 800。'],
         ],
         check: '开控前报“谁进、谁留”。不要把所有队员的面向统一成同一个方向。',
       },
@@ -2870,10 +2982,10 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         check: '血量是预警。到门槛附近先找六个灯位与主 T 的面向，准备好后按实际动作走。',
       },
       {
-        timing: '出隔离后约 30 秒', title: '用两组轮换避开隔离抵抗', diagram: 'spirit-rotation',
-        caption: 'A、B 代表两套岗位。队员出隔离后观察抵抗状态是否消失，再接受后续进场分工。',
+        timing: '出隔离后约 30 秒', title: '用两组轮换避开后遗症', diagram: 'spirit-rotation',
+        caption: 'A、B 代表两套岗位。队员出隔离后观察后遗症是否消失，再接受后续进场分工。',
         roles: [
-          ['刚出隔离的一组', '出场后约 30 秒内有隔离抵抗，先在外场站回约定位置并准备控制、躲惩罚。'],
+          ['刚出隔离的一组', '出场后约 30 秒内有后遗症，此时再次进入隔离有死亡风险。先在外场站回约定位置并准备控制、躲惩罚。'],
           ['下一组业火位', '让仍能进场的人占好远点，以当前点名和击倒口令为准。进场后照常躲炸弹、斩击和风扇状地面攻击。'],
           ['指挥与主 T', '每轮检查远点组、近点炸弹位、进入隔离的三人是否就位。最后一轮染灯后的战斗仍需处理业火、炸弹和控制。'],
         ],
@@ -2898,7 +3010,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         timing: '击倒后至扇形扫描', title: '识别前冲或后冲，把扫描带向空地', diagram: 'witch-charge',
         caption: '前后以首领当前面向为准。扇形范围只作走位示意。',
         roles: [
-          ['主 T', '击倒后看起身动作和台词。“你还是避开为好”对应前冲，“烦人的家伙”对应后冲。根据预判落点与活跃的线调整身位。'],
+          ['主 T', '击倒后观察起身动作、台词和首领面向，判断前冲或后冲。根据预判落点与活跃的线调整身位。'],
           ['主 T 与控制位', '冲锋结束后，主 T 让接下来的扇形扫描朝空地。控制位根据带位情况报下一轮控制，别在前冲路径贴线时抢控。'],
           ['输出与机制位', '离开冲锋路径和扇形覆盖区，给主 T 留出可带扫描的方向。站到首领侧面前先确认危险线。'],
         ],
@@ -3014,7 +3126,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
         token(125, 111, 'A', 'map-hazard', 21), token(125, 186, 'B', 'map-ally', 21),
         token(435, 111, 'B', 'map-hazard', 21), token(435, 186, 'A', 'map-ally', 21),
         arrow(154, 111, 400, 111), arrow(154, 186, 400, 186, 'map-ally-line'),
-        label(280, 98, '隔离内'), label(280, 172, '外场'), label(280, 232, 'A 出场后 · 约 30 秒抵抗')].join('');
+        label(280, 98, '隔离内'), label(280, 172, '外场'), label(280, 232, 'A 出场后 · 约 30 秒后遗症')].join('');
       break;
     case 'witch-line':
       art = [arena(), boss(305, 154, '首领'), line('M280 135L184 90 M280 135L323 38', 'map-red-line'),
@@ -3081,7 +3193,17 @@ function drawRaidDiagram(key, caption, questionId = null) {
   let candidate = identity;
   let profile = read(':profile');
   let draft = read(':draft',{});
-  if (draft.version !== bank.version || !draft.answers || typeof draft.answers !== 'object') draft={version:bank.version,index:0,answers:{}};
+  if (draft.version !== bank.version || !draft.answers || typeof draft.answers !== 'object') {
+    const changed = bank.draft_migrations?.[draft.version];
+    if (Array.isArray(changed) && draft.answers && typeof draft.answers === 'object' && !Array.isArray(draft.answers)) {
+      const changedIds = new Set(changed);
+      const previousAnswers = draft.answers;
+      const answers = Object.fromEntries(Object.entries(previousAnswers).filter(([id]) => !changedIds.has(id)));
+      const cleared = Object.keys(previousAnswers).filter(id => changedIds.has(id)).length;
+      draft={version:bank.version,index:draft.index,answers,migrationCleared:cleared};
+      save(':draft',draft);
+    } else draft={version:bank.version,index:0,answers:{}};
+  }
   let index = Math.max(0,Math.min(qs.length-1,Number(draft.index)||0));
   let result = null;
   let onlyWrong = false;
@@ -3109,7 +3231,8 @@ function drawRaidDiagram(key, caption, questionId = null) {
     const pending = read(':pending');
     return Array.isArray(pending) ? pending : pending ? [pending] : [];
   }
-  function nextPendingAttempt() { return pendingAttempts().find(attempt => attempt.version === bank.version); }
+  function supportedAttempt(attempt) { return attempt.version === bank.version || Object.prototype.hasOwnProperty.call(bank.draft_migrations || {}, attempt.version); }
+  function nextPendingAttempt() { return pendingAttempts().find(supportedAttempt); }
   function setView(which) {
     view = which;
     if (which === 'home' && location.hash.startsWith('#guide-')) window.history.replaceState(null, '', '#guide');
@@ -3223,6 +3346,9 @@ function drawRaidDiagram(key, caption, questionId = null) {
   function start() { if(!profile) showProfile('start'); else beginExam(); }
   function beginExam() {
     if (location.hash.startsWith('#guide-')) window.history.replaceState(null, '', location.pathname + location.search);
+    const notice = $('draft-update-notice');
+    notice.hidden = !draft.migrationCleared;
+    notice.textContent = draft.migrationCleared ? `题库已更新，其他作答已保留；${draft.migrationCleared} 道调整过的题目需要重新作答。` : '';
     setView('exam'); updateProfileLabel(); renderQuestion();
   }
   function questionDiagram(question) {
@@ -3389,11 +3515,12 @@ function drawRaidDiagram(key, caption, questionId = null) {
       time.textContent = attemptDate.format(entry.submittedAt);
     } else time.textContent = '本机记录';
     const context = document.createElement('small');
-    context.textContent = `${entry.pending ? '待上传' : entry.currentVersion ? '当前题库' : '旧版题库'} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
+    context.textContent = entry.pending && !entry.currentVersion ? '旧版成绩待上传'
+      : `${entry.pending ? '待上传' : entry.currentVersion ? '当前题库' : '旧版题库'} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
     const details = document.createElement('div');
     details.append(time, context);
     const score = document.createElement('strong');
-    score.textContent = `${formatScore(entry.score)} 分`;
+    score.textContent = entry.score == null ? '待上传' : `${formatScore(entry.score)} 分`;
     row.append(details, score);
     return row;
   }
@@ -3434,9 +3561,10 @@ function drawRaidDiagram(key, caption, questionId = null) {
       more.hidden = !historyCursor;
     } catch (error) {
       if (requestId !== historyRequest || view !== 'history') return;
-      const local = pendingAttempts().filter(attempt => attempt.version === bank.version);
+      const local = pendingAttempts().filter(supportedAttempt);
       if (!append && error.unavailable && local.length) {
         const rows = local.slice().reverse().map(attempt => {
+          if (attempt.version !== bank.version) return {currentVersion:false, pending:true, submittedAt:attempt.localSubmittedAt || null};
           const item = grade(attempt.answers);
           return {...item, currentVersion:true, pending:true, submittedAt:attempt.localSubmittedAt || null};
         });

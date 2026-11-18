@@ -20,6 +20,13 @@ ROOT = Path(__file__).resolve().parent
 BANK = json.loads((ROOT / 'questions.json').read_text(encoding='utf-8'))
 QUESTIONS = BANK['questions']
 VERSION = BANK['version']
+BANKS = {VERSION: BANK}
+for path in sorted((ROOT / 'banks').glob('*.json')):
+    archived = json.loads(path.read_text(encoding='utf-8'))
+    archived_version = archived['version']
+    if archived_version in BANKS:
+        raise RuntimeError(f'Duplicate question bank version: {archived_version}')
+    BANKS[archived_version] = archived
 DATABASE = Path(os.environ.get('QUIZ_DATABASE', '/var/lib/spiral-raid-quiz/quiz.sqlite3'))
 PORT = int(os.environ.get('QUIZ_PORT', '8791'))
 ALLOWED_ORIGINS = {'https://found-l.github.io', 'https://www.lysue.com'}
@@ -89,14 +96,16 @@ def score(correct, total):
 
 
 def grade(answers, submitted_version):
-    if submitted_version != VERSION:
+    bank = BANKS.get(submitted_version) if isinstance(submitted_version, str) else None
+    if not bank:
         raise ApiError('题库已更新，请刷新页面后重新答题。')
+    questions = bank['questions']
     if not isinstance(answers, dict):
         raise ApiError('答案格式不正确。')
-    if len(answers) != len(QUESTIONS):
+    if len(answers) != len(questions):
         raise ApiError('请完成全部题目后提交。')
     correct = 0
-    for question in QUESTIONS:
+    for question in questions:
         answer = answers.get(question['id'])
         options = {item['id'] for item in question['options']}
         if (not isinstance(answer, list) or not answer or len(answer) > len(options)
@@ -105,7 +114,7 @@ def grade(answers, submitted_version):
             raise ApiError('请完成全部题目后提交。')
         if set(answer) == set(question['answer']):
             correct += 1
-    return {'correctCount': correct, 'totalCount': len(QUESTIONS), 'score': score(correct, len(QUESTIONS))}
+    return {'correctCount': correct, 'totalCount': len(questions), 'score': score(correct, len(questions))}
 
 
 def authenticated(db, device, secret_hash, message):
@@ -141,7 +150,8 @@ def profile(db, body):
 
 def submit(db, body):
     device, secret_hash = credentials(body)
-    result = grade(body.get('answers'), body.get('version'))
+    submitted_version = body.get('version')
+    result = grade(body.get('answers'), submitted_version)
     attempt_id = body.get('attemptId')
     if not isinstance(attempt_id, str) or not re.fullmatch(r'[a-f0-9]{32}', attempt_id):
         raise ApiError('成绩编号无效。')
@@ -150,7 +160,7 @@ def submit(db, body):
         authenticated(db, device, secret_hash, '请先保存昵称，或恢复原来的身份。')
         previous = db.execute('SELECT * FROM attempts WHERE id = ?', (attempt_id,)).fetchone()
         if previous:
-            if (previous['participant_id'] != device or previous['quiz_version'] != VERSION
+            if (previous['participant_id'] != device or previous['quiz_version'] != submitted_version
                     or previous['correct_count'] != result['correctCount']
                     or previous['total_count'] != result['totalCount']):
                 raise ApiError('成绩编号已被使用。', 409)
@@ -158,7 +168,7 @@ def submit(db, body):
         else:
             now = int(time.time() * 1000)
             db.execute('INSERT INTO attempts VALUES (?, ?, ?, ?, ?, ?)',
-                       (attempt_id, device, VERSION, result['correctCount'], result['totalCount'], now))
+                       (attempt_id, device, submitted_version, result['correctCount'], result['totalCount'], now))
         db.execute('COMMIT')
         return {'ok': True, **result, 'submittedAt': now}
     except Exception:
