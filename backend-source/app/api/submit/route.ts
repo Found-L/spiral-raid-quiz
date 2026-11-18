@@ -13,7 +13,7 @@ export async function POST(request: Request) {
     if (!/^[a-f0-9]{32}$/.test(body.attemptId || '')) return json(request, {error:'成绩编号无效。'}, 400);
     if (!env.DB) return json(request, {error: '排行榜暂时不可用，请稍后重试。'}, 503);
     const current = await env.DB.prepare('SELECT secret_hash FROM participants WHERE id = ?').bind(deviceId).first<{secret_hash:string}>();
-    if (!current || current.secret_hash !== await digest(secret)) return json(request, {error: '请先保存你的昵称和游戏 ID。'}, 403);
+    if (!current || current.secret_hash !== await digest(secret)) return json(request, {error: '请先保存昵称，或恢复原来的身份。'}, 403);
     const previous = await env.DB.prepare('SELECT participant_id, quiz_version, correct_count, total_count, submitted_at FROM attempts WHERE id = ?')
       .bind(body.attemptId).first<{participant_id:string,quiz_version:string,correct_count:number,total_count:number,submitted_at:number}>();
     if (previous) {
