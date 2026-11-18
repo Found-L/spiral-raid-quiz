@@ -1,6 +1,8 @@
 # 剑灵巅峰服 · 螺旋寺院机制考核
 
-在线地址：<https://found-l.github.io/spiral-raid-quiz/>
+国内访问：<https://www.lysue.com/spiral-raid-quiz/>
+
+GitHub 入口：<https://found-l.github.io/spiral-raid-quiz/>
 
 免注册填写昵称后即可答题。题库共 87 道客观题，覆盖灼热剑与酷寒剑、超魔灵、黑风魔女，以及主 T、控制、挡球、加血、业火、炸弹和蜘蛛等位置。完成后自动评分并展示逐题解析；排行榜保留每个身份的最高分，同分按首次达到该成绩的时间排序。
 
@@ -19,9 +21,10 @@
 
 ## 项目结构
 
-- `index.html` 是包含样式、脚本、题库和插图的独立网页，由 GitHub Pages 托管。
-- `template.html`、`style.css`、`detail.css`、`app.js`、`guide.js`、`diagrams.js` 和 `questions.json` 是网页源码。修改题库时先运行 `python build_questions.py`，再运行 `python build_page.py` 生成网页。
-- `backend-source/` 是共享计分与排行榜服务的源码快照；线上服务运行于 Sites，使用 D1 数据库。更新题库后，前后端必须使用同一份题库和版本号，再分别发布网页和服务。
+- `index.html` 是包含样式、脚本、题库和插图的独立网页，部署在 GitHub Pages 和国内服务器。
+- `template.html`、`style.css`、`detail.css`、`app.js`、`guide.js`、`diagrams.js` 和 `questions.json` 是网页源码。修改题库时先运行 `python build_questions.py`，再运行 `python build_page.py` 生成网页并同步国内服务题库。
+- `domestic-backend/` 是国内共享计分与排行榜服务；两个入口使用同一份 SQLite 数据库。旧的 Sites 接口负责兼容旧版网页。更新题库后，前后端必须使用同一份题库和版本号，再分别发布网页和服务。
+- `backend-source/` 是 Sites 兼容接口的源码快照，旧接口转发到国内成绩服务。
 
 ## 巅峰服参考
 

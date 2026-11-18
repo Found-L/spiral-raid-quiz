@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const localPreview = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('api')==='local';
-  const API = localPreview ? 'http://127.0.0.1:8787' : 'https://spiral-raid-quiz-api.foundliny.chatgpt.site';
+  const API = localPreview ? 'http://127.0.0.1:8787' : 'https://www.lysue.com/spiral-raid-quiz';
   const bank = JSON.parse(document.getElementById('question-bank').textContent);
   const qs = bank.questions;
   const SECTIONS = [
@@ -431,7 +431,7 @@
   function importIdentity() {
     const code=$('identity-code').value.trim(); const m=/^([a-f0-9]{32})\.([a-f0-9]{64})$/i.exec(code);
     if(!m){$('profile-error').textContent='身份码格式不正确。';return;}
-    if(m[1].toLowerCase()!==identity.deviceId && (Object.keys(draft.answers).length || read(':pending')) && !confirm('恢复其他身份会清除当前浏览器未提交的答题进度，确定继续吗？'))return;
+    if(m[1].toLowerCase()!==identity.deviceId && (Object.keys(draft.answers).length || pendingAttempts().length) && !confirm('恢复其他身份会删除当前浏览器尚未上传的成绩和未交卷的答题进度，确定继续吗？'))return;
     candidate={deviceId:m[1].toLowerCase(),secret:m[2].toLowerCase()}; $('profile-error').textContent='身份码已读取，请填写昵称并保存。';
     if (candidate.deviceId !== identity.deviceId) $('profile-player-number').hidden = true;
   }
