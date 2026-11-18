@@ -15,13 +15,123 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 @media(max-width:680px){.topbar{height:68px;padding:0 18px}.brand-mark{width:34px;height:34px;font-size:16px}.brand strong{font-size:13px}.brand small{font-size:9px}.nav-links{display:none}.profile-trigger{margin-left:auto;padding:6px 8px;font-size:11px}.profile-trigger>span:last-child{display:none}.hero{display:flex;flex-direction:column;align-items:start;min-height:0;padding:65px 22px 38px}.hero h1{font-size:38px}.hero-description{font-size:13px}.desktop-only{display:none}.hero-art{align-self:center;margin:10px 0 -10px;width:min(90%,390px)}.hero-index{right:24px;bottom:18px}.overview{grid-template-columns:repeat(2,1fr);row-gap:22px;padding:26px 22px}.overview>div{padding:0 0 0 18px}.overview>div:nth-child(3){border:0;padding-left:0}.overview strong{font-size:24px}.section{padding:70px 22px}.section-heading{display:block}.section-heading>p{margin-top:14px}.guide-grid{grid-template-columns:1fr;gap:14px}.guide-card{padding:22px 22px 0}.guide-card h3{font-size:22px}.diagram{max-height:180px}.how-section{grid-template-columns:1fr;gap:35px}.sources-section{grid-template-columns:1fr;gap:25px}.leaderboard-header,.ranking-row{grid-template-columns:minmax(0,1fr) 62px 66px;padding:15px 13px;gap:8px}.ranking-score{font-size:17px}.rank-number{width:20px}.ranking-player{gap:8px}footer{padding:24px 22px;display:block}footer p{margin:8px 0}footer>span{display:none}.exam-top{padding:20px;flex-wrap:wrap}.exam-meta{order:3;width:100%;justify-content:space-between}.exam-layout{display:block;padding:28px 18px 70px}.exam-sidebar h2{font-size:18px}.exam-sidebar .eyebrow{margin-bottom:9px}.progress-number{margin:10px 0 6px}.progress-number strong{font-size:30px}.section-list{display:flex;gap:8px;margin:15px 0}.section-button{border:1px solid var(--line);padding:9px;font-size:11px;display:block}.section-button span{display:block}.sidebar-submit{margin-bottom:25px}.question-card{padding:25px 18px}.question-card h2{font-size:20px}.question-bar{margin-bottom:12px}.option{padding:12px}.result-view{padding:50px 20px 70px}.score-display strong{font-size:64px}.review-head{align-items:start}.review-card{padding:16px}.nav-number{min-height:34px}.profile-trigger #header-profile{max-width:110px;overflow:hidden;text-overflow:ellipsis}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
 .question-label{flex-wrap:wrap}.question-label a{padding:4px 9px;border:1px solid #414d4a;color:#a6b9af;font-size:10px}.question-label a:hover,.review-meta a:hover{color:#f4cf8e;text-decoration:underline}
+
+.guide-view,
+.history-view {
+  width: min(100%, 1230px);
+  margin: 0 auto;
+  padding: 52px clamp(18px, 5vw, 62px) 90px;
+}
+
+.guide-view h1,
+.history-view h1 {
+  margin: 19px 0 14px;
+  font: 600 clamp(32px, 4.5vw, 54px)/1.22 var(--serif);
+  color: var(--text);
+}
+.guide-view h1:focus,
+.guide-stage h2:focus,
+.history-view h1:focus { outline: none; }
+
+.guide-intro { max-width: 780px; margin: 0 0 23px; color: var(--muted); }
+.guide-chapters,
+.guide-timeline,
+.ranking-actions { display: flex; flex-wrap: wrap; gap: 9px 16px; }
+.guide-chapters { padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.guide-chapters a,
+.guide-timeline button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: #151d25;
+  color: #d5d4c9;
+  font-size: 13px;
+}
+.guide-chapters a[aria-current],
+.guide-chapters a:hover,
+.guide-timeline button:hover { border-color: var(--gold); color: var(--gold); }
+.guide-timeline { margin: 20px 0 25px; }
+.guide-stage {
+  padding: clamp(16px, 3.2vw, 34px);
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-top-color: #7b684d;
+  background: #121a23;
+  scroll-margin-top: 16px;
+}
+.guide-stage > .eyebrow { margin-bottom: 9px; letter-spacing: .06em; }
+.guide-stage h2 { margin: 0 0 16px; font: 600 clamp(20px, 2.9vw, 30px)/1.38 var(--serif); }
+.stage-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.stage-roles { margin: 0; }
+.stage-roles > div { padding: 0 0 9px; margin-bottom: 9px; border-bottom: 1px solid var(--line); }
+.stage-roles > div:last-child { margin-bottom: 0; border: 0; }
+.stage-roles dt { font-weight: 700; color: var(--gold); }
+.stage-roles dd { margin: 3px 0 0; font-size: 14px; color: #d0d5d0; }
+.stage-check { margin: 14px 0 0; padding: 10px 13px; border-left: 3px solid #9f8258; background: #231f1c; color: #e2cda8; font-size: 13px; }
+.card-footer:hover span:last-child { text-decoration: underline; }
+.card-footer span:last-child { flex-shrink: 0; font-size: 12px; }
+
+.raid-diagram {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #36444c;
+  border-radius: 4px;
+  background: radial-gradient(ellipse at center, #1a2b34, #0d151e 75%);
+}
+.raid-diagram svg { display: block; width: 100%; height: auto; }
+.raid-diagram figcaption { padding: 9px 12px; border-top: 1px solid #36444c; font-size: 12px; color: #bbcac8; }
+.raid-diagram text { fill: #e3e2d8; font: 17px var(--sans); text-anchor: middle; }
+.raid-diagram .map-token { font-size: 15px; font-weight: bold; }
+.raid-diagram .map-soft { fill: #b8ccca; }
+.raid-diagram .map-gold-text { fill: #f6d49b; }
+.map-field { fill: #162632; stroke: #627778; }
+.map-boss { fill: #5d472f; stroke: #e5be81; }
+.map-ally { fill: #254d50; stroke: #89ccc9; }
+.map-hazard { fill: #703d40; stroke: #faa293; }
+.map-lamp { fill: #5b4f29; stroke: #ffe3a2; }
+.map-rule, .map-grid, .map-red-grid, .map-ally-line, .map-red-line, .map-gold-line { fill: none; }
+.map-rule { stroke: #93a7a6; stroke-width: 1.4; }
+.map-grid { stroke: #7c9698; stroke-dasharray: 5 5; }
+.map-red-grid { stroke: #df8279; stroke-dasharray: 5 5; }
+.map-ally-line { stroke: #8ddbd0; stroke-width: 2.5; }
+.map-red-line { stroke: #ff9386; stroke-width: 3; }
+.map-gold-line { stroke: #f2cc8a; stroke-width: 2.5; }
+.map-scan { fill: #6e4a2c; fill-opacity: .85; stroke: #d3a374; stroke-dasharray: 5 4; }
+#question-diagram, .review-card .raid-diagram { max-width: 530px; margin: 0 0 17px; }
+
+.history-view { max-width: 920px; }
+.history-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 21px 0; }
+.history-summary > div { min-width: 0; padding: 15px 18px; border: 1px solid var(--line); background: #18212a; }
+.history-summary span { display: block; font-size: 12px; color: #aab3b0; }
+.history-summary strong { display: block; margin-top: 4px; font-size: clamp(20px, 3vw, 30px); color: var(--gold); }
+.history-toolbar { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; }
+.history-toolbar p { font-size: 13px; }
+.history-toolbar button { flex-shrink: 0; }
+.history-list { margin: 0 0 20px; padding: 0; list-style: none; }
+.history-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; border-top: 1px solid var(--line); }
+.history-list li strong { color: var(--gold); font-size: 18px; flex-shrink: 0; }
+.history-list li small { display: block; color: #aeb7b4; }
+.history-list li:last-child { border-bottom: 1px solid var(--line); }
+.history-list:empty { margin-bottom: 0; }
+
+@media (max-width: 760px) {
+  .stage-layout { grid-template-columns: 1fr; gap: 15px; }
+  .guide-timeline { gap: 7px; }
+  .guide-timeline button { font-size: 12px; }
+  .guide-view, .history-view { padding-top: 36px; }
+  .stage-roles dd { font-size: 13px; }
+  .ranking-actions { margin-top: 8px; }
+}
 </style>
 </head>
 <body>
   <div class="site-shell">
     <header class="topbar">
       <a href="#home" class="brand" aria-label="螺旋寺院机制考核首页"><span class="brand-mark">旋</span><span><strong>螺旋寺院</strong><small>团队机制考核</small></span></a>
-      <nav class="nav-links" aria-label="主导航"><a href="#guide">机制图解</a><button type="button" data-action="show-leaderboard">排行榜</button></nav>
+      <nav class="nav-links" aria-label="主导航"><a href="#guide">机制图解</a><button type="button" data-action="show-leaderboard">排行榜</button><button type="button" data-action="open-history">我的记录</button></nav>
       <button class="profile-trigger" type="button" data-action="profile"><span class="avatar">人</span><span id="header-profile">设置我的资料</span><span aria-hidden="true">↗</span></button>
     </header>
 
@@ -62,36 +172,63 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
           <div class="guide-grid">
             <article class="guide-card twins"><div class="card-top"><span>01 / 双首领</span><span>球 · 花 · 治疗</span></div><h3>灼热剑 &amp; 酷寒剑</h3><p>分清同色与异色，让接球、踩花和治疗有序衔接。</p>
               <svg class="diagram" viewBox="0 0 360 160" role="img" aria-label="双剑分工示意：火与冰、球花、治疗"><circle cx="95" cy="75" r="49" fill="#b64c3b" fill-opacity=".12" stroke="#d67960" stroke-opacity=".7"/><circle cx="265" cy="75" r="49" fill="#4e9fa8" fill-opacity=".12" stroke="#78b9c4" stroke-opacity=".7"/><circle cx="95" cy="75" r="18" fill="#bf6550" fill-opacity=".25"/><circle cx="265" cy="75" r="18" fill="#6ab2be" fill-opacity=".25"/><path d="M147 75h65" stroke="#cdb68a" stroke-opacity=".65" stroke-dasharray="4 5"/><circle cx="61" cy="42" r="5" fill="#dc9873"/><circle cx="130" cy="108" r="5" fill="#7ec2cd"/><circle cx="232" cy="42" r="5" fill="#dc9873"/><circle cx="297" cy="107" r="5" fill="#7ec2cd"/><text x="95" y="81" text-anchor="middle" fill="#eecab2" font-size="14">火</text><text x="265" y="81" text-anchor="middle" fill="#b9e4e8" font-size="14">冰</text><text x="180" y="142" text-anchor="middle" fill="#b8a98d" font-size="11">同色踩花 · 异色治疗</text></svg>
-              <div class="card-footer"><span>主 T / 吃球 / 踩花 / 治疗</span><span>↗</span></div></article>
+              <a class="card-footer" href="#guide-twins" aria-label="查看双剑详细图解"><span>主 T / 吃球 / 踩花 / 治疗</span><span>查看图解 →</span></a></article>
             <article class="guide-card spirit"><div class="card-top"><span>02 / 超魔灵</span><span>隔离 · 染灯</span></div><h3>超魔灵</h3><p>看清业火与隔离时间，分开确认仇恨和追踪。</p>
               <svg class="diagram" viewBox="0 0 360 160" fill="none" role="img" aria-label="超魔灵染灯示意：中心首领及周围核心"><circle cx="180" cy="78" r="55" stroke="#c3a97a" stroke-opacity=".45" stroke-dasharray="4 5"/><circle cx="180" cy="78" r="25" fill="#c8ac79" fill-opacity=".15" stroke="#c8ac79"/><g fill="#e1c38c"><circle cx="180" cy="17" r="5"/><circle cx="233" cy="47" r="5"/><circle cx="233" cy="109" r="5"/><circle cx="180" cy="139" r="5"/><circle cx="127" cy="109" r="5"/><circle cx="127" cy="47" r="5"/></g><path d="M205 39c28 12 43 36 37 61" stroke="#79b7b5" stroke-width="2"/><path d="m235 96 7 7 3-10" stroke="#79b7b5" stroke-width="2"/><text x="180" y="83" text-anchor="middle" fill="#e6d3ae" font-size="12">引导</text></svg>
-              <div class="card-footer"><span>主副 T / 隔离 / 保护 / 染灯</span><span>↗</span></div></article>
+              <a class="card-footer" href="#guide-spirit" aria-label="查看超魔灵详细图解"><span>主 T / 业火 / 隔离 / 染灯</span><span>查看图解 →</span></a></article>
             <article class="guide-card witch"><div class="card-top"><span>03 / 黑风魔女</span><span>冲锋 · 蜘蛛</span></div><h3>黑风魔女</h3><p>观察正反冲与危险线，炸弹和蜘蛛各自分点处理。</p>
               <svg class="diagram" viewBox="0 0 360 160" fill="none" role="img" aria-label="魔女机制示意：旋转危险线及蜘蛛分点"><circle cx="180" cy="80" r="59" stroke="#bfa67a" stroke-opacity=".4"/><circle cx="180" cy="80" r="25" stroke="#bfa67a" stroke-opacity=".25"/><path d="M180 80 232 51" stroke="#e17372" stroke-width="3"/><path d="M120 47a70 70 0 0 1 95-25" stroke="#d78778" stroke-opacity=".8"/><path d="m210 17 7 7-10 2" stroke="#d78778" stroke-opacity=".8"/><g fill="#87beb4"><circle cx="126" cy="112" r="6"/><circle cx="231" cy="112" r="6"/><circle cx="180" cy="19" r="6"/></g><text x="180" y="84" text-anchor="middle" fill="#e6d3ae" font-size="11">BOSS</text></svg>
-              <div class="card-footer"><span>主 T / 炸弹 / 蜘蛛 / 远点</span><span>↗</span></div></article>
+              <a class="card-footer" href="#guide-witch" aria-label="查看黑风魔女详细图解"><span>主 T / 控制 / 炸弹 / 蜘蛛</span><span>查看图解 →</span></a></article>
           </div>
         </section>
 
         <section class="section how-section"><div class="how-copy"><p class="eyebrow">HOW IT WORKS <span class="slash">/</span> 考核方式</p><h2>练的是判断，<br>也是配合。</h2><p>单选、多选、判断和选择式填空。每题等权，多选需要全部选对。完成后立即查看分数与每题解析。</p><button class="text-action" type="button" data-action="start">进入考核 <span>→</span></button></div>
           <div class="steps"><div><span>01</span><div><strong>填写昵称</strong><p>输入你的昵称，无需注册。</p></div></div><div><span>02</span><div><strong>完成考题</strong><p>可分段答题，进度保存在当前浏览器。</p></div></div><div><span>03</span><div><strong>查看解析与排名</strong><p>排行榜保留每位玩家的最高成绩。</p></div></div></div>
         </section>
-        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><button class="link-button" type="button" data-action="refresh-ranking">刷新榜单 ↻</button></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>正确题数</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div><p class="muted ranking-foot">同名玩家以榜单编号区分。同分按首次达到该成绩的时间排序。</p></section>
+        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button" type="button" data-action="refresh-ranking">刷新榜单 ↻</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>正确题数</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div><p class="muted ranking-foot">同名玩家以榜单编号区分。同分按首次达到该成绩的时间排序。</p></section>
         <section class="section sources-section"><div><p class="eyebrow">BEFORE YOU START <span class="slash">/</span> 资料说明</p><h2>版本与资料</h2></div><div><p>题库根据巅峰服螺旋寺院上线后的实战资料和提供的魔女试卷整理。</p><p>团队站位、控制顺序和人员分配可按配置调整，实际操作请结合当前版本和团长安排。</p><div class="source-links"><a href="https://www.bilibili.com/video/BV15uny6qENV/" target="_blank" rel="noopener noreferrer">双剑教学 · 10 月 22 日 ↗</a><a href="https://www.bilibili.com/video/BV1d9n265EyM/" target="_blank" rel="noopener noreferrer">双剑换边补充 ↗</a><a href="https://www.bilibili.com/video/BV1rFWY6REex/" target="_blank" rel="noopener noreferrer">超魔灵教学 · 11 月 13 日 ↗</a><a href="https://www.bilibili.com/video/BV1rQHP6zE56/" target="_blank" rel="noopener noreferrer">超魔灵机制补充 ↗</a><a href="https://www.bilibili.com/video/BV1Gh4x6wEAt/" target="_blank" rel="noopener noreferrer">魔女教学 · 11 月 8 日 ↗</a><a href="https://www.bilibili.com/video/BV1o1x36hEC6/" target="_blank" rel="noopener noreferrer">魔女主 T 实战 ↗</a></div></div></section>
       </div>
+
+      <section id="guide-view" class="guide-view hidden" aria-labelledby="guide-title">
+        <a class="back-button" href="#guide">← 全部机制图解</a>
+        <h1 id="guide-title" tabindex="-1"></h1>
+        <p id="guide-intro" class="guide-intro"></p>
+        <nav id="guide-chapters" class="guide-chapters" aria-label="切换首领"></nav>
+        <nav id="guide-timeline" class="guide-timeline" aria-label="阶段索引"></nav>
+        <div id="guide-stages"></div>
+        <button class="btn btn-primary" type="button" data-action="start">开始机制考核 →</button>
+      </section>
+
+      <section id="history-view" class="history-view hidden" aria-labelledby="history-title">
+        <button class="back-button" type="button" data-action="close-history">← 返回</button>
+        <h1 id="history-title" tabindex="-1">我的答题记录</h1>
+        <p id="history-player" class="muted" hidden></p>
+        <div id="history-summary" class="history-summary" hidden>
+          <div><span>已提交</span><strong id="history-count"></strong></div>
+          <div><span>当前题库最高分</span><strong id="history-best"></strong></div>
+        </div>
+        <div class="history-toolbar">
+          <p id="history-status" class="muted" role="status"></p>
+          <button id="history-refresh" class="link-button" type="button" data-action="refresh-history" hidden>刷新记录</button>
+        </div>
+        <ol id="history-list" class="history-list"></ol>
+        <button id="history-sign-in" class="btn btn-primary" type="button" data-action="history-profile" hidden>设置昵称或恢复身份</button>
+        <button id="history-more" class="btn btn-ghost" type="button" data-action="history-more" hidden>查看更多</button>
+      </section>
 
       <section id="exam-view" class="exam-view hidden" aria-label="机制考核">
         <div class="exam-top"><button class="back-button" type="button" data-action="leave-exam">← 返回首页</button><div class="exam-meta"><span>螺旋寺院 · 机制考核</span><strong id="exam-profile"></strong></div><button class="link-button" type="button" data-action="profile">修改资料</button></div>
         <div class="exam-layout"><aside class="exam-sidebar"><p class="eyebrow">YOUR PROGRESS</p><h2>考核进度</h2><div class="progress-number"><strong id="answered-count">0</strong><span id="total-count"></span></div><div class="progress-track"><div id="progress-fill"></div></div><p class="muted small">答案自动保存在当前浏览器。</p><div id="section-list" class="section-list"></div><button class="btn btn-secondary sidebar-submit" type="button" data-action="submit">交卷并查看成绩</button></aside>
-          <div class="question-area"><div class="question-bar"><span id="question-chapter">01 / 双剑</span><span id="question-number"></span></div><div class="question-card"><div class="question-label"><span id="question-type">单选题</span><span id="question-role">岗位</span></div><h2 id="question-text"></h2><p id="question-help" class="question-help"></p><div id="question-options" class="options"></div><div class="question-controls"><button class="btn btn-ghost" type="button" data-action="previous">← 上一题</button><button id="next-button" class="btn btn-primary" type="button" data-action="next">下一题 →</button></div></div><div class="navigator-title"><span>题目导航</span><span class="muted small">选择数字可快速跳题</span></div><div id="question-nav" class="question-nav" aria-label="题目导航"></div></div>
+          <div class="question-area"><div class="question-bar"><span id="question-chapter">01 / 双剑</span><span id="question-number"></span></div><div class="question-card"><div class="question-label"><span id="question-type">单选题</span><span id="question-role">岗位</span></div><h2 id="question-text"></h2><p id="question-help" class="question-help"></p><div id="question-diagram" hidden></div><div id="question-options" class="options"></div><div class="question-controls"><button class="btn btn-ghost" type="button" data-action="previous">← 上一题</button><button id="next-button" class="btn btn-primary" type="button" data-action="next">下一题 →</button></div></div><div class="navigator-title"><span>题目导航</span><span class="muted small">选择数字可快速跳题</span></div><div id="question-nav" class="question-nav" aria-label="题目导航"></div></div>
         </div>
       </section>
 
-      <section id="result-view" class="result-view hidden" aria-label="考核结果"><div class="result-head"><p class="eyebrow">ASSESSMENT COMPLETE <span class="slash">/</span> 考核完成</p><h2>这一轮，辛苦了。</h2><p id="result-name" class="muted"></p><div class="score-display"><strong id="result-score">0</strong><span> / 100</span></div><p id="result-detail"></p><p id="sync-status" class="sync-status" aria-live="polite"></p><div class="result-actions"><button class="btn btn-primary" type="button" data-action="retry-upload" id="retry-upload" hidden>重新上传成绩</button><button class="btn btn-secondary" type="button" data-action="restart">再练一次</button><button class="btn btn-ghost" type="button" data-action="results-home">查看排行榜 →</button></div></div><div class="review-head"><div><p class="eyebrow">ANSWER REVIEW</p><h2>答案与解析</h2></div><button id="review-toggle" class="link-button" type="button" data-action="toggle-review">只看错题</button></div><div id="review-list" class="review-list"></div></section>
+      <section id="result-view" class="result-view hidden" aria-label="考核结果"><div class="result-head"><p class="eyebrow">ASSESSMENT COMPLETE <span class="slash">/</span> 考核完成</p><h2>这一轮，辛苦了。</h2><p id="result-name" class="muted"></p><div class="score-display"><strong id="result-score">0</strong><span> / 100</span></div><p id="result-detail"></p><p id="sync-status" class="sync-status" aria-live="polite"></p><div class="result-actions"><button class="btn btn-primary" type="button" data-action="retry-upload" id="retry-upload" hidden>重新上传成绩</button><button class="btn btn-secondary" type="button" data-action="restart">再练一次</button><button class="btn btn-ghost" type="button" data-action="open-history">我的答题记录</button><button class="btn btn-ghost" type="button" data-action="results-home">查看排行榜 →</button></div></div><div class="review-head"><div><p class="eyebrow">ANSWER REVIEW</p><h2>答案与解析</h2></div><button id="review-toggle" class="link-button" type="button" data-action="toggle-review">只看错题</button></div><div id="review-list" class="review-list"></div></section>
     </main>
     <footer><div class="footer-brand">螺旋寺院 <span>·</span> 团队机制考核</div><p>用于团队训练，请结合当前版本实战确认。</p><span>BUILT FOR THE RAID</span></footer>
   </div>
 
-  <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭">×</button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
+  <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭">×</button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="profile-history" class="link-button" type="button" data-action="open-history" hidden>我的答题记录 →</button><br><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script id="question-bank" type="application/json">{
   "version": "peak-spiral-2026-11-18-v3",
@@ -2605,6 +2742,270 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   ]
 }
 </script>
+  <script>const RAID_GUIDE = {
+  twins: {
+    title: '灼热剑与酷寒剑',
+    intro: '两边同时打。先分清本侧首领与球的颜色，接着处理球花、四刀治疗和换边。每次换边后都要重新确认主 T 与治疗的位置。',
+    stages: [
+      {
+        timing: '开场与每次换边后', title: '两侧主 T 就位', diagram: 'twins-distance',
+        caption: '以各自主 T 到本侧首领的距离为准。圆圈表示约 8 米的距离边界。',
+        roles: [
+          ['冰 T', '常规阶段贴近酷寒剑，避免拉到约 8 米之外。被击退后尽快沿安全方向回位。'],
+          ['火 T', '与灼热剑保持距离，避免进入约 8 米内引出火圈。漏球先稳住位置，不贴脸追球。'],
+          ['两侧输出', '确认自己跟哪一边。挡球人处理各自来球，其余人避开球路和首领面向。'],
+        ],
+        check: '首领换了边时，以首领颜色重新找位置，别把开场的左右位置当成固定分组。',
+      },
+      {
+        timing: '挡球与叠状态', title: '同色挡球，异色准备治疗', diagram: 'twins-orbs',
+        caption: '图中的颜色代表球的属性。先认首领颜色，再确认自己的岗位和当前状态。',
+        roles: [
+          ['两侧主 T 与挡球协助位', '火侧挡火球，冰侧挡冰球。单人挡球通常获得 2 层，两人同挡通常各分 1 层。按团长安排轮换，让负责踩花的人提前叠好对应状态。'],
+          ['治疗位', '冰侧治疗位接火球，火侧治疗位接冰球。层数与颜色都要看，误碰后立即报当前状态。'],
+          ['全员', '两层时误碰另一色，状态可能变成另一色的一层。已有三层时误碰异色球可能直接死亡。非本轮挡球人员不要为了输出蹭球。'],
+        ],
+        check: '开怪前把挡球位、踩花位和治疗位排清楚，临时补球先报颜色与层数。',
+      },
+      {
+        timing: '球花出现至第四刀', title: '踩花、捡治疗珠、保主 T', diagram: 'twins-heal',
+        caption: '图按实际处理顺序展开。点位由团队提前标记，两侧独立执行。',
+        roles: [
+          ['踩花位', '三层同色状态就绪后处理分配到的同色花点。没有对应状态的队员避开点位，以免清掉自己的状态。'],
+          ['治疗位', '花点处理后拾取治疗珠，绿色治疗指示对准本侧主 T。前两刀用小加稳血，第三、第四刀提前安排大加，末刀尤其要留够治疗。'],
+          ['主 T', '留意自己的血量和治疗朝向。花点与治疗珠的位置出现变化时，和治疗位沟通，给队友留下瞄准与读条时间。'],
+        ],
+        check: '可安排一名治疗位负责第三刀大加，其他人辅助，第四刀由后续治疗位接手。具体人数随团队调整。',
+      },
+      {
+        timing: '一轮机制结束，首领互换', title: '等吸人结束，再跨到对岸', diagram: 'twins-swap',
+        caption: '图中的左右是相对位置。关键是区分会被吸引的队员与需要自行过河的治疗位。',
+        roles: [
+          ['主 T 与同色位', '两只首领互换位置时，注意被吸到另一侧的落点。转场后恢复仇恨、距离与挡球分工。'],
+          ['异色治疗位', '先确认首领的吸引动作结束，再自行过河。过早踏进吸人范围可能被吸回，耽误下一轮治疗。'],
+          ['团队指挥', '转场完成后重新确认两个主 T 到位，核对两边的治疗与球花人员，再按新位置执行下一轮。'],
+        ],
+      },
+    ],
+  },
+  spirit: {
+    title: '超魔灵',
+    intro: '主 T 带染灯路线，业火组按击倒窗口轮换进出隔离，近点炸弹位负责把爆炸拉离内外场队员。染灯和隔离会重叠，两套机制要同时处理。',
+    stages: [
+      {
+        timing: '每轮业火与波动点名', title: '远点接业火，近点拉炸弹', diagram: 'spirit-select',
+        caption: '按与首领的距离分近点与远点。团队可以在开打前标记炸弹撤离方向。',
+        roles: [
+          ['业火组', '让三名指定人员保持最远站位，留一名备份可提高容错。业火约 45 秒，应在到期前按击倒机制进入隔离。'],
+          ['波动炸弹位', '最近位注意点名。波动炸弹约 5 秒，被点后立刻拉离人群，避开隔离内队员对应的位置。'],
+          ['主 T 与外场', '留出远点组和炸弹位的站位，不无意抢距离。换人时先报替补，避免主 T 误吃业火。'],
+        ],
+        check: '两种点名分别看远近。业火要等控制窗口，炸弹要在约 5 秒内撤离。',
+      },
+      {
+        timing: '控制条开放，击倒切换', title: '按身上状态决定面向', diagram: 'spirit-facing',
+        caption: '箭头表示角色面向。确认自己身上的业火状态后再转向。',
+        roles: [
+          ['控制位', '按指挥接控制。采用先眩晕再击倒的队伍，可让业火组先确认状态，随后在约定的击倒窗口换场。漏控时，外场留意额外惩罚圈。'],
+          ['带业火且要进隔离', '在击倒切换时面向首领，确认进场后留意脚下攻击与血量。'],
+          ['没有业火且要留外场', '切换时背对首领。无业火误进会受到报应状态，伤害和暴击伤害降低。'],
+        ],
+        check: '开控前报“谁进、谁留”。不要把所有队员的面向统一成同一个方向。',
+      },
+      {
+        timing: '约 90%、60%、30% 血量', title: '主 T 引导攻击给六盏灯染色', diagram: 'spirit-lamps',
+        caption: '六盏灯是机制目标。图中的路线表示一轮引导的方向示意，实际起点和次序按团队标记。',
+        roles: [
+          ['主 T', '接近血量门槛时提前报染灯起点。引导首领攻击覆盖灯位，逐一检查灯的状态，确认六盏都处理完成。'],
+          ['外场输出', '站在团队约定侧，躲惩罚圈和染灯攻击。不用位移技能穿过主 T 与待染灯之间的线路。'],
+          ['隔离内', '染灯时仍要躲斩击、波动炸弹和地面风扇状区域。优先走安全区，再继续输出。'],
+        ],
+        check: '血量是预警。到门槛附近先找六个灯位与主 T 的面向，准备好后按实际动作走。',
+      },
+      {
+        timing: '出隔离后约 30 秒', title: '用两组轮换避开隔离抵抗', diagram: 'spirit-rotation',
+        caption: 'A、B 代表两套岗位。队员出隔离后观察抵抗状态是否消失，再接受后续进场分工。',
+        roles: [
+          ['刚出隔离的一组', '出场后约 30 秒内有隔离抵抗，先在外场站回约定位置并准备控制、躲惩罚。'],
+          ['下一组业火位', '让仍能进场的人占好远点，以当前点名和击倒口令为准。进场后照常躲炸弹、斩击和风扇状地面攻击。'],
+          ['指挥与主 T', '每轮检查远点组、近点炸弹位、进入隔离的三人是否就位。最后一轮染灯后的战斗仍需处理业火、炸弹和控制。'],
+        ],
+      },
+    ],
+  },
+  witch: {
+    title: '黑风魔女',
+    intro: '主 T 控首领与不祥气息的距离，控制位决定何时击倒触发冲锋，炸弹位与蜘蛛组各走自己的路线。约 71% 和 41% 两次飞天，第二次落地后首领与蜘蛛可以同场。',
+    stages: [
+      {
+        timing: '常规阶段，全程留意', title: '普攻循环、走内侧、避开不祥气息', diagram: 'witch-line',
+        caption: '红线表示不祥气息。方向与当前位置以场内为准，图未指定开怪钟点或转动速度。',
+        roles: [
+          ['主 T', '沿危险线移动方向带位，利用内侧缩短跑动距离，同时给首领留出安全间隔。首领碰线可能狂暴。'],
+          ['控制位', '常规循环看三次普攻、两次砸地、三次普攻后的控制点。想让主 T 稳定走位时，按指挥接眩晕；需要转移首领时，等主 T 准备好再击倒。'],
+          ['输出位', '优先避开不祥气息和冲锋线路，选择首领侧方的安全区域。砸地前留出位移空间，避免被击退撞线。'],
+        ],
+        check: '危险线对玩家和首领都有威胁。压血、砸地和转场时都要先看线，再决定站位。',
+      },
+      {
+        timing: '击倒后至扇形扫描', title: '识别前冲或后冲，把扫描带向空地', diagram: 'witch-charge',
+        caption: '前后以首领当前面向为准。扇形范围只作走位示意。',
+        roles: [
+          ['主 T', '击倒后看起身动作和台词。“你还是避开为好”对应前冲，“烦人的家伙”对应后冲。根据预判落点与活跃的线调整身位。'],
+          ['主 T 与控制位', '冲锋结束后，主 T 让接下来的扇形扫描朝空地。控制位根据带位情况报下一轮控制，别在前冲路径贴线时抢控。'],
+          ['输出与机制位', '离开冲锋路径和扇形覆盖区，给主 T 留出可带扫描的方向。站到首领侧面前先确认危险线。'],
+        ],
+      },
+      {
+        timing: '常规阶段，出现小虫子提示', title: '中圈认标记，炸弹带到空处', diagram: 'witch-bomb',
+        caption: '撤离路径应避开危险线、其他炸弹位和蜘蛛小组。图中的外撤方向只用于解释分工。',
+        roles: [
+          ['中圈点名候选', '按开怪前约定就位，看到投放小虫子的提示，先看头顶标记。选中的队员立刻向约定的空处撤离。'],
+          ['被点名的队员', '撤离时观察不祥气息和队友。如果同时出现多枚，沿不同线路拉开，避免互相靠近或穿过人群。'],
+          ['全员', '为炸弹位留出撤离路线。多人承担点名工作时，被点名者仍须离团，其他人继续各自职责。'],
+        ],
+      },
+      {
+        timing: '约 71% 与 41% 飞天，第二次落地后持续处理', title: '先分点，聚小蜘蛛并打断大蜘蛛回血', diagram: 'witch-spiders',
+        caption: 'A、B、C 表示团队分配的处理区。实际出生点以场内标记为准，第二次落地后还要留出首领带位区域。',
+        roles: [
+          ['蜘蛛组', '飞天时到各自分点。先接住大蜘蛛，小蜘蛛出现后聚到大蜘蛛附近，用范围输出同时处理。分配好聚怪、控制、输出，避免多人追同一只小怪。'],
+          ['蜘蛛控制位', '注意大蜘蛛抬头转向首领，及时用约定的眩晕或击倒打断回血。按当场小怪状态安排输出和下一轮控制。'],
+          ['主 T', '蜘蛛清完、首领落地前先确认落点附近的线，接稳仇恨再回到安全带位路线。第二次落地后带位时避开蜘蛛组和小蜘蛛自爆区域。'],
+          ['远点位', '第二次落地后按团队安排站远点。注意可能锁定最远玩家的震荡波，看到出招预兆时用跳跃规避。'],
+          ['团队指挥', '约 41% 后保留专职清蜘蛛的人，同时安排其他人继续首领带位、输出及炸弹处理。小怪积压时先检查聚怪、控制和集火。'],
+        ],
+      },
+    ],
+  },
+};
+
+const QUESTION_DIAGRAMS = {
+  q001: ['twins-distance', '酷寒剑主 T 被击退到圆圈外侧。圆圈表示与首领的距离。'],
+  q002: ['twins-orbs', '图中左侧为灼热剑区域，圆点表示球。'],
+  q025: ['twins-swap', '图中为本轮末、首领尚未换边时的相对站位。'],
+  q027: ['twins-swap', '中间是两侧之间的过河区域。'],
+  q036: ['spirit-select', '图中标出了首领、被点名者和队友的位置。'],
+  q047: ['spirit-lamps', '箭头表示主 T 当前正引导首领攻击的方向。'],
+  q055: ['witch-line', '红线是不祥气息，移动方向以场内为准。'],
+  q059: ['witch-charge', '图中标出了首领面向和队友所在区域。'],
+  q066: ['witch-bomb', '中圈已有一名队员被标记，外圈有其他机制队员。'],
+  q070: ['witch-spiders', '图中标出了本处理区的大蜘蛛和分散的小蜘蛛。'],
+  q071: ['witch-spiders', '大蜘蛛转头面对场地中央的首领。'],
+  q076: ['witch-line', '近战站在首领附近，附近有不祥气息。'],
+};
+
+function drawRaidDiagram(key, caption, questionId = null) {
+  const test = Boolean(questionId);
+  const circle = (x, y, radius, style) => `<circle cx="${x}" cy="${y}" r="${radius}" class="${style}"/>`;
+  const line = (path, style = 'map-rule') => `<path d="${path}" class="${style}"/>`;
+  const label = (x, y, text, style = '') => `<text x="${x}" y="${y}" class="${style}">${text}</text>`;
+  const arrow = (x1, y1, x2, y2, style = 'map-gold-line') => {
+    const angle = Math.atan2(y2 - y1, x2 - x1);
+    const base = [x2 - 10 * Math.cos(angle), y2 - 10 * Math.sin(angle)];
+    const dx = 4 * Math.sin(angle), dy = 4 * Math.cos(angle);
+    return line(`M${x1} ${y1}L${x2} ${y2}M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`, style);
+  };
+  const token = (x, y, text, style = 'map-ally', radius = 12) => circle(x, y, radius, style) + label(x, y + 4.5, text, 'map-token');
+  const arena = (x = 280, y = 135, radius = 106) => circle(x, y, radius, 'map-field') + circle(x, y, radius - 12, 'map-grid');
+  const boss = (x = 280, y = 135, text = '首领', style = 'map-boss') => token(x, y, text, style, 24);
+  const spider = (x, y) => token(x, y, '大', 'map-boss', 17);
+  const swarm = (x, y) => [[-16, -4], [9, -16], [12, 9], [-6, 15]].map(([dx,dy]) => circle(x+dx, y+dy, 5, 'map-hazard')).join('');
+  let art;
+
+  switch (key) {
+    case 'twins-distance':
+      art = [boss(145, 135, '灼热剑', 'map-hazard'), boss(414, 135, '酷寒剑', 'map-ally'),
+        circle(145, 135, 65, 'map-red-grid'), circle(414, 135, 65, 'map-grid'),
+        token(56, 135, 'T', 'map-hazard'), token(test ? 514 : 459, 135, 'T'),
+        line('M280 32v206'), label(145, 226, '灼热剑区域'), label(414, 226, '酷寒剑区域')].join('');
+      if (test) art += label(507, 171, '击退后');
+      else art += label(56, 171, '火 T 在圈外') + label(472, 171, '冰 T 在圈内');
+      break;
+    case 'twins-orbs':
+      art = [arena(145, 135, 95), arena(415, 135, 95), boss(145, 135, '灼热剑', 'map-hazard'), boss(415, 135, '酷寒剑', 'map-ally'),
+        circle(94, 81, 8, 'map-hazard'), circle(195, 178, 8, 'map-ally'),
+        circle(365, 81, 8, 'map-hazard'), circle(465, 178, 8, 'map-ally'),
+        label(91, 65, '火球'), label(195, 207, '冰球'), label(365, 65, '火球'), label(465, 207, '冰球')].join('');
+      if (!test) art += label(145, 252, '同色挡球 · 异色治疗') + label(415, 252, '同色挡球 · 异色治疗');
+      break;
+    case 'twins-heal':
+      art = [token(118, 112, '花', 'map-ally', 22), token(280, 112, '珠', 'map-ally', 22), token(442, 112, 'T', 'map-boss', 22),
+        arrow(149, 112, 248, 112), arrow(312, 112, 410, 112),
+        label(118, 154, '同色位踩花'), label(280, 154, '治疗位拾取'), label(442, 154, '指示对准主 T'),
+        line('M40 188H520'), label(114, 223, '一刀 · 二刀', 'map-soft'), label(282, 223, '三刀', 'map-gold-text'), label(450, 223, '四刀', 'map-gold-text'),
+        label(114, 249, '小加', 'map-soft'), label(282, 249, '准备大加'), label(450, 249, '接续大加')].join('');
+      break;
+    case 'twins-swap':
+      art = [line('M247 25v220M313 25v220'), label(280, 47, '河道', 'map-soft'),
+        boss(126, 82, '灼热剑', 'map-hazard'), boss(434, 82, '酷寒剑', 'map-ally'),
+        token(72, 122, 'T', 'map-hazard'), token(488, 122, 'T'),
+        token(97, 183, '疗'), token(463, 183, '疗'), label(110, 230, '本侧队伍'), label(444, 230, '对岸队伍')].join('');
+      if (!test) art += arrow(167, 79, 391, 79) + arrow(393, 116, 169, 116, 'map-ally-line') + label(280, 174, '吸人结束后') + arrow(118, 184, 444, 184, 'map-rule');
+      break;
+    case 'spirit-select':
+      art = [boss(), circle(280, 135, 66, 'map-grid'), token(320, 106, '弹', 'map-hazard'),
+        token(247, 187, 'T', 'map-ally'), token(205, 163, '队'), token(224, 204, '队'),
+        token(137, 78, 'A'), token(96, 122, 'B'), token(115, 172, 'C'), label(115, 216, test ? '分散队员' : '业火远点组'),
+        label(339, 78, '波动炸弹')].join('');
+      if (!test) art += arrow(344, 110, 479, 153, 'map-red-line') + label(476, 186, '撤离方向');
+      break;
+    case 'spirit-facing':
+      art = [boss(), token(128, 135, '火', 'map-hazard', 18), token(431, 135, '外', 'map-ally', 18),
+        arrow(157, 135, 244, 135, 'map-red-line'), arrow(458, 135, 516, 135, 'map-ally-line'),
+        label(128, 182, '带业火 · 进隔离'), label(431, 182, '留外场 · 背对'), label(280, 222, '击倒切换时')].join('');
+      break;
+    case 'spirit-lamps': {
+      const lights = [[280,35],[363,80],[363,191],[280,234],[197,191],[197,80]];
+      art = arena() + boss() + lights.map(([x,y]) => token(x,y,'灯','map-lamp',12)).join('');
+      art += token(318, 106, 'T') + arrow(329, 94, 352, 83) + token(232, 165, '队');
+      if (!test) art += label(453,75,'引向待染灯') + label(106,196,'外场站位') + line('M416 76h-33 M152 190l48-19');
+      break;
+    }
+    case 'spirit-rotation':
+      art = [label(125, 63, '本轮', 'map-soft'), label(280, 63, '击倒切换', 'map-soft'), label(435, 63, '下一轮', 'map-soft'),
+        token(125, 111, 'A', 'map-hazard', 21), token(125, 186, 'B', 'map-ally', 21),
+        token(435, 111, 'B', 'map-hazard', 21), token(435, 186, 'A', 'map-ally', 21),
+        arrow(154, 111, 400, 111), arrow(154, 186, 400, 186, 'map-ally-line'),
+        label(280, 98, '隔离内'), label(280, 172, '外场'), label(280, 232, 'A 出场后 · 约 30 秒抵抗')].join('');
+      break;
+    case 'witch-line':
+      art = [arena(), boss(305, 154, '首领'), line('M280 135L184 90 M280 135L323 38', 'map-red-line'),
+        token(340, 156, 'T'), token(293, 192, '近'), token(234, 164, '队'), label(113, 72, '不祥气息'), line('M155 76l25 12')].join('');
+      if (!test) art += line('M348 168q6 37-35 50', 'map-ally-line') + arrow(334, 207, 313, 218, 'map-ally-line') + label(448, 208, '沿内侧带位');
+      break;
+    case 'witch-charge':
+      art = [arena(280, 135, 108), boss(), arrow(308, 135, 348, 135), label(360, 162, '面向'),
+        token(216, 197, '队'), token(241, 217, '队'), label(117, 214, '队友区')].join('');
+      if (!test) art += arrow(252, 135, 188, 135, 'map-ally-line') + label(110, 138, '后冲方向') + label(449, 137, '前冲方向')
+        + line('M304 126L372 74A112 112 0 0 1 386 121Z', 'map-scan') + label(458, 65, '扇面朝空处');
+      break;
+    case 'witch-bomb':
+      art = [arena(), circle(280, 135, 54, 'map-grid'), boss(275, 129),
+        token(305, 168, '弹', 'map-hazard'), token(257, 170, '候'), token(289, 91, '候'),
+        token(208, 194, '蛛'), token(346, 88, '队'), line('M280 135L204 61', 'map-red-line'),
+        label(115, 67, '不祥气息'), label(115, 213, '蜘蛛组'), label(455, 90, '其他队员')].join('');
+      if (!test) art += arrow(317, 179, 377, 215, 'map-red-line') + label(449, 218, '撤向空处');
+      break;
+    case 'witch-spiders':
+      if (questionId === 'q070') {
+        art = arena() + spider(280, 137) + swarm(346, 193) + swarm(219, 82)
+          + label(280, 171, '大蜘蛛') + label(430, 185, '小蜘蛛') + label(146, 83, '小蜘蛛');
+        break;
+      }
+      art = [arena(), boss(280, 125, '首领'), spider(364, 178), swarm(399, 191),
+        spider(195, 150), swarm(160, 172), spider(279, 49), swarm(312, 51),
+        label(417, 162, '小蜘蛛'), label(379, 231, '处理区 A'), label(176, 222, '处理区 B'), label(223, 40, '处理区 C')].join('');
+      if (!test) art += arrow(412, 204, 385, 186, 'map-ally-line') + arrow(349, 166, 306, 140, 'map-red-line') + label(440, 86, '大蜘蛛转向首领');
+      if (questionId === 'q071') art += arrow(349, 166, 306, 140, 'map-red-line');
+      break;
+    default:
+      throw new Error(`Unknown raid diagram: ${key}`);
+  }
+
+  return `<figure class="raid-diagram"><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${art}</svg><figcaption>${caption}</figcaption></figure>`;
+}
+</script>
   <script>(() => {
   'use strict';
   const localPreview = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('api')==='local';
@@ -2634,24 +3035,42 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   let result = null;
   let onlyWrong = false;
   let afterProfile = null;
+  let view = 'home';
+  let historyReturn = 'home';
+  let historyCursor = null;
+  let historyRequest = 0;
+  let uploading = false;
   let toastTimer;
   const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const sectionOf = (id) => SECTIONS.find(x=>x.id===id);
   const formatPlayerNumber = (number) => Number.isSafeInteger(number) && number > 0
     ? `#${String(number).padStart(6, '0')}` : '';
+  const formatScore = (score) => Number(score).toFixed(score % 1 ? 2 : 0);
+  const attemptDate = new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+  });
   const answered = (q) => Array.isArray(draft.answers[q.id]) && draft.answers[q.id].length>0;
   function toast(message) { const t=$('toast'); t.textContent=message; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3200); }
   function storeDraft() { draft.index=index; save(':draft',draft); }
+  function pendingAttempts() {
+    const pending = read(':pending');
+    return Array.isArray(pending) ? pending : pending ? [pending] : [];
+  }
+  function nextPendingAttempt() { return pendingAttempts().find(attempt => attempt.version === bank.version); }
   function setView(which) {
-    $('home-view').classList.toggle('hidden',which!=='home');
-    $('exam-view').classList.toggle('hidden',which!=='exam');
-    $('result-view').classList.toggle('hidden',which!=='result');
+    view = which;
+    if (which === 'home' && location.hash.startsWith('#guide-')) window.history.replaceState(null, '', '#guide');
+    for (const section of ['home', 'exam', 'result', 'guide', 'history']) {
+      $(section + '-view').classList.toggle('hidden', section !== which);
+    }
     window.scrollTo({top:0,behavior:'instant'});
   }
   function updateProfileLabel() {
     $('header-profile').textContent = profile ? profile.nickname : '设置我的资料';
     $('exam-profile').textContent = profile ? profile.nickname : '';
     $('delete-profile').classList.toggle('hidden',!profile);
+    $('profile-history').hidden = !profile;
   }
   async function request(path, body) {
     const controller = new AbortController(); const timer=setTimeout(()=>controller.abort(),12000);
@@ -2691,12 +3110,21 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       const next=afterProfile; $('profile-dialog').close(); afterProfile=null;
       const number = formatPlayerNumber(profile.playerNumber);
       toast(number ? `资料已保存 · 榜单编号 ${number}` : '资料已保存');
-      if(next==='start') beginExam(); else refreshRanking();
+      if(next==='start') beginExam();
+      else if (view === 'history') loadHistory();
+      else refreshRanking();
     } catch(err) { $('profile-error').textContent=err.message; }
     finally { submit.disabled=false; submit.textContent='保存资料'; }
   });
   function start() { if(!profile) showProfile('start'); else beginExam(); }
-  function beginExam() { setView('exam'); updateProfileLabel(); renderQuestion(); }
+  function beginExam() {
+    if (location.hash.startsWith('#guide-')) window.history.replaceState(null, '', location.pathname + location.search);
+    setView('exam'); updateProfileLabel(); renderQuestion();
+  }
+  function questionDiagram(question) {
+    const diagram = QUESTION_DIAGRAMS[question.id];
+    return diagram ? drawRaidDiagram(...diagram, question.id) : '';
+  }
   function selectOption(q, id, checked) {
     if(q.type==='multiple') { const current=new Set(draft.answers[q.id]||[]); if(checked) current.add(id); else current.delete(id); draft.answers[q.id]=Array.from(current); }
     else draft.answers[q.id]=[id];
@@ -2710,6 +3138,12 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
     $('question-type').textContent=TYPE_NAMES[q.type]; $('question-role').textContent=q.role;
     $('question-text').textContent=q.question;
     $('question-help').textContent=q.type==='multiple'?'可选多项；全部选对才得分。':'请选择一个答案。';
+    const figure = $('question-diagram');
+    if (figure.dataset.question !== q.id) {
+      figure.innerHTML = questionDiagram(q);
+      figure.hidden = !figure.firstElementChild;
+      figure.dataset.question = q.id;
+    }
     $('answered-count').textContent=String(done); $('progress-fill').style.width=`${100*done/qs.length}%`;
     const wrap=$('question-options'); wrap.replaceChildren();
     q.options.forEach((opt,i)=>{
@@ -2742,24 +3176,45 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
     if(missing.length) { toast(`还有 ${missing.length} 题未作答，已跳到第一道未答题。`); goto(qs.findIndex(q=>!answered(q))); return; }
     const answers=JSON.parse(JSON.stringify(draft.answers));
     const pending={attemptId:hex(16),version:bank.version,answers};
-    save(':pending',pending); result={...grade(answers),answers}; save(':last-result',result); remove(':draft');
+    save(':pending', [...pendingAttempts(), pending]);
+    result={...grade(answers),answers,attemptId:pending.attemptId}; save(':last-result',result); remove(':draft');
     draft={version:bank.version,index:0,answers:{}}; index=0; onlyWrong=false; setView('result'); renderResult(); uploadPending();
   }
   async function uploadPending() {
-    const pending=read(':pending'); if(!pending)return;
+    if (uploading || !nextPendingAttempt() || !profile) return;
+    const participant = identity;
+    uploading = true;
     $('sync-status').className='sync-status'; $('sync-status').textContent='正在保存成绩到排行榜…'; $('retry-upload').hidden=true;
     try {
-      const stored = await saveRemoteProfile();
+      const stored = await saveRemoteProfile(participant);
+      if (identity !== participant) return;
       if (stored.playerNumber && !profile.playerNumber) rememberProfile(stored);
-      const data=await request('/api/submit',{...identity,...pending});
-      if(result && (data.correctCount!==result.correctCount || data.totalCount!==result.totalCount)) throw new Error('成绩核对失败，请刷新后联系团长。');
-      remove(':pending'); $('sync-status').textContent='成绩已上传，排行榜保留你的最高分。'; refreshRanking();
-    } catch(err) { $('sync-status').className='sync-status error'; $('sync-status').textContent=`成绩已保存在本机，但尚未上传：${err.message}`; $('retry-upload').hidden=false; }
+      let attempt = nextPendingAttempt();
+      while (attempt) {
+        const data = await request('/api/submit', {...participant, ...attempt});
+        if (identity !== participant) return;
+        if (result?.attemptId === attempt.attemptId && (data.correctCount !== result.correctCount || data.totalCount !== result.totalCount)) {
+          throw new Error('成绩核对失败，请刷新后联系团长。');
+        }
+        const remaining = pendingAttempts().filter(item => item.attemptId !== attempt.attemptId);
+        if (remaining.length) save(':pending', remaining); else remove(':pending');
+        attempt = nextPendingAttempt();
+      }
+      $('sync-status').textContent='成绩已上传，排行榜保留你的最高分。'; refreshRanking();
+      if (view === 'history') loadHistory();
+    } catch(err) {
+      if (identity === participant) {
+        $('sync-status').className='sync-status error'; $('sync-status').textContent=`成绩已保存在本机，但尚未上传：${err.message}`; $('retry-upload').hidden=false;
+      }
+    } finally {
+      uploading = false;
+      if (identity !== participant && nextPendingAttempt()) uploadPending();
+    }
   }
   function renderResult() {
     if(!result)return;
     $('result-name').textContent=profile?profile.nickname:'';
-    $('result-score').textContent=Number(result.score).toFixed(result.score%1?2:0);
+    $('result-score').textContent=formatScore(result.score);
     $('result-detail').textContent=`答对 ${result.correctCount} / ${result.totalCount} 题 · 多选题全部选对才计分`;
     $('review-toggle').textContent=onlyWrong?'查看全部题目':'只看错题';
     const list=$('review-list'); list.replaceChildren();
@@ -2768,7 +3223,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       const chosen=q.options.filter(o=>selected.includes(o.id)).map(o=>o.text).join('；')||'未作答';
       const expected=q.options.filter(o=>q.answer.includes(o.id)).map(o=>o.text).join('；');
       const article=document.createElement('article'); article.className=`review-card ${correct?'correct':'wrong'}`;
-      article.innerHTML=`<div class="review-meta">${String(i+1).padStart(2,'0')} / ${escape(sectionOf(q.section).short)} · ${escape(q.role)} · ${correct?'回答正确':'回答有误'}</div><h3>${escape(q.question)}</h3><p>你的选择：${escape(chosen)}</p><p>正确答案：${escape(expected)}</p><p class="explanation">解析：${escape(q.explanation)}</p>`; list.append(article);
+      article.innerHTML=`<div class="review-meta">${String(i+1).padStart(2,'0')} / ${escape(sectionOf(q.section).short)} · ${escape(q.role)} · ${correct?'回答正确':'回答有误'}</div><h3>${escape(q.question)}</h3>${questionDiagram(q)}<p>你的选择：${escape(chosen)}</p><p>正确答案：${escape(expected)}</p><p class="explanation">解析：${escape(q.explanation)}</p>`; list.append(article);
     });
     if(!list.children.length){const p=document.createElement('p');p.className='empty-state';p.textContent='这一轮没有错题。';list.append(p);}
   }
@@ -2785,6 +3240,104 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       }
     } catch(err){loading.textContent=err.message+' 可以稍后点击刷新。';list.replaceChildren(loading);}
   }
+  function openHistory() {
+    if ($('profile-dialog').open) closeProfile();
+    if (view !== 'history') historyReturn = view;
+    setView('history');
+    $('history-title').focus({preventScroll:true});
+    loadHistory();
+  }
+  function closeHistory() {
+    ++historyRequest;
+    $('history-list').replaceChildren();
+    setView(historyReturn);
+    if (historyReturn === 'home') $('leaderboard').scrollIntoView();
+  }
+  function historyRow(entry) {
+    const row = document.createElement('li');
+    const time = document.createElement('time');
+    time.dateTime = new Date(entry.submittedAt).toISOString();
+    time.textContent = attemptDate.format(entry.submittedAt);
+    const context = document.createElement('small');
+    context.textContent = `${entry.currentVersion ? '当前题库' : '旧版题库'} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
+    const details = document.createElement('div');
+    details.append(time, context);
+    const score = document.createElement('strong');
+    score.textContent = `${formatScore(entry.score)} 分`;
+    row.append(details, score);
+    return row;
+  }
+  async function loadHistory(append = false) {
+    const cursor = append ? historyCursor : null;
+    if (append && !cursor) return;
+    const requestId = ++historyRequest;
+    const list = $('history-list');
+    const status = $('history-status');
+    const more = $('history-more');
+    if (!append) {
+      historyCursor = null;
+      list.replaceChildren();
+      $('history-summary').hidden = true;
+      more.hidden = true;
+    }
+    $('history-sign-in').hidden = Boolean(profile);
+    $('history-player').hidden = !profile;
+    $('history-refresh').hidden = !profile;
+    if (!profile) {
+      status.textContent = '保存昵称或恢复原来的身份后，即可查看你的记录。';
+      return;
+    }
+    const number = formatPlayerNumber(profile.playerNumber);
+    $('history-player').textContent = [profile.nickname, number].filter(Boolean).join(' · ');
+    status.textContent = '正在读取答题记录…';
+    more.disabled = true;
+    try {
+      const data = await request('/api/history', {...identity, cursor});
+      if (requestId !== historyRequest || view !== 'history') return;
+      $('history-count').textContent = `${data.attemptCount} 次`;
+      $('history-best').textContent = data.bestScore == null ? '—' : `${formatScore(data.bestScore)} 分`;
+      $('history-summary').hidden = false;
+      list.append(...data.entries.map(historyRow));
+      if (nextPendingAttempt()) status.textContent = '有成绩尚未上传。上传成功后会出现在这里。';
+      else status.textContent = data.attemptCount ? '按交卷时间从新到旧排列 · 北京时间' : '还没有已提交的成绩。';
+      historyCursor = data.nextCursor;
+      more.hidden = !historyCursor;
+    } catch (error) {
+      if (requestId !== historyRequest || view !== 'history') return;
+      status.textContent = error.message;
+    } finally {
+      if (requestId === historyRequest) more.disabled = false;
+    }
+  }
+  function renderGuide(chapterId) {
+    const guide = RAID_GUIDE[chapterId];
+    $('guide-title').textContent = guide.title;
+    $('guide-intro').textContent = guide.intro;
+    $('guide-chapters').innerHTML = SECTIONS.map(chapter => {
+      const active = chapter.id === chapterId ? ' aria-current="page"' : '';
+      return `<a href="#guide-${chapter.id}"${active}>${escape(chapter.short)}</a>`;
+    }).join('');
+    $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}">${escape(stage.timing)}</button>`).join('');
+    $('guide-stages').innerHTML = guide.stages.map((stage, i) => `<article class="guide-stage" id="guide-stage-${i}">
+      <p class="eyebrow">${escape(stage.timing)}</p>
+      <h2 tabindex="-1">${escape(stage.title)}</h2>
+      <div class="stage-layout">
+        ${drawRaidDiagram(stage.diagram, stage.caption)}
+        <dl class="stage-roles">${stage.roles.map(([role, action]) => `<div><dt>${escape(role)}</dt><dd>${escape(action)}</dd></div>`).join('')}</dl>
+      </div>
+      ${stage.check ? `<p class="stage-check">${escape(stage.check)}</p>` : ''}
+    </article>`).join('');
+    setView('guide');
+    $('guide-title').focus({preventScroll:true});
+  }
+  function readGuideHash() {
+    const chapter = /^#guide-(twins|spirit|witch)$/.exec(location.hash)?.[1];
+    if (chapter) renderGuide(chapter);
+    else if (view === 'guide') {
+      setView('home');
+      if (location.hash === '#guide') $('guide').scrollIntoView();
+    }
+  }
   function identityCode(who=identity) { return `${who.deviceId}.${who.secret}`; }
   async function copyIdentity() {
     const code=identityCode();
@@ -2800,10 +3353,11 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   }
   async function deleteProfile() {
     if(!profile || !confirm('确认删除你的线上资料和全部成绩？删除后无法恢复。'))return;
-    try { await request('/api/delete-profile',identity); remove(':profile');remove(':pending');remove(':last-result');remove(':draft');draft={version:bank.version,index:0,answers:{}};index=0;profile=null;identity=makeIdentity();candidate=identity;save(':identity',identity);updateProfileLabel();closeProfile();refreshRanking();toast('线上资料与成绩已删除。'); }
+    try { await request('/api/delete-profile',identity); remove(':profile');remove(':pending');remove(':last-result');remove(':draft');draft={version:bank.version,index:0,answers:{}};index=0;profile=null;identity=makeIdentity();candidate=identity;save(':identity',identity);updateProfileLabel();closeProfile();refreshRanking();if(view==='history')loadHistory();toast('线上资料与成绩已删除。'); }
     catch(err){$('profile-error').textContent=err.message;}
   }
   document.addEventListener('click',(e)=>{
+    if (view !== 'home' && e.target.closest('a[href="#guide"], a[href="#home"]')) setView('home');
     const target=e.target.closest('[data-action]'); if(!target)return;
     switch(target.dataset.action){
       case 'start': start();break;
@@ -2822,11 +3376,24 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       case 'restart': draft={version:bank.version,index:0,answers:{}};index=0;save(':draft',draft);beginExam();break;
       case 'results-home': setView('home');refreshRanking();requestAnimationFrame(()=>$('leaderboard').scrollIntoView({behavior:'smooth'}));break;
       case 'toggle-review': onlyWrong=!onlyWrong;renderResult();break;
+      case 'open-history': openHistory();break;
+      case 'close-history': closeHistory();break;
+      case 'refresh-history': loadHistory();uploadPending();break;
+      case 'history-more': loadHistory(true);break;
+      case 'history-profile': showProfile();break;
+      case 'guide-stage': {
+        const stage = $('guide-stage-' + target.dataset.stage);
+        stage.scrollIntoView({block:'start'});
+        stage.querySelector('h2').focus({preventScroll:true});
+        break;
+      }
     }
   });
   $('profile-dialog').addEventListener('cancel',()=>{afterProfile=null;candidate=identity;});
+  window.addEventListener('hashchange', readGuideHash);
+  readGuideHash();
   $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); refreshRanking();
-  if(read(':pending') && profile) uploadPending();
+  if(nextPendingAttempt() && profile) uploadPending();
 })();
 </script>
 </body>

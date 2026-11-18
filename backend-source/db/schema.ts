@@ -23,4 +23,7 @@ export const attempts = sqliteTable('attempts', {
   correctCount: integer('correct_count').notNull(),
   totalCount: integer('total_count').notNull(),
   submittedAt: integer('submitted_at').notNull(),
-}, (t) => [index('attempts_version_participant').on(t.quizVersion, t.participantId)]);
+}, (t) => [
+  index('attempts_version_participant').on(t.quizVersion, t.participantId),
+  index('attempts_participant_time').on(t.participantId, t.submittedAt, t.id),
+]);
