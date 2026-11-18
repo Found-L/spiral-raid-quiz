@@ -1,0 +1,1 @@
+CREATE INDEX `attempts_participant_time` ON `attempts` (`participant_id`,`submitted_at`,`id`);
