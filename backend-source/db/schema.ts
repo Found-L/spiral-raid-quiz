@@ -10,6 +10,12 @@ export const participants = sqliteTable('participants', {
   updatedAt: integer('updated_at').notNull(),
 }, (t) => [uniqueIndex('participants_game_id_key').on(t.gameIdKey)]);
 
+export const participantNumbers = sqliteTable('participant_numbers', {
+  number: integer('number').primaryKey({ autoIncrement: true }),
+  participantId: text('participant_id').notNull().unique()
+    .references(() => participants.id, { onDelete: 'cascade' }),
+});
+
 export const attempts = sqliteTable('attempts', {
   id: text('id').primaryKey(),
   participantId: text('participant_id').notNull().references(() => participants.id),

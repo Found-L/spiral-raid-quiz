@@ -18,7 +18,12 @@ const attemptId=rnd(16);
 let createdOne=false,createdTwo=false;
 try {
   let r=await post('/api/profile',{...one,nickname}); assert.equal(r.status,200,JSON.stringify(r.body));createdOne=true;assert.equal(r.cors,'https://found-l.github.io');
+  const firstNumber=r.body.playerNumber;
+  assert.ok(Number.isSafeInteger(firstNumber) && firstNumber > 0);
   r=await post('/api/profile',{...two,nickname});assert.equal(r.status,200);createdTwo=true;
+  const secondNumber=r.body.playerNumber;
+  assert.ok(Number.isSafeInteger(secondNumber) && secondNumber > 0);
+  assert.notEqual(firstNumber,secondNumber);
   r=await post('/api/profile',{...one,secret:two.secret,nickname:'冒用'});assert.equal(r.status,403);
   r=await post('/api/submit',{...one,attemptId:rnd(16),version:bank.version,answers:{}});assert.equal(r.status,400);
   r=await post('/api/submit',{...one,attemptId,version:bank.version,answers:perfect,score:999});assert.equal(r.status,200,JSON.stringify(r.body));assert.equal(r.body.score,100);assert.equal(r.body.correctCount,bank.questions.length);
@@ -27,12 +32,15 @@ try {
   r=await post('/api/submit',{...one,attemptId,version:bank.version,answers:incorrect});assert.equal(r.status,409);
   r=await post('/api/submit',{...one,attemptId:rnd(16),version:bank.version,answers:incorrect,score:999});assert.equal(r.status,200);assert.equal(r.body.score,0);
   r=await post('/api/submit',{...two,attemptId:rnd(16),version:bank.version,answers:incorrect});assert.equal(r.status,200);
+  let board=await ranking();assert.equal(board.status,200);
+  const sameName=board.body.entries.filter(x=>x.nickname===nickname);
+  assert.deepEqual(sameName.map(x=>x.playerNumber),[firstNumber,secondNumber]);
   const renamed = nickname+'改';
-  r=await post('/api/profile',{...one,nickname:renamed});assert.equal(r.status,200);
-  let board=await ranking();assert.equal(board.status,200);const entry=board.body.entries.find(x=>x.nickname===renamed);assert.ok(entry);assert.equal(entry.score,100);assert.ok(!JSON.stringify(board).includes(one.secret));assert.ok(!JSON.stringify(board).includes(one.deviceId));assert.ok(!('gameId' in entry));
+  r=await post('/api/profile',{...one,nickname:renamed});assert.equal(r.status,200);assert.equal(r.body.playerNumber,firstNumber);
+  board=await ranking();assert.equal(board.status,200);const entry=board.body.entries.find(x=>x.nickname===renamed);assert.ok(entry);assert.equal(entry.score,100);assert.equal(entry.playerNumber,firstNumber);assert.ok(!JSON.stringify(board).includes(one.secret));assert.ok(!JSON.stringify(board).includes(one.deviceId));assert.ok(!('gameId' in entry));
   r=await post('/api/delete-profile',{...one,secret:two.secret});assert.equal(r.status,403);
   const pre=await fetch(base+'/api/submit',{method:'OPTIONS',headers:{origin:'https://found-l.github.io','access-control-request-method':'POST','access-control-request-headers':'content-type'}});assert.equal(pre.status,204);assert.equal(pre.headers.get('access-control-allow-origin'),'https://found-l.github.io');
-  console.log('PASS nickname-only profile, duplicate nicknames, edit, authentication, server scoring, idempotent retry, best-score ranking, deletion protection, CORS.');
+  console.log('PASS unique public numbers for duplicate nicknames, renaming preserves number and score, authentication, server scoring, idempotent retry, deletion protection, CORS.');
 } finally {
   if(createdOne) await post('/api/delete-profile',one);
   if(createdTwo) await post('/api/delete-profile',two);
