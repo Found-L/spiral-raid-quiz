@@ -88,7 +88,7 @@
     const q=qs[index], section=sectionOf(q.section), done=qs.filter(answered).length;
     $('question-chapter').textContent=`${String(SECTIONS.indexOf(section)+1).padStart(2,'0')} / ${section.title}`;
     $('question-number').textContent=`${String(index+1).padStart(2,'0')} / ${qs.length}`;
-    $('question-type').textContent=TYPE_NAMES[q.type]; $('question-source').textContent=`${q.role} · ${q.source} ↗`; $('question-source').href=q.sourceUrl;
+    $('question-type').textContent=TYPE_NAMES[q.type]; $('question-role').textContent=q.role;
     $('question-text').textContent=q.question;
     $('question-help').textContent=q.type==='multiple'?'可选多项；全部选对才得分。':'请选择一个答案。';
     $('answered-count').textContent=String(done); $('progress-fill').style.width=`${100*done/qs.length}%`;
@@ -147,7 +147,7 @@
       const chosen=q.options.filter(o=>selected.includes(o.id)).map(o=>o.text).join('；')||'未作答';
       const expected=q.options.filter(o=>q.answer.includes(o.id)).map(o=>o.text).join('；');
       const article=document.createElement('article'); article.className=`review-card ${correct?'correct':'wrong'}`;
-      article.innerHTML=`<div class="review-meta">${String(i+1).padStart(2,'0')} / ${escape(sectionOf(q.section).short)} · ${escape(q.role)} · ${correct?'回答正确':'回答有误'} · <a href="${escape(q.sourceUrl)}" target="_blank" rel="noopener noreferrer">${escape(q.source)} ↗</a></div><h3>${escape(q.question)}</h3><p>你的选择：${escape(chosen)}</p><p>参考答案：${escape(expected)}</p><p class="explanation">解析：${escape(q.explanation)}</p>`; list.append(article);
+      article.innerHTML=`<div class="review-meta">${String(i+1).padStart(2,'0')} / ${escape(sectionOf(q.section).short)} · ${escape(q.role)} · ${correct?'回答正确':'回答有误'}</div><h3>${escape(q.question)}</h3><p>你的选择：${escape(chosen)}</p><p>正确答案：${escape(expected)}</p><p class="explanation">解析：${escape(q.explanation)}</p>`; list.append(article);
     });
     if(!list.children.length){const p=document.createElement('p');p.className='empty-state';p.textContent='这一轮没有错题。';list.append(p);}
   }
