@@ -65,8 +65,6 @@
 .stage-roles dt { font-weight: 700; color: var(--gold); }
 .stage-roles dd { margin: 3px 0 0; font-size: 14px; color: #d0d5d0; }
 .stage-check { margin: 14px 0 0; padding: 10px 13px; border-left: 3px solid #9f8258; background: #231f1c; color: #e2cda8; font-size: 13px; }
-.card-footer:hover span:last-child { text-decoration: underline; }
-.card-footer span:last-child { flex-shrink: 0; font-size: 12px; }
 
 .raid-diagram {
   margin: 0;
@@ -119,4 +117,75 @@
   .guide-view, .history-view { padding-top: 36px; }
   .stage-roles dd { font-size: 13px; }
   .ranking-actions { margin-top: 8px; }
+}
+
+/* A single icon language for navigation and actions. */
+.icon-library { position: absolute; width: 0; height: 0; overflow: hidden; }
+.icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: middle;
+}
+.avatar .icon { width: 19px; height: 19px; stroke-width: 1.5; }
+.profile-trigger { transition: border-color .18s, background .18s; }
+.profile-trigger:hover { border-color: #9b8562; background: #1d252c; }
+.profile-arrow { width: 15px; height: 15px; color: #c6b595; }
+.btn .icon { width: 17px; height: 17px; }
+.icon-action { display: inline-flex; align-items: center; gap: 7px; }
+.icon-action .icon { width: 16px; height: 16px; }
+.source-links a { display: inline-flex; align-items: center; gap: 4px; }
+.source-links .icon { width: 14px; height: 14px; }
+.close-button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  transition: background .18s, border-color .18s, color .18s;
+}
+.close-button:hover { color: var(--gold); border-color: var(--line); background: #222a30; }
+.close-button .icon { width: 19px; height: 19px; }
+
+.guide-card { border-radius: 3px; }
+.guide-card .diagram {
+  border: 1px solid rgba(229,214,181,.07);
+  border-radius: 3px;
+  background: radial-gradient(ellipse at center, rgba(213,189,140,.055), transparent 75%), rgba(7,13,19,.18);
+}
+.card-footer { align-items: center; gap: 12px; min-height: 61px; }
+.card-roles { min-width: 0; }
+.card-footer .card-cta { display: inline-flex; align-items: center; gap: 9px; flex: none; color: var(--gold); font-size: 12px; font-weight: 600; }
+.icon-ring {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(223,191,135,.4);
+  border-radius: 50%;
+  color: var(--gold);
+  background: rgba(223,191,135,.055);
+  transition: background .18s, border-color .18s, transform .18s;
+}
+.icon-ring .icon { width: 16px; height: 16px; }
+.card-footer:hover .icon-ring, .back-button:hover .icon-ring {
+  background: rgba(223,191,135,.16);
+  border-color: var(--gold);
+}
+.card-footer:hover .icon-ring { transform: translateX(3px); }
+.back-button { display: inline-flex; align-items: center; gap: 10px; }
+.back-button:hover .icon-ring { transform: translateX(-3px); }
+
+@media (max-width: 680px) {
+  .profile-arrow { display: none; }
+  .card-footer { gap: 8px; }
+  .card-footer .card-cta { gap: 7px; }
 }

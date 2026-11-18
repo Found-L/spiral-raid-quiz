@@ -281,7 +281,7 @@
       label.append(input,letter,text); wrap.append(label);
     });
     const prev=document.querySelector('[data-action="previous"]'); prev.disabled=index===0;
-    $('next-button').textContent=index===qs.length-1?'完成并交卷 →':'下一题 →';
+    $('next-button-label').textContent=index===qs.length-1?'完成并交卷':'下一题';
     const nav=$('question-nav'); nav.replaceChildren(); qs.forEach((item,i)=>{
       const b=document.createElement('button'); b.type='button'; b.className=`nav-number${answered(item)?' answered':''}${i===index?' current':''}`;
       b.textContent=String(i+1); b.setAttribute('aria-label',`第 ${i+1} 题${answered(item)?'，已答':''}${i===index?'，当前题':''}`);
