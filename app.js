@@ -30,6 +30,8 @@
   let toastTimer;
   const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const sectionOf = (id) => SECTIONS.find(x=>x.id===id);
+  const formatPlayerNumber = (number) => Number.isSafeInteger(number) && number > 0
+    ? `#${String(number).padStart(6, '0')}` : '';
   const answered = (q) => Array.isArray(draft.answers[q.id]) && draft.answers[q.id].length>0;
   function toast(message) { const t=$('toast'); t.textContent=message; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3200); }
   function storeDraft() { draft.index=index; save(':draft',draft); }
@@ -56,10 +58,18 @@
   }
   async function saveRemoteProfile(who=identity, data=profile) {
     if(!data) throw new Error('请先设置昵称。');
-    return request('/api/profile',{...who,...data});
+    return request('/api/profile', {...who, nickname:data.nickname});
+  }
+  function rememberProfile(stored) {
+    profile = {nickname:stored.nickname, playerNumber:stored.playerNumber};
+    save(':profile', profile);
+    updateProfileLabel();
   }
   function showProfile(next=null) {
     candidate=identity; afterProfile=next; $('nickname').value=profile?.nickname||'';
+    const number = formatPlayerNumber(profile?.playerNumber);
+    $('profile-player-number').textContent = number ? `我的榜单编号 ${number}` : '';
+    $('profile-player-number').hidden = !number;
     $('identity-code').value=''; $('profile-error').textContent='';
     if(!$('profile-dialog').open) $('profile-dialog').showModal();
   }
@@ -70,8 +80,10 @@
     try {
       const stored=await saveRemoteProfile(candidate,data);
       if(candidate.deviceId!==identity.deviceId) { remove(':pending');remove(':draft');remove(':last-result');draft={version:bank.version,index:0,answers:{}};index=0; }
-      identity=candidate; save(':identity',identity); profile={nickname:stored.nickname}; save(':profile',profile);
-      updateProfileLabel(); const next=afterProfile; $('profile-dialog').close(); afterProfile=null; toast('资料已保存');
+      identity=candidate; save(':identity',identity); rememberProfile(stored);
+      const next=afterProfile; $('profile-dialog').close(); afterProfile=null;
+      const number = formatPlayerNumber(profile.playerNumber);
+      toast(number ? `资料已保存 · 榜单编号 ${number}` : '资料已保存');
       if(next==='start') beginExam(); else refreshRanking();
     } catch(err) { $('profile-error').textContent=err.message; }
     finally { submit.disabled=false; submit.textContent='保存资料'; }
@@ -130,7 +142,9 @@
     const pending=read(':pending'); if(!pending)return;
     $('sync-status').className='sync-status'; $('sync-status').textContent='正在保存成绩到排行榜…'; $('retry-upload').hidden=true;
     try {
-      await saveRemoteProfile(); const data=await request('/api/submit',{...identity,...pending});
+      const stored = await saveRemoteProfile();
+      if (stored.playerNumber && !profile.playerNumber) rememberProfile(stored);
+      const data=await request('/api/submit',{...identity,...pending});
       if(result && (data.correctCount!==result.correctCount || data.totalCount!==result.totalCount)) throw new Error('成绩核对失败，请刷新后联系团长。');
       remove(':pending'); $('sync-status').textContent='成绩已上传，排行榜保留你的最高分。'; refreshRanking();
     } catch(err) { $('sync-status').className='sync-status error'; $('sync-status').textContent=`成绩已保存在本机，但尚未上传：${err.message}`; $('retry-upload').hidden=false; }
@@ -158,7 +172,9 @@
       if(!data.entries?.length){loading.textContent='还没有成绩，来做第一个上榜的人。';list.append(loading);return;}
       for(const entry of data.entries){
         const row=document.createElement('div');row.className='ranking-row';
-        row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong></div></div><span>${entry.correctCount} / ${entry.totalCount}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
+        const number = formatPlayerNumber(entry.playerNumber);
+        const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
+        row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
       }
     } catch(err){loading.textContent=err.message+' 可以稍后点击刷新。';list.replaceChildren(loading);}
   }
@@ -173,6 +189,7 @@
     if(!m){$('profile-error').textContent='身份码格式不正确。';return;}
     if(m[1].toLowerCase()!==identity.deviceId && (Object.keys(draft.answers).length || read(':pending')) && !confirm('恢复其他身份会清除当前浏览器未提交的答题进度，确定继续吗？'))return;
     candidate={deviceId:m[1].toLowerCase(),secret:m[2].toLowerCase()}; $('profile-error').textContent='身份码已读取，请填写昵称并保存。';
+    if (candidate.deviceId !== identity.deviceId) $('profile-player-number').hidden = true;
   }
   async function deleteProfile() {
     if(!profile || !confirm('确认删除你的线上资料和全部成绩？删除后无法恢复。'))return;
