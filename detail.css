@@ -11,6 +11,9 @@
   font: 600 clamp(32px, 4.5vw, 54px)/1.22 var(--serif);
   color: var(--text);
 }
+.guide-view h1:focus,
+.guide-stage h2:focus,
+.history-view h1:focus { outline: none; }
 
 .guide-intro { max-width: 780px; margin: 0 0 23px; color: var(--muted); }
 .guide-chapters,

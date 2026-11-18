@@ -29,6 +29,9 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   font: 600 clamp(32px, 4.5vw, 54px)/1.22 var(--serif);
   color: var(--text);
 }
+.guide-view h1:focus,
+.guide-stage h2:focus,
+.history-view h1:focus { outline: none; }
 
 .guide-intro { max-width: 780px; margin: 0 0 23px; color: var(--muted); }
 .guide-chapters,
@@ -2979,7 +2982,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       break;
     case 'witch-bomb':
       art = [arena(), circle(280, 135, 54, 'map-grid'), boss(275, 129),
-        token(305, 168, '弹', 'map-hazard'), token(257, 170, '候'), token(250, 100, '候'),
+        token(305, 168, '弹', 'map-hazard'), token(257, 170, '候'), token(289, 91, '候'),
         token(208, 194, '蛛'), token(346, 88, '队'), line('M280 135L204 61', 'map-red-line'),
         label(115, 67, '不祥气息'), label(115, 213, '蜘蛛组'), label(455, 90, '其他队员')].join('');
       if (!test) art += arrow(317, 179, 377, 215, 'map-red-line') + label(449, 218, '撤向空处');

@@ -85,7 +85,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       break;
     case 'witch-bomb':
       art = [arena(), circle(280, 135, 54, 'map-grid'), boss(275, 129),
-        token(305, 168, '弹', 'map-hazard'), token(257, 170, '候'), token(250, 100, '候'),
+        token(305, 168, '弹', 'map-hazard'), token(257, 170, '候'), token(289, 91, '候'),
         token(208, 194, '蛛'), token(346, 88, '队'), line('M280 135L204 61', 'map-red-line'),
         label(115, 67, '不祥气息'), label(115, 213, '蜘蛛组'), label(455, 90, '其他队员')].join('');
       if (!test) art += arrow(317, 179, 377, 215, 'map-red-line') + label(449, 218, '撤向空处');
