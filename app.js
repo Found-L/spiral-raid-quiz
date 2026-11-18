@@ -12,8 +12,12 @@
   const TYPE_NAMES = {single:'单选题', multiple:'多选题', judge:'判断题', fill:'选择式填空'};
   const KEY = 'spiral-temple-quiz-v1';
   const $ = (id) => document.getElementById(id);
+  let toastTimer;
   const read = (suffix, fallback=null) => { try { const v=localStorage.getItem(KEY+suffix); return v ? JSON.parse(v) : fallback; } catch { return fallback; } };
-  const save = (suffix, value) => { try { localStorage.setItem(KEY+suffix,JSON.stringify(value)); } catch { toast('浏览器无法保存进度，请检查存储设置。'); } };
+  const save = (suffix, value) => {
+    try { localStorage.setItem(KEY+suffix,JSON.stringify(value)); return true; }
+    catch { toast('浏览器无法保存进度，请检查存储设置。'); return false; }
+  };
   const remove = (suffix) => { try { localStorage.removeItem(KEY+suffix); } catch {} };
   const hex = (count) => Array.from(crypto.getRandomValues(new Uint8Array(count)), x=>x.toString(16).padStart(2,'0')).join('');
   const makeIdentity = () => ({deviceId:hex(16),secret:hex(32)});
@@ -32,7 +36,7 @@
   let historyCursor = null;
   let historyRequest = 0;
   let uploading = false;
-  let toastTimer;
+  let connecting = false;
   const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const sectionOf = (id) => SECTIONS.find(x=>x.id===id);
   const formatPlayerNumber = (number) => Number.isSafeInteger(number) && number > 0
@@ -44,6 +48,7 @@
   });
   const answered = (q) => Array.isArray(draft.answers[q.id]) && draft.answers[q.id].length>0;
   function toast(message) { const t=$('toast'); t.textContent=message; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),3200); }
+  function setConnectionUnavailable(unavailable) { $('connection-notice').hidden = !unavailable; }
   function storeDraft() { draft.index=index; save(':draft',draft); }
   function pendingAttempts() {
     const pending = read(':pending');
@@ -68,20 +73,45 @@
     const controller = new AbortController(); const timer=setTimeout(()=>controller.abort(),12000);
     try {
       const response=await fetch(API+path,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json'}:{},body:body?JSON.stringify(body):undefined,signal:controller.signal,cache:'no-store'});
-      const payload=await response.json().catch(()=>({}));
-      if(!response.ok) { const error=new Error(payload.error||'服务暂时不可用，请稍后重试。'); error.status=response.status; throw error; }
+      const payload=await response.json().catch(()=>null);
+      if(!response.ok) {
+        const error=new Error(payload?.error||'服务暂时不可用，请稍后重试。');
+        error.status=response.status;
+        error.unavailable=response.status>=500 || response.status===429 || (response.status===403 && !payload?.error);
+        throw error;
+      }
+      if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+        const error=new Error('成绩服务返回了无法识别的内容，请稍后重试。');
+        error.unavailable=true;
+        throw error;
+      }
       return payload;
-    } catch(e) { if(e.name==='AbortError') throw new Error('连接超时，请稍后重试。'); if(e instanceof TypeError) throw new Error('无法连接成绩服务，请检查网络后重试。'); throw e; }
+    } catch(e) {
+      if(e.name==='AbortError' || e instanceof TypeError) {
+        const error=new Error(e.name==='AbortError' ? '连接超时，请稍后重试。' : '无法连接成绩服务，请检查网络后重试。');
+        error.unavailable=true;
+        throw error;
+      }
+      throw e;
+    }
     finally { clearTimeout(timer); }
   }
   async function saveRemoteProfile(who=identity, data=profile) {
     if(!data) throw new Error('请先设置昵称。');
-    return request('/api/profile', {...who, nickname:data.nickname});
+    const stored = await request('/api/profile', {...who, nickname:data.nickname});
+    if (typeof stored.nickname !== 'string' || !Number.isSafeInteger(stored.playerNumber) || stored.playerNumber < 1) {
+      const error = new Error('成绩服务返回了无法识别的资料，请稍后重试。');
+      error.unavailable = true;
+      throw error;
+    }
+    return stored;
   }
   function rememberProfile(stored) {
-    profile = {nickname:stored.nickname, playerNumber:stored.playerNumber};
-    save(':profile', profile);
+    const updated = {nickname:stored.nickname, playerNumber:stored.playerNumber, localOnly:Boolean(stored.localOnly)};
+    if (!save(':profile', updated)) return false;
+    profile = updated;
     updateProfileLabel();
+    return true;
   }
   function showProfile(next=null) {
     candidate=identity; afterProfile=next; $('nickname').value=profile?.nickname||'';
@@ -92,20 +122,47 @@
     if(!$('profile-dialog').open) $('profile-dialog').showModal();
   }
   function closeProfile() { $('profile-dialog').close(); afterProfile=null; candidate=identity; }
+  function validNickname(value) {
+    const nickname = value.normalize('NFKC').trim().replace(/\s+/gu, ' ');
+    if (/[\u0000-\u001f\u007f-\u009f]/u.test(nickname) || [...nickname].length < 1 || [...nickname].length > 24) {
+      throw new Error('昵称请填写 1 至 24 个字符。');
+    }
+    return nickname;
+  }
+  function finishProfile(stored, localOnly=false) {
+    const updated = {nickname:stored.nickname, playerNumber:stored.playerNumber, localOnly};
+    if (!save(':identity', candidate)) { $('profile-error').textContent='浏览器无法保存身份，请检查存储设置。'; return; }
+    if (!save(':profile', updated)) {
+      save(':identity', identity);
+      $('profile-error').textContent='浏览器无法保存昵称，请检查存储设置。';
+      return;
+    }
+    if(candidate.deviceId!==identity.deviceId) { remove(':pending');remove(':draft');remove(':last-result');draft={version:bank.version,index:0,answers:{}};index=0; }
+    identity=candidate; profile=updated; updateProfileLabel();
+    const next=afterProfile; $('profile-dialog').close(); afterProfile=null;
+    setConnectionUnavailable(localOnly);
+    const number = formatPlayerNumber(profile.playerNumber);
+    toast(localOnly ? '昵称已保存在本机，可以开始答题。' : number ? `资料已保存 · 榜单编号 ${number}` : '资料已保存');
+    if(next==='start') beginExam();
+    else if (view === 'history') loadHistory();
+    else refreshRanking();
+    if (!localOnly && nextPendingAttempt()) uploadPending();
+  }
   $('profile-form').addEventListener('submit',async (e)=>{
-    e.preventDefault(); const submit=e.submitter || $('profile-form').querySelector('[type="submit"]'); const data={nickname:$('nickname').value.trim()};
+    e.preventDefault(); const submit=e.submitter || $('profile-form').querySelector('[type="submit"]');
+    let data;
+    try { data={nickname:validNickname($('nickname').value)}; }
+    catch(error) { $('profile-error').textContent=error.message; return; }
     $('profile-error').textContent=''; submit.disabled=true; submit.textContent='保存中…';
     try {
       const stored=await saveRemoteProfile(candidate,data);
-      if(candidate.deviceId!==identity.deviceId) { remove(':pending');remove(':draft');remove(':last-result');draft={version:bank.version,index:0,answers:{}};index=0; }
-      identity=candidate; save(':identity',identity); rememberProfile(stored);
-      const next=afterProfile; $('profile-dialog').close(); afterProfile=null;
-      const number = formatPlayerNumber(profile.playerNumber);
-      toast(number ? `资料已保存 · 榜单编号 ${number}` : '资料已保存');
-      if(next==='start') beginExam();
-      else if (view === 'history') loadHistory();
-      else refreshRanking();
-    } catch(err) { $('profile-error').textContent=err.message; }
+      finishProfile(stored);
+    } catch(err) {
+      const currentIdentity = candidate.deviceId===identity.deviceId && candidate.secret===identity.secret;
+      if(err.unavailable && currentIdentity && !profile) finishProfile(data,true);
+      else $('profile-error').textContent=err.unavailable && !currentIdentity
+        ? '暂时无法连接成绩服务，请连通后再恢复身份。' : err.message;
+    }
     finally { submit.disabled=false; submit.textContent='保存资料'; }
   });
   function start() { if(!profile) showProfile('start'); else beginExam(); }
@@ -167,8 +224,8 @@
     const missing=qs.filter(q=>!answered(q));
     if(missing.length) { toast(`还有 ${missing.length} 题未作答，已跳到第一道未答题。`); goto(qs.findIndex(q=>!answered(q))); return; }
     const answers=JSON.parse(JSON.stringify(draft.answers));
-    const pending={attemptId:hex(16),version:bank.version,answers};
-    save(':pending', [...pendingAttempts(), pending]);
+    const pending={attemptId:hex(16),version:bank.version,answers,localSubmittedAt:Date.now()};
+    if (!save(':pending', [...pendingAttempts(), pending])) return;
     result={...grade(answers),answers,attemptId:pending.attemptId}; save(':last-result',result); remove(':draft');
     draft={version:bank.version,index:0,answers:{}}; index=0; onlyWrong=false; setView('result'); renderResult(); uploadPending();
   }
@@ -180,7 +237,7 @@
     try {
       const stored = await saveRemoteProfile(participant);
       if (identity !== participant) return;
-      if (stored.playerNumber && !profile.playerNumber) rememberProfile(stored);
+      if (stored.playerNumber && (!profile.playerNumber || profile.localOnly)) rememberProfile(stored);
       let attempt = nextPendingAttempt();
       while (attempt) {
         const data = await request('/api/submit', {...participant, ...attempt});
@@ -189,18 +246,42 @@
           throw new Error('成绩核对失败，请刷新后联系团长。');
         }
         const remaining = pendingAttempts().filter(item => item.attemptId !== attempt.attemptId);
-        if (remaining.length) save(':pending', remaining); else remove(':pending');
+        if (remaining.length && !save(':pending', remaining)) throw new Error('浏览器无法保存上传进度，请检查存储设置。');
+        if (!remaining.length) remove(':pending');
         attempt = nextPendingAttempt();
       }
+      setConnectionUnavailable(false);
       $('sync-status').textContent='成绩已上传，排行榜保留你的最高分。'; refreshRanking();
       if (view === 'history') loadHistory();
     } catch(err) {
       if (identity === participant) {
+        if (err.unavailable) setConnectionUnavailable(true);
         $('sync-status').className='sync-status error'; $('sync-status').textContent=`成绩已保存在本机，但尚未上传：${err.message}`; $('retry-upload').hidden=false;
       }
     } finally {
       uploading = false;
       if (identity !== participant && nextPendingAttempt()) uploadPending();
+    }
+  }
+  async function retryConnection() {
+    if (connecting) return;
+    if (!profile) { await refreshRanking(); return; }
+    connecting = true;
+    const participant = identity;
+    const currentProfile = profile;
+    try {
+      const stored = await saveRemoteProfile(participant, currentProfile);
+      if (identity !== participant || profile !== currentProfile) return;
+      rememberProfile(stored);
+      setConnectionUnavailable(false);
+      if (nextPendingAttempt()) await uploadPending();
+      else toast('成绩服务已连接。');
+      if (view === 'history') loadHistory();
+      refreshRanking();
+    } catch (error) {
+      if (identity === participant) toast(error.message);
+    } finally {
+      connecting = false;
     }
   }
   function renderResult() {
@@ -230,7 +311,7 @@
         const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
         row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
       }
-    } catch(err){loading.textContent=err.message+' 可以稍后点击刷新。';list.replaceChildren(loading);}
+    } catch(err){loading.textContent=err.message+' 可以稍后点击刷新。';list.replaceChildren(loading);if(err.unavailable)setConnectionUnavailable(true);}
   }
   function openHistory() {
     if ($('profile-dialog').open) closeProfile();
@@ -248,10 +329,12 @@
   function historyRow(entry) {
     const row = document.createElement('li');
     const time = document.createElement('time');
-    time.dateTime = new Date(entry.submittedAt).toISOString();
-    time.textContent = attemptDate.format(entry.submittedAt);
+    if (Number.isSafeInteger(entry.submittedAt)) {
+      time.dateTime = new Date(entry.submittedAt).toISOString();
+      time.textContent = attemptDate.format(entry.submittedAt);
+    } else time.textContent = '本机记录';
     const context = document.createElement('small');
-    context.textContent = `${entry.currentVersion ? '当前题库' : '旧版题库'} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
+    context.textContent = `${entry.pending ? '待上传' : entry.currentVersion ? '当前题库' : '旧版题库'} · 答对 ${entry.correctCount} / ${entry.totalCount}`;
     const details = document.createElement('div');
     details.append(time, context);
     const score = document.createElement('strong');
@@ -296,7 +379,16 @@
       more.hidden = !historyCursor;
     } catch (error) {
       if (requestId !== historyRequest || view !== 'history') return;
-      status.textContent = error.message;
+      const local = pendingAttempts().filter(attempt => attempt.version === bank.version);
+      if (!append && error.unavailable && local.length) {
+        const rows = local.slice().reverse().map(attempt => {
+          const item = grade(attempt.answers);
+          return {...item, currentVersion:true, pending:true, submittedAt:attempt.localSubmittedAt || null};
+        });
+        list.replaceChildren(...rows.map(historyRow));
+        status.textContent = '暂时无法读取线上记录，以下是保存在本机、待上传的成绩。';
+      } else status.textContent = error.message;
+      if (error.unavailable) setConnectionUnavailable(true);
     } finally {
       if (requestId === historyRequest) more.disabled = false;
     }
@@ -365,6 +457,7 @@
       case 'show-leaderboard': setView('home');refreshRanking();requestAnimationFrame(()=>$('leaderboard').scrollIntoView({behavior:'smooth'}));break;
       case 'refresh-ranking': refreshRanking();break;
       case 'retry-upload': uploadPending();break;
+      case 'retry-connection': retryConnection();break;
       case 'restart': draft={version:bank.version,index:0,answers:{}};index=0;save(':draft',draft);beginExam();break;
       case 'results-home': setView('home');refreshRanking();requestAnimationFrame(()=>$('leaderboard').scrollIntoView({behavior:'smooth'}));break;
       case 'toggle-review': onlyWrong=!onlyWrong;renderResult();break;
@@ -383,7 +476,9 @@
   });
   $('profile-dialog').addEventListener('cancel',()=>{afterProfile=null;candidate=identity;});
   window.addEventListener('hashchange', readGuideHash);
+  window.addEventListener('online', () => { if (!$('connection-notice').hidden) retryConnection(); });
   readGuideHash();
   $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); refreshRanking();
+  if (profile?.localOnly) setConnectionUnavailable(true);
   if(nextPendingAttempt() && profile) uploadPending();
 })();
