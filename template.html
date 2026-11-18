@@ -17,6 +17,11 @@
       <button class="profile-trigger" type="button" data-action="profile" aria-haspopup="dialog"><span class="avatar" aria-hidden="true"></span><span id="header-profile">设置我的资料</span><span aria-hidden="true">↗</span></button>
     </header>
 
+    <div id="connection-notice" class="connection-notice" role="status" hidden>
+      <span>成绩服务暂时连接不上，可以继续答题。成绩先保存在此浏览器，连通后再上传排行榜。</span>
+      <button class="link-button" type="button" data-action="retry-connection">重新连接</button>
+    </div>
+
     <main>
       <div id="home-view">
         <section class="hero" id="home">
@@ -110,7 +115,7 @@
     <footer><div class="footer-brand">螺旋寺院 <span>·</span> 团队机制考核</div><p>用于团队训练，请结合当前版本实战确认。</p><span>BUILT FOR THE RAID</span></footer>
   </div>
 
-  <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭">×</button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="profile-history" class="link-button" type="button" data-action="open-history" hidden>我的答题记录 →</button><br><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
+  <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭">×</button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码是以前备份的完整代码，第一次使用只需填写上方昵称。身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="profile-history" class="link-button" type="button" data-action="open-history" hidden>我的答题记录 →</button><br><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script id="question-bank" type="application/json">/*__QUESTION_BANK__*/</script>
   <script>/*__GUIDE_JS__*/</script>
