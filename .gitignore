@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env*
+.dev.vars*
+*.pem
+node_modules/
+dist/
+.wrangler/
+.sites-runtime/
+*.tar
+*.tar.gz
