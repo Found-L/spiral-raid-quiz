@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="剑灵巅峰服螺旋寺院团本机制练习，覆盖主 T 和各机制位。">
+  <meta name="theme-color" content="#0b1019">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%23151c24' stroke='%23dfbf87' stroke-width='3'/%3E%3Cpath d='M15 39 32 21 49 39M21 42h22' fill='none' stroke='%23dfbf87' stroke-width='3'/%3E%3C/svg%3E">
+  <title>螺旋寺院 · 团本机制考核</title>
+  <style>/*__APP_CSS__*/</style>
+</head>
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <a href="#home" class="brand" aria-label="螺旋寺院机制考核首页"><span class="brand-mark">旋</span><span><strong>螺旋寺院</strong><small>团队机制考核</small></span></a>
+      <nav class="nav-links" aria-label="主导航"><a href="#guide">机制图解</a><button type="button" data-action="show-leaderboard">排行榜</button></nav>
+      <button class="profile-trigger" type="button" data-action="profile"><span class="avatar">人</span><span id="header-profile">设置我的资料</span><span aria-hidden="true">↗</span></button>
+    </header>
+
+    <main>
+      <div id="home-view">
+        <section class="hero" id="home">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="dot"></span>剑灵巅峰服 <span class="slash">/</span> 12 人团本</p>
+            <h1>一起通关<br><em>也要一起懂机制</em></h1>
+            <p class="hero-description">从双剑的球与花，到超魔灵的染灯，<br class="desktop-only">再到黑风魔女的冲锋与蜘蛛。把每个位置的关键操作，练成团队的默契。</p>
+            <div class="hero-actions"><button class="btn btn-primary" type="button" data-action="start">开始机制考核 <span>↗</span></button><a class="btn btn-ghost" href="#guide">先看机制图解 <span>↓</span></a></div>
+            <p class="hero-note">免注册 · 自动评分 · 支持中途继续</p>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <svg viewBox="0 0 540 460" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs><radialGradient id="halo"><stop stop-color="#e6b96d" stop-opacity=".33"/><stop offset="1" stop-color="#1b2630" stop-opacity="0"/></radialGradient><linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d4ac6c"/><stop offset="1" stop-color="#6f573d"/></linearGradient></defs>
+              <circle cx="285" cy="220" r="210" fill="url(#halo)"/><circle cx="285" cy="218" r="149" stroke="#d5bd8c" stroke-opacity=".16"/><circle cx="285" cy="218" r="177" stroke="#d5bd8c" stroke-opacity=".12" stroke-dasharray="3 9"/>
+              <path d="M110 335h350M147 357h276M172 381h226" stroke="#bfa578" stroke-opacity=".35"/>
+              <path d="M187 321h194l-8-106h-179l-7 106Z" fill="#0f1820" stroke="#9b805a" stroke-width="2"/>
+              <path d="m167 224 118-68 118 68-26 8-92-47-92 47-26-8Z" fill="#181d20" stroke="url(#roof)" stroke-width="2"/>
+              <path d="m197 178 88-54 88 54-21 7-67-34-67 34-21-7Z" fill="#191d20" stroke="url(#roof)" stroke-width="2"/>
+              <path d="m227 133 58-38 58 38-17 6-41-21-41 21-17-6Z" fill="#1b1e20" stroke="url(#roof)" stroke-width="2"/>
+              <path d="M269 315v-60c0-12 7-20 16-20s16 8 16 20v60M220 252v55m130-55v55" stroke="#c7a876" stroke-opacity=".8" stroke-width="2"/>
+              <path d="M285 94V68m-14 17h28M143 119l11 11m-11 0 11-11M420 155l9 9m-9 0 9-9" stroke="#d3b681" stroke-opacity=".75"/>
+              <circle cx="115" cy="237" r="5" fill="#e08d6c"/><circle cx="445" cy="263" r="5" fill="#84c4ce"/><circle cx="285" cy="43" r="3" fill="#e6c990"/>
+            </svg>
+            <span class="art-caption">THE SPIRAL TEMPLE <i></i> TEAM STUDY</span>
+          </div>
+          <div class="hero-index" aria-hidden="true">01 <span></span> 03</div>
+        </section>
+
+        <section class="overview" aria-label="考核介绍">
+          <div><strong id="metric-count">—</strong><span>道客观题</span></div><div><strong>03</strong><span>个首领区间</span></div><div><strong>100</strong><span>分满分</span></div><div><strong>∞</strong><span>可反复练习</span></div>
+        </section>
+
+        <section class="section guide-section" id="guide">
+          <div class="section-heading"><div><p class="eyebrow">ENCOUNTER GUIDE <span class="slash">/</span> 机制速览</p><h2>先认清，你的位置</h2></div><p>三个区间，各司其职。图中为分工示意，<br>具体站位和流程以团队实战为准。</p></div>
+          <div class="guide-grid">
+            <article class="guide-card twins"><div class="card-top"><span>01 / 双首领</span><span>球 · 花 · 治疗</span></div><h3>灼热剑 &amp; 酷寒剑</h3><p>分清同色与异色，让接球、踩花和治疗有序衔接。</p>
+              <svg class="diagram" viewBox="0 0 360 160" role="img" aria-label="双剑分工示意：火与冰、球花、治疗"><circle cx="95" cy="75" r="49" fill="#b64c3b" fill-opacity=".12" stroke="#d67960" stroke-opacity=".7"/><circle cx="265" cy="75" r="49" fill="#4e9fa8" fill-opacity=".12" stroke="#78b9c4" stroke-opacity=".7"/><circle cx="95" cy="75" r="18" fill="#bf6550" fill-opacity=".25"/><circle cx="265" cy="75" r="18" fill="#6ab2be" fill-opacity=".25"/><path d="M147 75h65" stroke="#cdb68a" stroke-opacity=".65" stroke-dasharray="4 5"/><circle cx="61" cy="42" r="5" fill="#dc9873"/><circle cx="130" cy="108" r="5" fill="#7ec2cd"/><circle cx="232" cy="42" r="5" fill="#dc9873"/><circle cx="297" cy="107" r="5" fill="#7ec2cd"/><text x="95" y="81" text-anchor="middle" fill="#eecab2" font-size="14">火</text><text x="265" y="81" text-anchor="middle" fill="#b9e4e8" font-size="14">冰</text><text x="180" y="142" text-anchor="middle" fill="#b8a98d" font-size="11">同色踩花 · 异色治疗</text></svg>
+              <div class="card-footer"><span>主 T / 吃球 / 踩花 / 治疗</span><span>↗</span></div></article>
+            <article class="guide-card spirit"><div class="card-top"><span>02 / 超魔灵</span><span>隔离 · 染灯</span></div><h3>超魔灵</h3><p>看清业火与隔离时间，分开确认仇恨和追踪。</p>
+              <svg class="diagram" viewBox="0 0 360 160" fill="none" role="img" aria-label="超魔灵染灯示意：中心首领及周围核心"><circle cx="180" cy="78" r="55" stroke="#c3a97a" stroke-opacity=".45" stroke-dasharray="4 5"/><circle cx="180" cy="78" r="25" fill="#c8ac79" fill-opacity=".15" stroke="#c8ac79"/><g fill="#e1c38c"><circle cx="180" cy="17" r="5"/><circle cx="233" cy="47" r="5"/><circle cx="233" cy="109" r="5"/><circle cx="180" cy="139" r="5"/><circle cx="127" cy="109" r="5"/><circle cx="127" cy="47" r="5"/></g><path d="M205 39c28 12 43 36 37 61" stroke="#79b7b5" stroke-width="2"/><path d="m235 96 7 7 3-10" stroke="#79b7b5" stroke-width="2"/><text x="180" y="83" text-anchor="middle" fill="#e6d3ae" font-size="12">引导</text></svg>
+              <div class="card-footer"><span>主副 T / 隔离 / 保护 / 染灯</span><span>↗</span></div></article>
+            <article class="guide-card witch"><div class="card-top"><span>03 / 黑风魔女</span><span>冲锋 · 蜘蛛</span></div><h3>黑风魔女</h3><p>观察正反冲与危险线，炸弹和蜘蛛各自分点处理。</p>
+              <svg class="diagram" viewBox="0 0 360 160" fill="none" role="img" aria-label="魔女机制示意：旋转危险线及蜘蛛分点"><circle cx="180" cy="80" r="59" stroke="#bfa67a" stroke-opacity=".4"/><circle cx="180" cy="80" r="25" stroke="#bfa67a" stroke-opacity=".25"/><path d="M180 80 232 51" stroke="#e17372" stroke-width="3"/><path d="M120 47a70 70 0 0 1 95-25" stroke="#d78778" stroke-opacity=".8"/><path d="m210 17 7 7-10 2" stroke="#d78778" stroke-opacity=".8"/><g fill="#87beb4"><circle cx="126" cy="112" r="6"/><circle cx="231" cy="112" r="6"/><circle cx="180" cy="19" r="6"/></g><text x="180" y="84" text-anchor="middle" fill="#e6d3ae" font-size="11">BOSS</text></svg>
+              <div class="card-footer"><span>主 T / 炸弹 / 蜘蛛 / 远点</span><span>↗</span></div></article>
+          </div>
+        </section>
+
+        <section class="section how-section"><div class="how-copy"><p class="eyebrow">HOW IT WORKS <span class="slash">/</span> 考核方式</p><h2>练的是判断，<br>也是配合。</h2><p>单选、多选、判断和选择式填空。每题等权，多选需要全部选对。完成后立即查看分数与每题解析。</p><button class="text-action" type="button" data-action="start">进入考核 <span>→</span></button></div>
+          <div class="steps"><div><span>01</span><div><strong>填写昵称</strong><p>输入你的昵称，无需注册。</p></div></div><div><span>02</span><div><strong>完成考题</strong><p>可分段答题，进度保存在当前浏览器。</p></div></div><div><span>03</span><div><strong>查看解析与排名</strong><p>排行榜保留每位玩家的最高成绩。</p></div></div></div>
+        </section>
+        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><button class="link-button" type="button" data-action="refresh-ranking">刷新榜单 ↻</button></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>正确题数</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div><p class="muted ranking-foot">同分按首次达到该成绩的时间排序。昵称可修改，本榜用于团队练习。</p></section>
+        <section class="section sources-section"><div><p class="eyebrow">BEFORE YOU START <span class="slash">/</span> 资料说明</p><h2>版本与资料</h2></div><div><p>题库按剑灵巅峰服螺旋寺院的教学视频与提供的魔女样卷编写。三个视频均在团本上线后发布；每道题可打开对应的参考时间点。</p><p>涉及团队站位、控制顺序和人员分配的题目按视频中的打法考核。实际团队配置或版本更新可能影响操作，请以团长安排和当前实战为准。</p><div class="source-links"><a href="https://www.bilibili.com/video/BV15uny6qENV/" target="_blank" rel="noopener noreferrer">双剑教学 · 10 月 22 日 ↗</a><a href="https://www.bilibili.com/video/BV1rFWY6REex/" target="_blank" rel="noopener noreferrer">超魔灵教学 · 11 月 13 日 ↗</a><a href="https://www.bilibili.com/video/BV1Gh4x6wEAt/" target="_blank" rel="noopener noreferrer">魔女教学 · 11 月 8 日 ↗</a></div></div></section>
+      </div>
+
+      <section id="exam-view" class="exam-view hidden" aria-label="机制考核">
+        <div class="exam-top"><button class="back-button" type="button" data-action="leave-exam">← 返回首页</button><div class="exam-meta"><span>螺旋寺院 · 机制考核</span><strong id="exam-profile"></strong></div><button class="link-button" type="button" data-action="profile">修改资料</button></div>
+        <div class="exam-layout"><aside class="exam-sidebar"><p class="eyebrow">YOUR PROGRESS</p><h2>考核进度</h2><div class="progress-number"><strong id="answered-count">0</strong><span id="total-count"></span></div><div class="progress-track"><div id="progress-fill"></div></div><p class="muted small">答案自动保存在当前浏览器。</p><div id="section-list" class="section-list"></div><button class="btn btn-secondary sidebar-submit" type="button" data-action="submit">交卷并查看成绩</button></aside>
+          <div class="question-area"><div class="question-bar"><span id="question-chapter">01 / 双剑</span><span id="question-number"></span></div><div class="question-card"><div class="question-label"><span id="question-type">单选题</span><a id="question-source" target="_blank" rel="noopener noreferrer">巅峰服参考 ↗</a></div><h2 id="question-text"></h2><p id="question-help" class="question-help"></p><div id="question-options" class="options"></div><div class="question-controls"><button class="btn btn-ghost" type="button" data-action="previous">← 上一题</button><button id="next-button" class="btn btn-primary" type="button" data-action="next">下一题 →</button></div></div><div class="navigator-title"><span>题目导航</span><span class="muted small">选择数字可快速跳题</span></div><div id="question-nav" class="question-nav" aria-label="题目导航"></div></div>
+        </div>
+      </section>
+
+      <section id="result-view" class="result-view hidden" aria-label="考核结果"><div class="result-head"><p class="eyebrow">ASSESSMENT COMPLETE <span class="slash">/</span> 考核完成</p><h2>这一轮，辛苦了。</h2><p id="result-name" class="muted"></p><div class="score-display"><strong id="result-score">0</strong><span> / 100</span></div><p id="result-detail"></p><p id="sync-status" class="sync-status" aria-live="polite"></p><div class="result-actions"><button class="btn btn-primary" type="button" data-action="retry-upload" id="retry-upload" hidden>重新上传成绩</button><button class="btn btn-secondary" type="button" data-action="restart">再练一次</button><button class="btn btn-ghost" type="button" data-action="results-home">查看排行榜 →</button></div></div><div class="review-head"><div><p class="eyebrow">ANSWER REVIEW</p><h2>答案与解析</h2></div><button id="review-toggle" class="link-button" type="button" data-action="toggle-review">只看错题</button></div><div id="review-list" class="review-list"></div></section>
+    </main>
+    <footer><div class="footer-brand">螺旋寺院 <span>·</span> 团队机制考核</div><p>机制参考用于团队训练，请结合当前版本实战确认。</p><span>BUILT FOR THE RAID</span></footer>
+  </div>
+
+  <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭">×</button></div><p class="muted">无需注册。昵称会显示在排行榜上，之后可以修改。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script id="question-bank" type="application/json">/*__QUESTION_BANK__*/</script>
+  <script>/*__APP_JS__*/</script>
+</body>
+</html>
