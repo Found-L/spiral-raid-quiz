@@ -36,9 +36,6 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
 
 .ranking-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.ranking-version-label{color:var(--muted);font-size:12px}
-#ranking-version{background:#151d25;border:1px solid #49514b;border-radius:2px;color:var(--text);font:inherit;font-size:12px;padding:8px 10px}
-#ranking-version:focus-visible{outline:2px solid #f4cf8e;outline-offset:4px}
 .transfer-notice{background:#1b2b2b;border-color:#506b60}
 #saved-profiles-list{display:grid;gap:8px}
 .saved-profile-row{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#d4d6ce}

@@ -45,9 +45,6 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
 
 .ranking-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.ranking-version-label{color:var(--muted);font-size:12px}
-#ranking-version{background:#151d25;border:1px solid #49514b;border-radius:2px;color:var(--text);font:inherit;font-size:12px;padding:8px 10px}
-#ranking-version:focus-visible{outline:2px solid #f4cf8e;outline-offset:4px}
 .transfer-notice{background:#1b2b2b;border-color:#506b60}
 #saved-profiles-list{display:grid;gap:8px}
 .saved-profile-row{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#d4d6ce}
@@ -250,7 +247,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         <section class="section how-section"><div class="how-copy"><p class="eyebrow">HOW IT WORKS <span class="slash">/</span> 考核方式</p><h2>练的是判断，<br>也是配合。</h2><p>单选、多选、判断和选择式填空。每题等权，多选需要全部选对。完成后立即查看分数与每题解析。</p><button class="text-action" type="button" data-action="start">进入考核 <span>→</span></button></div>
           <div class="steps"><div><span>01</span><div><strong>填写昵称</strong><p>输入你的昵称，无需注册。</p></div></div><div><span>02</span><div><strong>完成考题</strong><p>可分段答题，进度保存在当前浏览器。</p></div></div><div><span>03</span><div><strong>查看解析与排名</strong><p>排行榜保留每位玩家的最高成绩。</p></div></div></div>
         </section>
-        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><label class="ranking-version-label" for="ranking-version">查看榜单</label><select id="ranking-version"></select><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button" type="button" data-action="refresh-ranking">刷新榜单 ↻</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>正确题数</span><span>用时</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div><p class="muted ranking-foot">综合榜单保留每位玩家已完成的最新题库成绩，同一题库取最高分；做完新版后，旧版不再计入综合排名。同分按用时由短到长排列，未记录用时排在同分已计时成绩之后。用时从开始答题到交卷，包含中途离开页面的时间，仅供学习参考。</p></section>
+        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button" type="button" data-action="refresh-ranking">刷新榜单 ↻</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>正确题数</span><span>用时</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div><p class="muted ranking-foot">每位玩家显示一条成绩。同分按用时由短到长排列，未记录用时排在同分已计时成绩之后。用时从开始答题到交卷，包含中途离开页面的时间，仅供学习参考。</p></section>
         <section class="section sources-section"><div><p class="eyebrow">BEFORE YOU START <span class="slash">/</span> 资料说明</p><h2>版本与资料</h2></div><div><p>题库根据巅峰服螺旋寺院上线后的实战资料和提供的魔女试卷整理。</p><p>团队站位、控制顺序和人员分配可按配置调整，实际操作请结合当前版本和团长安排。</p><div class="source-links"><a href="https://www.bilibili.com/video/BV15uny6qENV/" target="_blank" rel="noopener noreferrer">双剑教学 · 10 月 22 日 ↗</a><a href="https://www.bilibili.com/video/BV1d9n265EyM/" target="_blank" rel="noopener noreferrer">双剑换边补充 ↗</a><a href="https://www.bilibili.com/video/BV1rFWY6REex/" target="_blank" rel="noopener noreferrer">超魔灵教学 · 11 月 13 日 ↗</a><a href="https://www.bilibili.com/video/BV1rQHP6zE56/" target="_blank" rel="noopener noreferrer">超魔灵机制补充 ↗</a><a href="https://www.bilibili.com/video/BV1Gh4x6wEAt/" target="_blank" rel="noopener noreferrer">魔女教学 · 11 月 8 日 ↗</a><a href="https://www.bilibili.com/video/BV1o1x36hEC6/" target="_blank" rel="noopener noreferrer">魔女主 T 实战 ↗</a></div></div></section>
       </div>
 
@@ -270,7 +267,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         <p id="history-player" class="muted" hidden></p>
         <div id="history-summary" class="history-summary" hidden>
           <div><span>已提交</span><strong id="history-count"></strong></div>
-          <div><span>当前题库最高分</span><strong id="history-best"></strong></div>
+          <div><span>新题库最高分</span><strong id="history-best"></strong></div>
         </div>
         <div class="history-toolbar">
           <p id="history-status" class="muted" role="status"></p>
@@ -3578,17 +3575,15 @@ function drawRaidDiagram(key, caption, questionId = null) {
     const requestId = ++rankingRequest;
     const list=$('ranking-list'); list.replaceChildren(); const loading=document.createElement('p'); loading.className='empty-state'; loading.textContent='正在读取榜单…'; list.append(loading);
     try {
-      const selectedVersion = $('ranking-version').value || 'latest';
-      const query = selectedVersion === 'latest' ? '?view=latest' : '?version=' + encodeURIComponent(selectedVersion);
-      const data=await request('/api/leaderboard' + query);
+      const data=await request('/api/leaderboard?view=latest');
       if (requestId !== rankingRequest) return;
       list.replaceChildren();
       if(!data.entries?.length){loading.textContent='还没有成绩，来做第一个上榜的人。';list.append(loading);return;}
       for(const entry of data.entries){
         const row=document.createElement('div');row.className='ranking-row';
         const number = formatPlayerNumber(entry.playerNumber);
-        const label = [number, versionLabel(entry.quizVersion)].filter(Boolean).join(' · ');
-        row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong><small>${escape(label)}</small></div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
+        const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
+        row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
       }
     } catch(err){
       if(requestId !== rankingRequest) return;
@@ -3596,21 +3591,6 @@ function drawRaidDiagram(key, caption, questionId = null) {
       list.replaceChildren(loading);
       if(err.unavailable) setConnectionUnavailable(true);
     }
-  }
-  function versionLabel(version) {
-    if (version === bank.version) return '当前题库';
-    const suffix = /-v(\d+)$/.exec(version || '');
-    return suffix ? `旧版题库 v${suffix[1]}` : '旧版题库';
-  }
-  function setupRankingVersions() {
-    const selector = $('ranking-version');
-    const versions = ['latest', bank.version, ...Object.keys(bank.draft_migrations || {}).reverse()];
-    for (const version of versions) {
-      const option = document.createElement('option');
-      option.value = version; option.textContent = version === 'latest' ? '综合榜单' : versionLabel(version); selector.append(option);
-    }
-    selector.value = 'latest';
-    selector.addEventListener('change', refreshRanking);
   }
   function openHistory() {
     if ($('profile-dialog').open) closeProfile();
@@ -3633,11 +3613,9 @@ function drawRaidDiagram(key, caption, questionId = null) {
       time.textContent = attemptDate.format(entry.submittedAt);
     } else time.textContent = '本机记录';
     const context = document.createElement('small');
-    let kind = versionLabel(entry.quizVersion);
-    if (entry.pending) kind = '待上传';
-    else if (entry.currentVersion) kind = '当前题库';
-    context.textContent = entry.pending && !entry.currentVersion ? '旧版成绩待上传'
-      : `${kind} · 答对 ${entry.correctCount} / ${entry.totalCount} · 用时 ${formatDuration(entry.elapsedSeconds)}`;
+    const kind = entry.currentVersion ? '新题库' : '旧题库';
+    context.textContent = entry.pending && !entry.currentVersion ? `${kind} · 待上传`
+      : `${kind}${entry.pending ? ' · 待上传' : ''} · 答对 ${entry.correctCount} / ${entry.totalCount} · 用时 ${formatDuration(entry.elapsedSeconds)}`;
     const details = document.createElement('div');
     details.append(time, context);
     const score = document.createElement('strong');
@@ -4011,7 +3989,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
   });
   window.addEventListener('online', () => { if (!$('connection-notice').hidden) void retryConnection(); });
   readGuideHash();
-  $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); setupRankingVersions(); initializeTransfer(); void refreshRanking();
+  $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); initializeTransfer(); void refreshRanking();
   if (profile?.localOnly) setConnectionUnavailable(true);
   if(nextPendingAttempt() && profile) uploadPending();
 })();
