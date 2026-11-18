@@ -1,0 +1,16 @@
+[Unit]
+Description=Back up the Spiral Temple leaderboard
+After=spiral-raid-quiz.service
+
+[Service]
+Type=oneshot
+User=spiral-quiz
+Group=spiral-quiz
+Environment=QUIZ_DATABASE=/var/lib/spiral-raid-quiz/quiz.sqlite3
+ExecStart=/usr/bin/python3 /opt/spiral-raid-quiz/app/backup.py
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/spiral-raid-quiz

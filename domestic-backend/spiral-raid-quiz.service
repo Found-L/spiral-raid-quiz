@@ -1,0 +1,23 @@
+[Unit]
+Description=Spiral Temple practice leaderboard
+After=network.target
+
+[Service]
+Type=simple
+User=spiral-quiz
+Group=spiral-quiz
+WorkingDirectory=/opt/spiral-raid-quiz/app
+Environment=QUIZ_DATABASE=/var/lib/spiral-raid-quiz/quiz.sqlite3
+Environment=QUIZ_PORT=8791
+ExecStart=/usr/bin/python3 /opt/spiral-raid-quiz/app/server.py
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/spiral-raid-quiz
+
+[Install]
+WantedBy=multi-user.target
