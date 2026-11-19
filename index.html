@@ -268,21 +268,23 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .badge-card.locked { border: 1px dashed #38444a; background: #111a21; cursor: default; }
 .tone-gold { --badge-color: #e5c488; }.tone-teal { --badge-color: #93cec4; }.tone-red { --badge-color: #e7a092; }.tone-violet { --badge-color: #c9b8e6; }
 .badge-crest { position: relative; isolation: isolate; width: 68px; height: 72px; flex: none; display: grid; place-items: center; color: var(--badge-color); border: 1px solid color-mix(in srgb, var(--badge-color) 80%, #fff); border-radius: 24px 24px 28px 28px; background: radial-gradient(circle at 40% 25%, color-mix(in srgb, var(--badge-color) 42%, transparent), transparent 62%), linear-gradient(145deg, #303440, #101821 78%); box-shadow: inset 0 0 0 4px #111922, inset 0 0 0 5px color-mix(in srgb, var(--badge-color) 45%, transparent), 0 7px 16px #0007; }
-.badge-crest .icon { width: 31px; height: 31px; stroke-width: 1.65; filter: drop-shadow(0 2px 5px #000b); }
+.badge-crest .icon { width: 58px; height: 58px; stroke-width: 1.65; filter: drop-shadow(0 2px 5px #000b); }
 .badge-info { display: grid; align-content: start; gap: 7px; min-width: 0; }
 .badge-title { color: var(--badge-color); font-weight: 750; font-size: 16px; }
 .badge-description { color: #cbd2cc; font-size: 12px; line-height: 1.65; }
 .badge-state { justify-self: start; display: inline-flex; align-items: center; margin-top: 3px; padding: 3px 9px; border: 1px solid #668f80; border-radius: 999px; color: #bce4d3; background: #234239; font-size: 11px; font-weight: 700; line-height: 1.4; }
 .badge-card.selected .badge-state { color: #251d10; border-color: #f2d99f; background: #f1d49a; }
-.badge-card.locked .badge-crest { color: #76838a; filter: grayscale(.85); opacity: .7; background: #182127; box-shadow: inset 0 0 0 4px #0a1016aa; }
+.badge-card.locked .badge-crest { color: #9aa7a6; background: #182127; box-shadow: inset 0 0 0 4px #0a1016aa; }
+.badge-card.locked .badge-art { filter: saturate(.55) brightness(.82); }
 .badge-card.locked .badge-title { color: #9ba7aa; }
 .badge-card.locked .badge-description { color: #9ca8a8; }
 .badge-card.locked .badge-state { color: #a8b1b3; border-color: #48565a; background: #263137; }
 .badges-actions { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 15px; padding: 8px 0; background: rgba(11,16,23,.96); }
 .badges-note { margin: 18px 0 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
 .rank-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-.badge-chip { display: inline-flex; align-items: center; gap: 3px; max-width: 100%; padding: 2px 6px; border: 1px solid color-mix(in srgb, var(--badge-color) 45%, transparent); border-radius: 3px; color: var(--badge-color); background: rgba(224,196,151,.04); font-size: 10px; line-height: 1.4; white-space: nowrap; transition: background .2s ease, border-color .2s ease; }
-.badge-chip .icon { width: 12px; height: 12px; stroke-width: 1.8; }
+.badge-chip { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; padding: 3px 8px 3px 4px; border: 1px solid color-mix(in srgb, var(--badge-color) 45%, transparent); border-radius: 999px; color: var(--badge-color); background: linear-gradient(120deg, color-mix(in srgb, var(--badge-color) 15%, #16212a), #152029); font-size: 12px; font-weight: 650; line-height: 1.4; white-space: nowrap; transition: background .2s ease, border-color .2s ease; }
+.badge-chip-emblem { display: grid; place-items: center; width: 27px; height: 27px; flex: none; border: 1px solid color-mix(in srgb, var(--badge-color) 55%, transparent); border-radius: 50%; background: #10202a; }
+.badge-chip .icon { width: 26px; height: 26px; stroke-width: 1.8; }
 .result-honors { display: inline-grid; gap: 7px; margin-top: 15px; padding: 13px 18px; border: 1px solid #826b4b; border-radius: 8px; background: #271f1a; text-align: left; }
 .result-honors > span { color: #f0d19d; font-size: 13px; font-weight: 700; }
 .result-honors > div { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -294,7 +296,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   .badges-view { padding-top: 36px; }
   .badges-grid { grid-template-columns: 1fr; }
   .badge-card { min-height: 0; }
-  .badge-chip { font-size: 10px; }
+  .badge-chip { font-size: 11px; }
   .diagram-dialog { max-height: 90vh; }
 }
 
@@ -303,10 +305,10 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .guide-card:focus-within { border-color: var(--accent); }
 .guide-stage:focus-within { border-color: #ad9167; box-shadow: 0 0 0 2px #d3aa7017; }
 .ranking-list .ranking-row { transition: background .2s ease, border-color .2s ease; }
-.ranking-row:first-child { background: linear-gradient(90deg, #d9b8780d, transparent 65%); }
-.ranking-list .rank-number { width: 30px; min-width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #6b604c; border-radius: 50%; background: #211f1b; font-size: 14px; }
-.ranking-row:nth-child(2) .rank-number { color: #c5d1d2; border-color: #647a7d; background: #1b282b; }
-.ranking-row:nth-child(3) .rank-number { color: #ddb39b; border-color: #86675a; background: #2b211e; }
+.ranking-row[data-rank="1"] { background: linear-gradient(90deg, #d9b8780d, transparent 65%); }
+.ranking-list .rank-number { width: auto; min-width: 30px; height: 30px; padding-inline: 5px; display: grid; place-items: center; border: 1px solid #6b604c; border-radius: 999px; background: #211f1b; font-size: 14px; }
+.ranking-row[data-rank="2"] .rank-number { color: #c5d1d2; border-color: #647a7d; background: #1b282b; }
+.ranking-row[data-rank="3"] .rank-number { color: #ddb39b; border-color: #86675a; background: #2b211e; }
 .badge-card .badge-crest { transition: transform .24s ease, box-shadow .24s ease; }
 
 @media (hover: hover) and (pointer: fine) {
@@ -339,7 +341,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 @keyframes badge-select { 0% { transform: scale(.98); } 55% { transform: scale(1.015); } 100% { transform: scale(1); } }
 
 @media (max-width: 680px) {
-  .ranking-list .rank-number { width: 24px; min-width: 24px; height: 24px; font-size: 12px; }
+  .ranking-list .rank-number { min-width: 24px; height: 24px; padding-inline: 4px; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .map-route-glow { display: none; }
@@ -357,12 +359,10 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .badge-card.locked:before { opacity: .16; }
 .badge-crest:before { content: ''; position: absolute; z-index: -1; inset: 9px; border: 1px dashed color-mix(in srgb, var(--badge-color) 60%, transparent); border-radius: 50%; }
 .badge-crest:after { content: '✦'; position: absolute; top: -6px; right: -5px; color: var(--badge-color); font-size: 15px; text-shadow: 0 0 10px currentColor; }
-.badge-crest .badge-bomb-art { width: 52px; height: 52px; }
 .badge-card.locked .badge-crest:after { opacity: .35; }
 .badge-card.selected .badge-crest { box-shadow: inset 0 0 0 4px #111922, inset 0 0 0 5px var(--badge-color), 0 0 18px color-mix(in srgb, var(--badge-color) 24%, transparent); }
 .badge-card.selected:after { content: '✓'; position: absolute; top: 12px; right: 14px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #261b0e; background: #f3d18d; font-size: 13px; font-weight: 800; }
 .badge-card.selected .badge-info { padding-right: 17px; }
-.badge-chip .badge-bomb-art { width: 17px; height: 17px; }
 .option:focus-within { border-color: #e3c38a; box-shadow: 0 0 0 2px #e3c38a28; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -372,7 +372,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   .raid-diagram .map-token-ring { animation: token-pulse 2.8s ease-in-out infinite; }
   .badge-card.earned .badge-crest:before { animation: crest-spin 16s linear infinite; }
   .badge-card.earned .badge-crest:after { animation: crest-spark 2s ease-in-out infinite; }
-  .badge-card.earned .badge-bomb-art { animation: bomb-bob 2.8s ease-in-out infinite; }
+  .badge-card .badge-art { animation: bomb-bob 3.8s ease-in-out infinite; }
   .question-enter { animation: question-arrive .35s ease-out; }
   .question-enter .option { animation: option-arrive .34s backwards; }
   .question-enter .option:nth-child(2) { animation-delay: .035s; }
@@ -387,6 +387,49 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 @keyframes crest-spin { to { transform: rotate(360deg); } }
 @keyframes crest-spark { 0%, 100% { opacity: .55; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.18); } }
 @keyframes bomb-bob { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(4deg) translateY(-2px); } }
+
+/* Board navigation stays compact even when thousands of players have scores. */
+.ranking-pagination { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 14px; padding: 18px 4px 3px; color: #c2cbc7; font-size: 14px; }
+.ranking-pagination[hidden] { display: none; }
+.ranking-page-controls, .ranking-page-controls form { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ranking-page-controls button, .ranking-page-controls input { min-height: 38px; border: 1px solid #53635f; border-radius: 5px; color: #f0dcba; background: #142029; }
+.ranking-page-controls button { padding: 6px 13px; }
+.ranking-page-controls button:hover:not(:disabled) { border-color: #e3c38a; background: #24332f; }
+.ranking-page-controls button:disabled { opacity: .42; cursor: default; }
+.ranking-page-controls input { width: 66px; padding: 5px 8px; text-align: center; }
+.ranking-page-controls label { margin-left: 7px; color: #bfc9c4; }
+.map-flow-dot { fill: #fff1bd; stroke: #e4ba7a; stroke-width: 1.5; pointer-events: none; }
+.map-wave-ring { fill: none; stroke: #f3d59d; stroke-width: 2; transform-box: fill-box; transform-origin: center; }
+.hero-orbit, .hero-ring, .guide-witch-ray { transform-box: view-box; transform-origin: center; }
+.guide-orb, .guide-lights circle, .hero-spark, .map-spiderling, .map-lamp { transform-box: fill-box; transform-origin: center; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-orbit { animation: hero-orbit-spin 36s linear infinite; }
+  .hero-ring { animation: ambient-pulse 5s ease-in-out infinite alternate; }
+  .hero-spark { animation: ambient-pulse 3s ease-in-out infinite alternate; }
+  .hero-spark:nth-of-type(even) { animation-delay: -1.2s; }
+  .guide-orb { animation: guide-orb-pulse 2.4s ease-in-out infinite alternate; }
+  .guide-orb:nth-of-type(even) { animation-delay: -1s; }
+  .guide-lights circle { animation: guide-orb-pulse 2.8s ease-in-out infinite alternate; }
+  .guide-lights circle:nth-child(2n) { animation-delay: -.9s; }
+  .guide-lights circle:nth-child(3n) { animation-delay: -1.8s; }
+  .guide-witch-ray { transform-origin: 180px 80px; animation: hero-orbit-spin 17s linear infinite; }
+  .guide-direction { stroke-dasharray: 5 5; animation: route-flow 2.8s linear infinite; }
+  .map-spiderling { animation: guide-orb-pulse 2.1s ease-in-out infinite alternate; }
+  .map-lamp { animation: guide-orb-pulse 3s ease-in-out infinite alternate; }
+  .map-scan { animation: ambient-pulse 3s ease-in-out infinite alternate; }
+  .map-wave-ring { animation: wave-spread 2.6s ease-out infinite; }
+  .legend-mark { animation: ambient-pulse 3s ease-in-out infinite alternate; }
+  .badge-chip .badge-art { animation: badge-chip-glint 4s ease-in-out infinite; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-flow-dot { display: none; }
+}
+@keyframes hero-orbit-spin { to { transform: rotate(360deg); } }
+@keyframes ambient-pulse { from { opacity: .55; } to { opacity: 1; } }
+@keyframes guide-orb-pulse { from { opacity: .6; filter: brightness(.9); } to { opacity: 1; filter: brightness(1.35); } }
+@keyframes wave-spread { from { opacity: .9; transform: scale(.55); } to { opacity: .08; transform: scale(1.4); } }
+@keyframes badge-chip-glint { 0%, 80%, 100% { transform: rotate(0); } 90% { transform: rotate(-9deg) scale(1.05); } }
 @keyframes question-arrive { from { opacity: .72; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes option-arrive { from { opacity: .5; transform: translateX(-7px); } to { opacity: 1; transform: translateX(0); } }
 </style>
@@ -451,7 +494,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
           <div class="hero-art" aria-hidden="true">
             <svg viewBox="0 0 540 460" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs><radialGradient id="halo"><stop stop-color="#e6b96d" stop-opacity=".33"/><stop offset="1" stop-color="#1b2630" stop-opacity="0"/></radialGradient><linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d4ac6c"/><stop offset="1" stop-color="#6f573d"/></linearGradient></defs>
-              <circle cx="285" cy="220" r="210" fill="url(#halo)"/><circle cx="285" cy="218" r="149" stroke="#d5bd8c" stroke-opacity=".16"/><circle cx="285" cy="218" r="177" stroke="#d5bd8c" stroke-opacity=".12" stroke-dasharray="3 9"/>
+              <circle cx="285" cy="220" r="210" fill="url(#halo)"/><circle class="hero-ring" cx="285" cy="218" r="149" stroke="#d5bd8c" stroke-opacity=".16"/><circle class="hero-orbit" cx="285" cy="218" r="177" stroke="#d5bd8c" stroke-opacity=".12" stroke-dasharray="3 9"/>
               <path d="M110 335h350M147 357h276M172 381h226" stroke="#bfa578" stroke-opacity=".35"/>
               <path d="M187 321h194l-8-106h-179l-7 106Z" fill="#0f1820" stroke="#9b805a" stroke-width="2"/>
               <path d="m167 224 118-68 118 68-26 8-92-47-92 47-26-8Z" fill="#181d20" stroke="url(#roof)" stroke-width="2"/>
@@ -459,7 +502,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
               <path d="m227 133 58-38 58 38-17 6-41-21-41 21-17-6Z" fill="#1b1e20" stroke="url(#roof)" stroke-width="2"/>
               <path d="M269 315v-60c0-12 7-20 16-20s16 8 16 20v60M220 252v55m130-55v55" stroke="#c7a876" stroke-opacity=".8" stroke-width="2"/>
               <path d="M285 94V68m-14 17h28M143 119l11 11m-11 0 11-11M420 155l9 9m-9 0 9-9" stroke="#d3b681" stroke-opacity=".75"/>
-              <circle cx="115" cy="237" r="5" fill="#e08d6c"/><circle cx="445" cy="263" r="5" fill="#84c4ce"/><circle cx="285" cy="43" r="3" fill="#e6c990"/>
+              <circle class="hero-spark" cx="115" cy="237" r="5" fill="#e08d6c"/><circle class="hero-spark" cx="445" cy="263" r="5" fill="#84c4ce"/><circle class="hero-spark" cx="285" cy="43" r="3" fill="#e6c990"/>
             </svg>
             <span class="art-caption">THE SPIRAL TEMPLE <i></i> TEAM STUDY</span>
           </div>
@@ -474,13 +517,13 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
           <div class="section-heading"><div><p class="eyebrow">ENCOUNTER GUIDE <span class="slash">/</span> 机制速览</p><h2>先认清，你的位置</h2></div><p>三个区间，各司其职。图中为分工示意，<br>具体站位和流程以团队实战为准。</p></div>
           <div class="guide-grid">
             <article class="guide-card twins"><div class="card-top"><span>01 / 双首领</span><span>球 · 花 · 治疗</span></div><h3>灼热剑 &amp; 酷寒剑</h3><p>分清同色与异色，让接球、踩花和治疗有序衔接。</p>
-              <svg class="diagram" viewBox="0 0 360 160" role="img" aria-label="双剑分工示意：火与冰、球花、治疗"><circle cx="95" cy="75" r="49" fill="#b64c3b" fill-opacity=".12" stroke="#d67960" stroke-opacity=".7"/><circle cx="265" cy="75" r="49" fill="#4e9fa8" fill-opacity=".12" stroke="#78b9c4" stroke-opacity=".7"/><circle cx="95" cy="75" r="18" fill="#bf6550" fill-opacity=".25"/><circle cx="265" cy="75" r="18" fill="#6ab2be" fill-opacity=".25"/><path d="M147 75h65" stroke="#cdb68a" stroke-opacity=".65" stroke-dasharray="4 5"/><circle cx="61" cy="42" r="5" fill="#dc9873"/><circle cx="130" cy="108" r="5" fill="#7ec2cd"/><circle cx="232" cy="42" r="5" fill="#dc9873"/><circle cx="297" cy="107" r="5" fill="#7ec2cd"/><text x="95" y="81" text-anchor="middle" fill="#eecab2" font-size="14">火</text><text x="265" y="81" text-anchor="middle" fill="#b9e4e8" font-size="14">冰</text><text x="180" y="142" text-anchor="middle" fill="#b8a98d" font-size="11">同色踩花 · 异色治疗</text></svg>
+              <svg class="diagram" viewBox="0 0 360 160" role="img" aria-label="双剑分工示意：火与冰、球花、治疗"><circle cx="95" cy="75" r="49" fill="#b64c3b" fill-opacity=".12" stroke="#d67960" stroke-opacity=".7"/><circle cx="265" cy="75" r="49" fill="#4e9fa8" fill-opacity=".12" stroke="#78b9c4" stroke-opacity=".7"/><circle cx="95" cy="75" r="18" fill="#bf6550" fill-opacity=".25"/><circle cx="265" cy="75" r="18" fill="#6ab2be" fill-opacity=".25"/><path d="M147 75h65" stroke="#cdb68a" stroke-opacity=".65" stroke-dasharray="4 5"/><circle class="guide-orb" cx="61" cy="42" r="5" fill="#dc9873"/><circle class="guide-orb" cx="130" cy="108" r="5" fill="#7ec2cd"/><circle class="guide-orb" cx="232" cy="42" r="5" fill="#dc9873"/><circle class="guide-orb" cx="297" cy="107" r="5" fill="#7ec2cd"/><text x="95" y="81" text-anchor="middle" fill="#eecab2" font-size="14">火</text><text x="265" y="81" text-anchor="middle" fill="#b9e4e8" font-size="14">冰</text><text x="180" y="142" text-anchor="middle" fill="#b8a98d" font-size="11">同色踩花 · 异色治疗</text></svg>
               <a class="card-footer" href="#guide-twins" aria-label="查看双剑详细图解"><span class="card-roles">主 T / 吃球 / 踩花 / 治疗</span><span class="card-cta">查看图解 <span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-right"/></svg></span></span></a></article>
             <article class="guide-card spirit"><div class="card-top"><span>02 / 超魔灵</span><span>隔离 · 染灯</span></div><h3>超魔灵</h3><p>看清业火与隔离时间，分开确认仇恨和追踪。</p>
-              <svg class="diagram" viewBox="0 0 360 160" fill="none" role="img" aria-label="超魔灵染灯示意：中心首领及周围核心"><circle cx="180" cy="78" r="55" stroke="#c3a97a" stroke-opacity=".45" stroke-dasharray="4 5"/><circle cx="180" cy="78" r="25" fill="#c8ac79" fill-opacity=".15" stroke="#c8ac79"/><g fill="#e1c38c"><circle cx="180" cy="17" r="5"/><circle cx="233" cy="47" r="5"/><circle cx="233" cy="109" r="5"/><circle cx="180" cy="139" r="5"/><circle cx="127" cy="109" r="5"/><circle cx="127" cy="47" r="5"/></g><path d="M205 39c28 12 43 36 37 61" stroke="#79b7b5" stroke-width="2"/><path d="m235 96 7 7 3-10" stroke="#79b7b5" stroke-width="2"/><text x="180" y="83" text-anchor="middle" fill="#e6d3ae" font-size="12">引导</text></svg>
+              <svg class="diagram" viewBox="0 0 360 160" fill="none" role="img" aria-label="超魔灵染灯示意：中心首领及周围核心"><circle cx="180" cy="78" r="55" stroke="#c3a97a" stroke-opacity=".45" stroke-dasharray="4 5"/><circle cx="180" cy="78" r="25" fill="#c8ac79" fill-opacity=".15" stroke="#c8ac79"/><g class="guide-lights" fill="#e1c38c"><circle cx="180" cy="17" r="5"/><circle cx="233" cy="47" r="5"/><circle cx="233" cy="109" r="5"/><circle cx="180" cy="139" r="5"/><circle cx="127" cy="109" r="5"/><circle cx="127" cy="47" r="5"/></g><path class="guide-direction" d="M205 39c28 12 43 36 37 61" stroke="#79b7b5" stroke-width="2"/><path d="m235 96 7 7 3-10" stroke="#79b7b5" stroke-width="2"/><text x="180" y="83" text-anchor="middle" fill="#e6d3ae" font-size="12">引导</text></svg>
               <a class="card-footer" href="#guide-spirit" aria-label="查看超魔灵详细图解"><span class="card-roles">主 T / 业火 / 隔离 / 染灯</span><span class="card-cta">查看图解 <span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-right"/></svg></span></span></a></article>
             <article class="guide-card witch"><div class="card-top"><span>03 / 黑风魔女</span><span>冲锋 · 蜘蛛</span></div><h3>黑风魔女</h3><p>观察正反冲与危险线，炸弹和蜘蛛各自分点处理。</p>
-              <svg class="diagram" viewBox="0 0 360 160" fill="none" role="img" aria-label="魔女机制示意：旋转危险线及蜘蛛分点"><circle cx="180" cy="80" r="59" stroke="#bfa67a" stroke-opacity=".4"/><circle cx="180" cy="80" r="25" stroke="#bfa67a" stroke-opacity=".25"/><path d="M180 80 232 51" stroke="#e17372" stroke-width="3"/><path d="M120 47a70 70 0 0 1 95-25" stroke="#d78778" stroke-opacity=".8"/><path d="m210 17 7 7-10 2" stroke="#d78778" stroke-opacity=".8"/><g fill="#87beb4"><circle cx="126" cy="112" r="6"/><circle cx="231" cy="112" r="6"/><circle cx="180" cy="19" r="6"/></g><text x="180" y="84" text-anchor="middle" fill="#e6d3ae" font-size="11">BOSS</text></svg>
+              <svg class="diagram" viewBox="0 0 360 160" fill="none" role="img" aria-label="魔女机制示意：旋转危险线及蜘蛛分点"><circle cx="180" cy="80" r="59" stroke="#bfa67a" stroke-opacity=".4"/><circle cx="180" cy="80" r="25" stroke="#bfa67a" stroke-opacity=".25"/><g class="guide-witch-ray"><path d="M180 80 232 51" stroke="#e17372" stroke-width="3"/></g><path d="M120 47a70 70 0 0 1 95-25" stroke="#d78778" stroke-opacity=".8"/><path d="m210 17 7 7-10 2" stroke="#d78778" stroke-opacity=".8"/><g fill="#87beb4"><circle cx="126" cy="112" r="6"/><circle cx="231" cy="112" r="6"/><circle cx="180" cy="19" r="6"/></g><text x="180" y="84" text-anchor="middle" fill="#e6d3ae" font-size="11">BOSS</text></svg>
               <a class="card-footer" href="#guide-witch" aria-label="查看黑风魔女详细图解"><span class="card-roles">主 T / 控制 / 炸弹 / 蜘蛛</span><span class="card-cta">查看图解 <span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-right"/></svg></span></span></a></article>
           </div>
         </section>
@@ -488,7 +531,9 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         <section class="section how-section"><div class="how-copy"><p class="eyebrow">HOW IT WORKS <span class="slash">/</span> 考核方式</p><h2>练的是判断，<br>也是配合。</h2><p>单选、多选、判断和选择式填空。每题等权，多选需要全部选对。完成后立即查看分数与每题解析。</p><button class="text-action icon-action" type="button" data-action="start">进入考核 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div>
           <div class="steps"><div><span>01</span><div><strong>填写昵称</strong><p>输入你的昵称，无需注册。</p></div></div><div><span>02</span><div><strong>完成考题</strong><p>可分段答题，进度保存在当前浏览器。</p></div></div><div><span>03</span><div><strong>查看解析与排名</strong><p>排行榜保留每位玩家的最高成绩。</p></div></div></div>
         </section>
-        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button icon-action" type="button" data-action="refresh-ranking"><svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg>刷新榜单</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>正确题数</span><span>用时</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div><p class="muted ranking-foot">每位玩家显示一条成绩。同分按用时由短到长排列，未记录用时排在同分已计时成绩之后。新答卷仅计算答题页在前台的时间；旧成绩可能包含离开时间。用时由浏览器记录，仅供学习参考。</p></section>
+        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button icon-action" type="button" data-action="refresh-ranking"><svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg>刷新榜单</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>正确题数</span><span>用时</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div>
+          <nav class="ranking-pagination" id="ranking-pagination" aria-label="榜单分页" hidden><span id="ranking-page-status" aria-live="polite"></span><div class="ranking-page-controls"><button type="button" id="ranking-previous" data-action="ranking-previous">上一页</button><button type="button" id="ranking-next" data-action="ranking-next">下一页</button><form id="ranking-page-form"><label for="ranking-page-input">跳至</label><input id="ranking-page-input" type="number" min="1" inputmode="numeric" required><span>页</span><button type="submit">前往</button></form></div></nav>
+          <p class="muted ranking-foot">每位玩家显示一条成绩，最多展示 3 枚勋章。同分按用时由短到长排列，未记录用时排在同分已计时成绩之后。新答卷仅计算答题页在前台的时间；旧成绩可能包含离开时间。用时由浏览器记录，仅供学习参考。</p></section>
         <section class="section sources-section"><div><p class="eyebrow">BEFORE YOU START <span class="slash">/</span> 资料说明</p><h2>版本与资料</h2></div><div><p>题库根据巅峰服螺旋寺院上线后的实战资料和提供的魔女试卷整理。</p><p>团队站位、控制顺序和人员分配可按配置调整，实际操作请结合当前版本和团长安排。</p><div class="source-links"><a href="https://www.bilibili.com/video/BV15uny6qENV/" target="_blank" rel="noopener noreferrer">双剑教学 · 10 月 22 日 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1d9n265EyM/" target="_blank" rel="noopener noreferrer">双剑换边补充 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1rFWY6REex/" target="_blank" rel="noopener noreferrer">超魔灵教学 · 11 月 13 日 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1rQHP6zE56/" target="_blank" rel="noopener noreferrer">超魔灵机制补充 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1Gh4x6wEAt/" target="_blank" rel="noopener noreferrer">魔女教学 · 11 月 8 日 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1o1x36hEC6/" target="_blank" rel="noopener noreferrer">魔女主 T 实战 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a></div></div></section>
       </div>
 
@@ -550,7 +595,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   <dialog id="restart-dialog" aria-labelledby="restart-title"><div class="dialog-top"><div><p class="eyebrow">A FRESH START</p><h2 id="restart-title">重新开始这一轮？</h2></div><button class="close-button" type="button" data-action="cancel-restart" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted restart-description">本轮未交卷的答案将清空，题目和选项会重新打乱，计时归零。已提交的成绩和勋章会保留。</p><div class="dialog-actions"><button class="btn btn-primary" type="button" data-action="confirm-restart">重新考核</button><button class="btn btn-ghost" type="button" data-action="cancel-restart">继续答题</button></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script id="question-bank" type="application/json">{
-  "version": "peak-spiral-2026-11-18-v7",
+  "version": "peak-spiral-2026-11-18-v8",
   "title": "剑灵巅峰服螺旋寺院机制考核",
   "draft_migrations": {
     "peak-spiral-2026-11-18-v2": [
@@ -653,7 +698,9 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "q097",
       "q098",
       "q099",
-      "q100"
+      "q100",
+      "q101",
+      "q102"
     ],
     "peak-spiral-2026-11-18-v3": [
       "q009",
@@ -686,7 +733,9 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "q097",
       "q098",
       "q099",
-      "q100"
+      "q100",
+      "q101",
+      "q102"
     ],
     "peak-spiral-2026-11-18-v4": [
       "q018",
@@ -703,7 +752,9 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "q097",
       "q098",
       "q099",
-      "q100"
+      "q100",
+      "q101",
+      "q102"
     ],
     "peak-spiral-2026-11-18-v5": [
       "q088",
@@ -718,7 +769,9 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "q097",
       "q098",
       "q099",
-      "q100"
+      "q100",
+      "q101",
+      "q102"
     ],
     "peak-spiral-2026-11-18-v6": [
       "q095",
@@ -726,7 +779,13 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "q097",
       "q098",
       "q099",
-      "q100"
+      "q100",
+      "q101",
+      "q102"
+    ],
+    "peak-spiral-2026-11-18-v7": [
+      "q101",
+      "q102"
     ]
   },
   "questions": [
@@ -3611,6 +3670,64 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         "a"
       ],
       "explanation": "按团队分点和聚怪安排输出，避免拆散小蜘蛛或干扰炸弹位。"
+    },
+    {
+      "id": "q101",
+      "section": "witch",
+      "role": "远点位",
+      "type": "single",
+      "question": "黑风魔女第二次飞天结束后的常规阶段，哪名玩家应特别留意震荡波点名？",
+      "options": [
+        {
+          "id": "a",
+          "text": "距离首领最近的玩家"
+        },
+        {
+          "id": "b",
+          "text": "距离首领最远的玩家"
+        },
+        {
+          "id": "c",
+          "text": "只有主 T 会被点名"
+        },
+        {
+          "id": "d",
+          "text": "仅正在治疗的玩家"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "后期震荡波可能锁定距离首领最远的玩家，远点位要留意出招预兆。"
+    },
+    {
+      "id": "q102",
+      "section": "witch",
+      "role": "远点位",
+      "type": "single",
+      "question": "黑风魔女后期震荡波即将到达时，远点位应如何处理？",
+      "options": [
+        {
+          "id": "a",
+          "text": "观察波纹到达时机并起跳躲避"
+        },
+        {
+          "id": "b",
+          "text": "不看出招，贴着危险线继续输出"
+        },
+        {
+          "id": "c",
+          "text": "站在原地等待波纹经过"
+        },
+        {
+          "id": "d",
+          "text": "冲到炸弹位身边共同承受"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "观察首领出招与波纹到达时机，使用跳跃规避，并留意附近危险线。"
     }
   ]
 }
@@ -3757,6 +3874,16 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
           ['普通输出（无机制任务）', '飞天后按队长分点协助输出，先让聚怪位把小蜘蛛聚好，不要把小怪拉散；第二次落地后仍要避开首领、炸弹和蜘蛛路线。'],
         ],
       },
+      {
+        timing: '约 41% 飞天结束后', title: '远点留意震荡波，掌握起跳时机', diagram: 'witch-wave',
+        caption: '首领与远点位的示意位置；范围、出招时机以场内显示为准。',
+        roles: [
+          ['远点位', '后期按团队分工保持远点，留意可能锁定最远玩家的震荡波。观察首领的出招预兆和波纹到达时机，起跳躲避。'],
+          ['普通输出（无机制任务）', '确认自己的位置，不要无意抢到远点；留出远点位的活动空间，并同时留意蜘蛛与炸弹路线。'],
+          ['主 T 与指挥', '带位时兼顾蜘蛛组、危险线与远点，点名混乱时及时报位置并调整分工。'],
+        ],
+        check: '跳跃需要看实际波纹时机；站位和撤离方向以当场首领位置、队友分工为准。',
+      },
     ],
   },
 };
@@ -3782,6 +3909,7 @@ const QUESTION_DIAGRAMS = {
   q096: ['twins-swap', '中间是两侧之间的过河区域。'],
   q097: ['twins-orbs', '图中展示双剑两侧的火球与冰球。'],
   q099: ['witch-line', '红线是不祥气息，附近有近战队员。'],
+  q102: ['witch-wave', '图中标出首领和远点队员，范围与时机以场内为准。'],
   q100: ['witch-spiders', '小蜘蛛分散在大蜘蛛附近。'],
 };
 
@@ -3797,14 +3925,15 @@ function drawRaidDiagram(key, caption, questionId = null) {
     const shaft = `M${x1} ${y1}L${x2} ${y2}`;
     const arrowhead = `M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`;
     // Animate only existing route arrows; facing indicators remain static.
-    return line(shaft + arrowhead, style) + (animate ? line(shaft, 'map-route-glow') : '');
+    const traveler = `<circle class="map-flow-dot" r="4"><animateMotion path="${shaft}" dur="3s" repeatCount="indefinite"/></circle>`;
+    return line(shaft + arrowhead, style) + (animate ? line(shaft, 'map-route-glow') + traveler : '');
   };
   const token = (x, y, text, style = 'map-ally', radius = 12) =>
     circle(x, y, radius, style) + circle(x, y, Math.max(radius - 3, 1), 'map-token-ring') + label(x, y + 4.5, text, 'map-token');
   const arena = (x = 280, y = 135, radius = 106) => circle(x, y, radius, 'map-field') + circle(x, y, radius - 12, 'map-grid');
   const boss = (x = 280, y = 135, text = '首领', style = 'map-boss') => token(x, y, text, style, 24);
   const spider = (x, y) => token(x, y, '大', 'map-boss', 17);
-  const swarm = (x, y) => [[-16, -4], [9, -16], [12, 9], [-6, 15]].map(([dx,dy]) => circle(x+dx, y+dy, 5, 'map-hazard')).join('');
+  const swarm = (x, y) => [[-16, -4], [9, -16], [12, 9], [-6, 15]].map(([dx,dy]) => circle(x+dx, y+dy, 5, 'map-hazard map-spiderling')).join('');
   const legends = {
     'twins-distance': [['red', '火侧'], ['teal', '冰侧'], ['dash', '约 8 米边界']],
     'twins-orbs': [['red', '火球'], ['teal', '冰球']],
@@ -3818,6 +3947,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
     'witch-charge': [['gold', '首领'], ['teal', '队员'], ['gold-arrow', '面向']],
     'witch-bomb': [['red', '被标记'], ['red-line', '不祥气息'], ['teal', '其他队员'], ...(!test ? [['red-arrow', '撤离示意']] : [])],
     'witch-spiders': [['gold', '大蜘蛛 / 首领'], ['red', '小蜘蛛'], ...(!test ? [['teal-arrow', '聚怪'], ['red-arrow', '转向首领']] : [])],
+    'witch-wave': [['gold', '震荡范围示意'], ['teal', '队员'], ...(!test ? [['gold-arrow', '点名方向示意']] : [])],
   };
   let art;
 
@@ -3883,6 +4013,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       art = [arena(), `<g class="map-rotating-danger">${line('M280 135L184 90 M280 135L323 38', 'map-red-line')}</g>`, boss(305, 154, '首领'),
         token(340, 156, 'T'), token(293, 192, '近'), token(234, 164, '队'), label(113, 72, '不祥气息')].join('');
       if (!test) art += line('M348 168q6 37-35 50', 'map-ally-line') + line('M348 168q6 37-35 50', 'map-route-glow')
+        + '<circle class="map-flow-dot" r="4"><animateMotion path="M348 168q6 37-35 50" dur="3s" repeatCount="indefinite"/></circle>'
         + arrow(334, 207, 313, 218, 'map-ally-line', false) + label(448, 208, '沿内侧带位');
       break;
     case 'witch-charge':
@@ -3910,6 +4041,12 @@ function drawRaidDiagram(key, caption, questionId = null) {
       if (!test) art += arrow(412, 204, 385, 186, 'map-ally-line') + arrow(349, 166, 306, 140, 'map-red-line', false) + label(440, 86, '大蜘蛛转向首领');
       if (questionId === 'q071') art += arrow(349, 166, 306, 140, 'map-red-line');
       break;
+    case 'witch-wave':
+      art = [arena(260, 135, 98), boss(260, 135, '首领'), token(203, 189, '队'), token(251, 202, '队'),
+        circle(420, 122, 31, 'map-wave-ring'), circle(420, 122, 21, 'map-grid'),
+        token(420, 122, '远'), label(419, 180, '远点位'), label(420, 207, '留意震荡预兆')].join('');
+      if (!test) art += arrow(292, 128, 380, 123) + label(331, 95, '注意点名');
+      break;
     default:
       throw new Error(`Unknown raid diagram: ${key}`);
   }
@@ -3923,7 +4060,44 @@ function drawRaidDiagram(key, caption, questionId = null) {
   return `<figure class="raid-diagram"><div class="diagram-top"><span>站位与路线示意</span><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${grid}${art}</svg><figcaption><span>${caption}</span>${motionNote}${legendMarkup}</figcaption></figure>`;
 }
 </script>
-  <script>(() => {
+  <script>// Original vector artwork shared by the collection, results and leaderboard.
+const RAID_BADGE_ART = {
+  quickest: `<path d="M12 36 28 20h11l-8 12h13L27 49l4-13Z" fill="#ffe08e" stroke="#fff0c2"/><path d="M12 25h10M8 32h8M9 42h12" stroke="#8edee2"/><circle cx="47" cy="17" r="4" fill="#ed876b" stroke="#ffe1a8"/>`,
+  perfect_fast: `<circle cx="32" cy="33" r="20" fill="#344e59" stroke="#b9e9e6"/><path d="m17 22 7 4 8-10 8 10 7-4-3 19H20Z" fill="#eac274" stroke="#fff0be"/><path d="m34 27-7 10h6l-2 8 9-12h-6l2-6" fill="#fff4bf" stroke="#fff4bf"/>`,
+  perfect: `<path d="M18 16q14-5 28 0v31q-14-5-28 0Z" fill="#e6c585" stroke="#fff1c5"/><path d="M24 24h16M24 30h16M24 36h9" stroke="#865c43"/><circle cx="42" cy="44" r="8" fill="#e4775d" stroke="#ffd8a6"/><path d="m38 44 3 3 5-6" stroke="#fff2c1"/>`,
+  almost: `<circle cx="30" cy="33" r="20" fill="#465064" stroke="#e2d4fc"/><circle cx="30" cy="33" r="12" fill="#df9c85" stroke="#ffe0bf"/><circle cx="30" cy="33" r="5" fill="#ffe9b9"/><path d="m41 16 9-5-4 10-8 5" stroke="#fff2cb"/><path d="m48 29 3 2-3 2" stroke="#f8dda5"/>`,
+  knowledge: `<path d="M10 18q12-5 22 2 10-7 22-2v28q-12-4-22 3-10-7-22-3Z" fill="#7fbcb1" stroke="#d4f6df"/><path d="M32 20v29M16 25q6-1 10 2m-10 5q6-1 10 2m12-7q5-3 10-2m-10 9q5-3 10-2" stroke="#e8ffe8"/><path d="m44 9 2 4 5 1-4 3 1 5-4-3-4 3 1-5-4-3 5-1Z" fill="#f6d58f"/>`,
+  slow_careful: `<path d="M20 14h24M20 50h24M23 15q0 11 9 16-9 5-9 18m18-34q0 11-9 16 9 5 9 18" stroke="#d8eee1" stroke-width="3"/><path d="M27 18h10q0 5-5 9-5-4-5-9ZM26 46q0-5 6-9 6 4 6 9Z" fill="#f0c882"/><path d="M46 43q3-6 8-4-1 6-8 7" fill="#85c9a5" stroke="#d5f5d1"/>`,
+  five_minutes: `<circle cx="31" cy="33" r="17" fill="#527180" stroke="#cbf4ef"/><path d="M31 22v12l7 4M27 11h8" stroke="#fff0bd" stroke-width="3"/><path d="m14 27-8-5 5 12-6 2 11 4m31-13 8-5-5 12 6 2-11 4" fill="#eda17d" stroke="#ffe0b1"/>`,
+  ten_rounds: `<path d="M13 29 32 14l19 15H13Z" fill="#e6bc82" stroke="#fff0c1"/><path d="M18 28v20h28V28M28 48V36h8v12" fill="#687487" stroke="#dfecf1"/><path d="M10 50h44" stroke="#ffe1a7" stroke-width="3"/><circle cx="48" cy="17" r="9" fill="#ba86ba" stroke="#f6d2ef"/><text x="48" y="20" text-anchor="middle" font-size="9" fill="white" stroke="none">10</text>`,
+  five_rounds: `<path d="M13 16h38v31H13Z" fill="#91c5b4" stroke="#d7f5de"/><path d="M20 11v10M44 11v10M13 26h38" stroke="#fff0c2" stroke-width="3"/><circle cx="32" cy="36" r="8" fill="#e8bd80"/><path d="m28 36 3 3 5-6" stroke="#654b3e" stroke-width="3"/>`,
+  three_rounds: `<circle cx="32" cy="33" r="18" fill="#824d51" stroke="#ffc3a7"/><path d="M19 31a13 13 0 0 1 21-8l4 4m0-8v8h-8M45 35a13 13 0 0 1-21 8l-4-4m0 8v-8h8" stroke="#ffe6b4" stroke-width="3"/><circle cx="32" cy="33" r="4" fill="#e9c783"/>`,
+  steady: `<path d="m32 12 18 7v12q0 15-18 23-18-8-18-23V19Z" fill="#47877f" stroke="#c4f4df" stroke-width="2"/><path d="M24 32 30 38 41 26" stroke="#fff1ba" stroke-width="4"/><path d="M18 20h4m20 0h4" stroke="#f6d38c"/>`,
+  comeback: `<path d="M13 33q12-17 28-7l9-8v27l-9-8q-16 12-28-4Z" fill="#ecab77" stroke="#ffe4ba"/><circle cx="25" cy="31" r="2" fill="#39313b" stroke="none"/><path d="M29 38q4 3 8 0M22 21q7-9 17-7m-3-4 4 4-5 4" stroke="#c7f4eb"/><path d="m50 11 2 3 3 1-3 2-1 3-1-3-3-2 3-1Z" fill="#ffe9ae"/>`,
+  zero: `<circle cx="32" cy="33" r="21" fill="#5d536f" stroke="#ddd0ed"/><circle cx="32" cy="33" r="13" fill="#a283ad" stroke="#f2ddfa"/><path d="M27 27q5-6 10 0v12q-5 6-10 0Z" fill="#343242" stroke="#fbe4d9" stroke-width="2"/><path d="m13 14 7 2-5 5M51 50l-7-2 5-5" stroke="#f6cb94"/>`,
+  brave: `<path d="M32 10q4 9-3 14 10-2 10-10 12 11 12 23a19 19 0 0 1-38 0q0-11 10-20-1 11 5 13 1-10 4-20Z" fill="#eb805e" stroke="#ffd2a6"/><path d="M23 37h1m16 0h1M26 43q6 5 12 0" stroke="#5d3434" stroke-width="3"/><path d="M28 48q4-7 8 0" fill="#fbe08f"/>`,
+  demolition: `<circle cx="30" cy="37" r="21" fill="#ec7358" stroke="#ffd1a0" stroke-width="2"/><path d="M39 18c1-6 4-9 10-10" stroke="#ffda8c" stroke-width="3"/><path d="M50 3v5m-4-1 4 2 4-2m-2 5 3 2" stroke="#fff2bb" stroke-width="2.3"/><path d="M17 30q4-4 8-1m7 0q4-4 8-1" stroke="#4c2525" stroke-width="2.5"/><circle cx="21" cy="34" r="2.4" fill="#3b2222" stroke="none"/><circle cx="37" cy="34" r="2.4" fill="#3b2222" stroke="none"/><path d="M22 41q8 10 17 0Z" fill="#53242c" stroke="none"/><path d="M25 42q5 3 11 0" stroke="#fff0c7" stroke-width="2"/><circle cx="16" cy="39" r="2.5" fill="#ffb192" stroke="none"/><circle cx="43" cy="39" r="2.5" fill="#ffb192" stroke="none"/>`,
+  spider_keeper: `<path d="M19 27 11 20 6 23m11 12H7l-3 5m15 3-9 7m35-23 8-7 5 3M47 35h10l3 5m-15 3 9 7" stroke="#e5c7f2" stroke-width="3"/><ellipse cx="32" cy="35" rx="15" ry="14" fill="#aa83b5" stroke="#f7d9fa"/><circle cx="26" cy="32" r="2" fill="#3e3042" stroke="none"/><circle cx="38" cy="32" r="2" fill="#3e3042" stroke="none"/><path d="M27 39q5 4 10 0" stroke="#fff0d1"/><path d="M24 20q8-8 16 0" stroke="#ffd394"/>`,
+  laser_runner: `<path d="M10 45 52 17" stroke="#ff9e8f" stroke-width="5"/><path d="M12 48 54 20" stroke="#ffe0bf"/><path d="m22 21 8 2 2 9 8 5-4 6-12-5-5-10Z" fill="#83c9c7" stroke="#c8f3e9"/><path d="m13 18 5 1m-7 7 5 1" stroke="#ffe5a7"/>`,
+  lamp_tourist: `<path d="M28 10h8M32 10v6M21 22q11-8 22 0v20q-11 8-22 0Z" fill="#e4b96e" stroke="#ffefb9"/><path d="M26 20q-4 11 0 24m12-24q4 11 0 24M27 47h10m-5 0v6" stroke="#f8e8b8"/><circle cx="47" cy="19" r="8" fill="#7fc4b4" stroke="#d9f6e8"/><path d="M44 19h6M47 16v6" stroke="#244c4d"/>`,
+  doctor: `<path d="M32 49S12 39 12 27q0-13 12-13 6 0 8 5 3-5 8-5 12 0 12 13Q52 39 32 49Z" fill="#e79486" stroke="#ffdfbe"/><path d="M32 24v15M25 31h14" stroke="#fff5d9" stroke-width="4"/><path d="m42 43 7-7 5 5-7 7Z" fill="#e8d5b6" stroke="#fff3df"/>`,
+  direction: `<circle cx="32" cy="33" r="21" fill="#526f7d" stroke="#cbe8e8"/><circle cx="32" cy="33" r="15" fill="#83b0b5" stroke="#e8fcf3"/><path d="m39 24-4 12-12 5 4-12Z" fill="#e47868" stroke="#ffe1b8"/><path d="M45 10q5-2 6 2 1 2-2 4v2m0 4h.1" stroke="#ffe3a8" stroke-width="3"/>`,
+  boss_healer: `<path d="M32 48S15 39 15 28q0-11 10-11 5 0 7 5 2-5 7-5 10 0 10 11Q49 39 32 48Z" fill="#de806e" stroke="#ffddbf"/><path d="M32 26v13M25.5 32.5h13" stroke="#fff0d0" stroke-width="3"/><path d="m19 15 5-6 8 5 8-5 5 6-3 5H22Z" fill="#efc572" stroke="#fff1bf"/>`,
+  ball_crasher: `<circle cx="31" cy="32" r="18" fill="#e48876" stroke="#ffdbb8"/><circle cx="31" cy="32" r="12" fill="#f5ad91" stroke="#ffe7c6"/><path d="m20 43-8 6m28-5 9 5M15 28l-6-2m39 2 6-2" stroke="#e4f4d7" stroke-width="3"/><path d="M26 30h.1m10 0h.1M27 37q4 2 8 0" stroke="#654243" stroke-width="3"/>`,
+  rush_hour: `<path d="M11 46h42M17 46v5m30-5v5" stroke="#cde6e3" stroke-width="3"/><path d="m19 16 11 1 2 13 12 7-3 7H24l-8-7 5-6Z" fill="#e5b57a" stroke="#ffebc5"/><path d="M11 23h7M8 29h9" stroke="#8de0d5" stroke-width="3"/><path d="M25 23h6m-7 5h7" stroke="#74544a"/>`,
+  color_guess: `<path d="M14 27h36v23H14Z" fill="#a48bb2" stroke="#ead1ef"/><path d="m12 27 8-12h24l8 12M32 27v23" stroke="#ffe1be" stroke-width="2"/><circle cx="23" cy="34" r="5" fill="#f18d7a" stroke="#ffe2c2"/><circle cx="41" cy="34" r="5" fill="#8bcfd2" stroke="#e5ffff"/><path d="M29 13q1-7 6-6 5 1 4 5-1 2-4 4v2m0 4h.1" stroke="#fff0bd" stroke-width="3"/>`,
+  edge_dancer: `<path d="M12 49 51 13" stroke="#ff8d83" stroke-width="5"/><path d="m19 25 8 1 1 9 8 5-3 6-11-3-7-8Z" fill="#8ec6c2" stroke="#e1f9e9"/><path d="m41 15 2 3 4 1-4 1-2 4-1-4-4-1 4-1Z" fill="#ffe5a6"/>`,
+  spider_tour: `<path d="M12 26h40v19H12Z" fill="#73b7ac" stroke="#d8f5dd"/><path d="M17 26v-6h25l6 6M18 32h8m5 0h8m5 0h4" stroke="#eff9df" stroke-width="2"/><circle cx="21" cy="46" r="5" fill="#3c5260" stroke="#dcebec"/><circle cx="44" cy="46" r="5" fill="#3c5260" stroke="#dcebec"/><circle cx="32" cy="16" r="6" fill="#af89b6" stroke="#f1d7f1"/><path d="m26 15-5-4m5 7-6 2m18-5 5-4m-5 7 6 2" stroke="#e6c8eb"/>`,
+  first: `<path d="M11 31 32 16l21 15H11Z" fill="#e4bb7a" stroke="#fff0c3"/><path d="M17 30v19h30V30M27 49V36h10v13M11 50h42" fill="#5a8d88" stroke="#d1f3e4"/><path d="M32 16V8m0 0h11l-4 4h-7" fill="#ed9b7e" stroke="#ffddbc"/>`
+};
+
+function drawBadgeArtwork(badge) {
+  const art = RAID_BADGE_ART[badge.id];
+  if (!art) return '<svg class="icon badge-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="19" fill="#b9a480" stroke="#f5dfad"/><path d="m32 18 3 9 9 3-9 3-3 9-3-9-9-3 9-3Z" fill="#fff0ca"/></svg>';
+  return `<svg class="icon badge-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" fill="#101e2b" stroke="#d8cfba" stroke-opacity=".22"/><g stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${art}</g></svg>`;
+}
+
+(() => {
   'use strict';
   const localPreview = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('api')==='local';
   const previewPort = new URLSearchParams(location.search).get('api-port');
@@ -4011,20 +4185,19 @@ function drawRaidDiagram(key, caption, questionId = null) {
   let uploading = false;
   let connecting = false;
   let rankingRequest = 0;
+  let rankingPage = 1;
+  let rankingPages = 1;
   let lastUploadError = '';
   let examTimer = null;
   let runningSince = null;
   let timerTicks = 0;
   const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame','bomb','spider','laser','lantern','heart','compass','orb']);
   const badgeTones = new Set(['gold','teal','red','violet']);
   const badgeTone = badge => badgeTones.has(badge.tone) ? badge.tone : 'gold';
   function badgeIcon(badge) {
-    if (badge.icon === 'bomb') return `<svg class="icon badge-bomb-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="30" cy="37" r="21" fill="#ec7358" stroke="#ffd1a0" stroke-width="2"/><path d="M39 18c1-6 4-9 10-10" fill="none" stroke="#ffda8c" stroke-width="3" stroke-linecap="round"/><path d="M50 3v5m-4-1 4 2 4-2m-2 5 3 2" fill="none" stroke="#fff2bb" stroke-width="2.3" stroke-linecap="round"/><path d="M17 30q4-4 8-1m7 0q4-4 8-1" fill="none" stroke="#4c2525" stroke-width="2.5" stroke-linecap="round"/><circle cx="21" cy="34" r="2.4" fill="#3b2222" stroke="none"/><circle cx="37" cy="34" r="2.4" fill="#3b2222" stroke="none"/><path d="M22 41q8 10 17 0Z" fill="#53242c" stroke="none"/><path d="M25 42q5 3 11 0" fill="none" stroke="#fff0c7" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="39" r="2.5" fill="#ffb192" stroke="none"/><circle cx="43" cy="39" r="2.5" fill="#ffb192" stroke="none"/></svg>`;
-    const symbol = badgeIcons.has(badge.icon) ? badge.icon : 'spark';
-    return `<svg class="icon" aria-hidden="true"><use href="#badge-${symbol}"/></svg>`;
+    return drawBadgeArtwork(badge);
   }
-  const badgeChip = badge => `<span class="badge-chip tone-${badgeTone(badge)}" title="${escape(badge.description || '')}">${badgeIcon(badge)}${escape(badge.name)}</span>`;
+  const badgeChip = badge => `<span class="badge-chip tone-${badgeTone(badge)}" title="${escape(badge.description || '')}"><span class="badge-chip-emblem">${badgeIcon(badge)}</span><span>${escape(badge.name)}</span></span>`;
   const sectionOf = (id) => SECTIONS.find(x=>x.id===id);
   const formatPlayerNumber = (number) => Number.isSafeInteger(number) && number > 0
     ? `#${String(number).padStart(6, '0')}` : '';
@@ -4074,10 +4247,12 @@ function drawRaidDiagram(key, caption, questionId = null) {
   }
   function prepareExam() {
     const ids = bankQuestions.map(q => q.id);
-    const previousId = isPermutation(draft.order, ids) ? draft.order[index] : bankQuestions[index]?.id;
+    const previousId = Array.isArray(draft.order) ? draft.order[index] : bankQuestions[index]?.id;
     if (!isPermutation(draft.order, ids)) {
-      draft.order = shuffle(ids);
-      index = previousId && Object.keys(draft.answers).length ? Math.max(0, draft.order.indexOf(previousId)) : 0;
+      const canExtend = Array.isArray(draft.order) && draft.order.length < ids.length &&
+        new Set(draft.order).size === draft.order.length && draft.order.every(id => ids.includes(id));
+      draft.order = canExtend ? [...draft.order, ...shuffle(ids.filter(id => !draft.order.includes(id)))] : shuffle(ids);
+      index = previousId && (canExtend || Object.keys(draft.answers).length) ? Math.max(0, draft.order.indexOf(previousId)) : 0;
     }
     if (!draft.optionOrder || typeof draft.optionOrder !== 'object' || Array.isArray(draft.optionOrder)) draft.optionOrder = {};
     for (const question of bankQuestions) {
@@ -4436,6 +4611,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
   }
   function rankingRow(entry) {
     const row=document.createElement('div'); row.className='ranking-row';
+    row.dataset.rank = String(entry.rank);
     const number = formatPlayerNumber(entry.playerNumber);
     const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
     const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
@@ -4443,14 +4619,23 @@ function drawRaidDiagram(key, caption, questionId = null) {
     row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`;
     return row;
   }
-  async function refreshRanking() {
+  async function refreshRanking(page = rankingPage) {
     const requestId = ++rankingRequest;
+    $('ranking-pagination').hidden = true;
     const list=$('ranking-list'); list.replaceChildren(); const loading=document.createElement('p'); loading.className='empty-state'; loading.textContent='正在读取榜单…'; list.append(loading);
     try {
-      const data=await request('/api/leaderboard?view=latest');
+      const data=await request(`/api/leaderboard?view=latest&page=${page}&pageSize=20`);
       if (requestId !== rankingRequest) return;
       list.replaceChildren();
       if(!data.entries?.length){loading.textContent='还没有成绩，来做第一个上榜的人。';list.append(loading);return;}
+      rankingPage = Number.isSafeInteger(data.page) ? data.page : 1;
+      rankingPages = Number.isSafeInteger(data.pages) ? data.pages : 1;
+      $('ranking-page-status').textContent = `共 ${data.total ?? data.entries.length} 人 · 第 ${rankingPage} / ${rankingPages} 页`;
+      $('ranking-previous').disabled = rankingPage <= 1;
+      $('ranking-next').disabled = rankingPage >= rankingPages;
+      $('ranking-page-input').value = String(rankingPage);
+      $('ranking-page-input').max = String(rankingPages);
+      $('ranking-pagination').hidden = rankingPages <= 1;
       for(const entry of data.entries) list.append(rankingRow(entry));
     } catch(err){
       if(requestId !== rankingRequest) return;
@@ -4459,6 +4644,11 @@ function drawRaidDiagram(key, caption, questionId = null) {
       if(err.unavailable) setConnectionUnavailable(true);
     }
   }
+  $('ranking-page-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const page = Number($('ranking-page-input').value);
+    if (Number.isSafeInteger(page) && page >= 1 && page <= rankingPages) void refreshRanking(page);
+  });
   function openHistory() {
     if ($('profile-dialog').open) closeProfile();
     if (view !== 'history') historyReturn = view;
@@ -4959,6 +5149,8 @@ function drawRaidDiagram(key, caption, questionId = null) {
       case 'leave-exam': setView('home');refreshRanking();break;
       case 'show-leaderboard': setView('home');void refreshRanking();scrollToLeaderboard();break;
       case 'refresh-ranking': refreshRanking();break;
+      case 'ranking-previous': if (rankingPage > 1) void refreshRanking(rankingPage - 1);break;
+      case 'ranking-next': if (rankingPage < rankingPages) void refreshRanking(rankingPage + 1);break;
       case 'retry-upload': uploadPending();break;
       case 'retry-connection': retryConnection();break;
       case 'restart': restartExam();break;

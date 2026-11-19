@@ -10,14 +10,15 @@ function drawRaidDiagram(key, caption, questionId = null) {
     const shaft = `M${x1} ${y1}L${x2} ${y2}`;
     const arrowhead = `M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`;
     // Animate only existing route arrows; facing indicators remain static.
-    return line(shaft + arrowhead, style) + (animate ? line(shaft, 'map-route-glow') : '');
+    const traveler = `<circle class="map-flow-dot" r="4"><animateMotion path="${shaft}" dur="3s" repeatCount="indefinite"/></circle>`;
+    return line(shaft + arrowhead, style) + (animate ? line(shaft, 'map-route-glow') + traveler : '');
   };
   const token = (x, y, text, style = 'map-ally', radius = 12) =>
     circle(x, y, radius, style) + circle(x, y, Math.max(radius - 3, 1), 'map-token-ring') + label(x, y + 4.5, text, 'map-token');
   const arena = (x = 280, y = 135, radius = 106) => circle(x, y, radius, 'map-field') + circle(x, y, radius - 12, 'map-grid');
   const boss = (x = 280, y = 135, text = '首领', style = 'map-boss') => token(x, y, text, style, 24);
   const spider = (x, y) => token(x, y, '大', 'map-boss', 17);
-  const swarm = (x, y) => [[-16, -4], [9, -16], [12, 9], [-6, 15]].map(([dx,dy]) => circle(x+dx, y+dy, 5, 'map-hazard')).join('');
+  const swarm = (x, y) => [[-16, -4], [9, -16], [12, 9], [-6, 15]].map(([dx,dy]) => circle(x+dx, y+dy, 5, 'map-hazard map-spiderling')).join('');
   const legends = {
     'twins-distance': [['red', '火侧'], ['teal', '冰侧'], ['dash', '约 8 米边界']],
     'twins-orbs': [['red', '火球'], ['teal', '冰球']],
@@ -31,6 +32,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
     'witch-charge': [['gold', '首领'], ['teal', '队员'], ['gold-arrow', '面向']],
     'witch-bomb': [['red', '被标记'], ['red-line', '不祥气息'], ['teal', '其他队员'], ...(!test ? [['red-arrow', '撤离示意']] : [])],
     'witch-spiders': [['gold', '大蜘蛛 / 首领'], ['red', '小蜘蛛'], ...(!test ? [['teal-arrow', '聚怪'], ['red-arrow', '转向首领']] : [])],
+    'witch-wave': [['gold', '震荡范围示意'], ['teal', '队员'], ...(!test ? [['gold-arrow', '点名方向示意']] : [])],
   };
   let art;
 
@@ -96,6 +98,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       art = [arena(), `<g class="map-rotating-danger">${line('M280 135L184 90 M280 135L323 38', 'map-red-line')}</g>`, boss(305, 154, '首领'),
         token(340, 156, 'T'), token(293, 192, '近'), token(234, 164, '队'), label(113, 72, '不祥气息')].join('');
       if (!test) art += line('M348 168q6 37-35 50', 'map-ally-line') + line('M348 168q6 37-35 50', 'map-route-glow')
+        + '<circle class="map-flow-dot" r="4"><animateMotion path="M348 168q6 37-35 50" dur="3s" repeatCount="indefinite"/></circle>'
         + arrow(334, 207, 313, 218, 'map-ally-line', false) + label(448, 208, '沿内侧带位');
       break;
     case 'witch-charge':
@@ -122,6 +125,12 @@ function drawRaidDiagram(key, caption, questionId = null) {
         label(417, 162, '小蜘蛛'), label(379, 231, '处理区 A'), label(176, 222, '处理区 B'), label(223, 40, '处理区 C')].join('');
       if (!test) art += arrow(412, 204, 385, 186, 'map-ally-line') + arrow(349, 166, 306, 140, 'map-red-line', false) + label(440, 86, '大蜘蛛转向首领');
       if (questionId === 'q071') art += arrow(349, 166, 306, 140, 'map-red-line');
+      break;
+    case 'witch-wave':
+      art = [arena(260, 135, 98), boss(260, 135, '首领'), token(203, 189, '队'), token(251, 202, '队'),
+        circle(420, 122, 31, 'map-wave-ring'), circle(420, 122, 21, 'map-grid'),
+        token(420, 122, '远'), label(419, 180, '远点位'), label(420, 207, '留意震荡预兆')].join('');
+      if (!test) art += arrow(292, 128, 380, 123) + label(331, 95, '注意点名');
       break;
     default:
       throw new Error(`Unknown raid diagram: ${key}`);
