@@ -5,12 +5,28 @@
 .badge-share { position: absolute; right: 13px; bottom: 12px; padding: 6px 10px; border: 1px solid #c3a87380; border-radius: 5px; color: #f0d7a5; background: #19242b; font-size: 12px; font-weight: 700; }
 .badge-share:hover, .badge-share:focus-visible { color: #fff2d2; border-color: #e7c891; }
 .honor-holders .honor-actions { display: flex; flex-wrap: wrap; gap: 6px 12px; }
-.share-dialog { width: min(580px, calc(100vw - 28px)); max-height: min(92vh, 1000px); overflow: auto; }
+.share-dialog { width: min(580px, calc(100vw - 28px)); max-height: min(92vh, 1000px); overflow: auto; border-color: #b79c68; border-radius: 10px; background: radial-gradient(ellipse at 50% -5%, #254442, transparent 44%), linear-gradient(155deg, #1a2931, #101720 75%); box-shadow: 0 24px 90px #000c, 0 0 45px #b7893b24; }
 .share-dialog h2 { margin: 0; }
 .share-dialog .eyebrow { margin-bottom: 7px; }
 .share-status { display: block; color: #e5c68c; font-size: 13px; min-height: 1.4em; margin-top: 8px; }
 .share-note { margin: 3px 0 14px; color: #aebdb8; font-size: 12px; line-height: 1.6; }
-#share-poster { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; border: 1px solid #8e7959; border-radius: 6px; background: #101920; box-shadow: 0 12px 40px #0007; }
+.share-artwork { --share-glow: #f6d092; position: relative; isolation: isolate; overflow: hidden; width: min(100%, 360px); margin: 0 auto; border: 1px solid #d8b578; border-radius: 7px; background: #101920; box-shadow: 0 15px 40px #0009, 0 0 28px #e8b96224; }
+.share-artwork[data-kind="honor"] { --share-glow: #a5f5e6; }
+.share-artwork[data-kind="ranking"] { --share-glow: #ffd19a; }
+#share-poster { display: block; width: 100%; height: auto; }
+.share-artwork::after { content: ''; position: absolute; inset: -30%; z-index: 2; pointer-events: none; background: linear-gradient(112deg, transparent 42%, #fff1d224 50%, transparent 58%); transform: translateX(-80%); mix-blend-mode: screen; }
+.share-orbit { position: absolute; z-index: 1; top: 33%; left: 50%; width: 40%; aspect-ratio: 1; pointer-events: none; border: 1px solid color-mix(in srgb, var(--share-glow) 50%, transparent); border-radius: 50%; box-shadow: 0 0 20px color-mix(in srgb, var(--share-glow) 32%, transparent), inset 0 0 18px #fff2cf12; }
+.share-orbit-inner { width: 34%; border-style: dashed; border-color: color-mix(in srgb, var(--share-glow) 50%, transparent); box-shadow: none; }
+.share-sparks { position: absolute; z-index: 3; inset: 0; overflow: hidden; pointer-events: none; }
+.share-sparks i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff2ca; box-shadow: 0 0 6px 2px var(--share-glow); }
+.share-sparks i:nth-child(1) { left: 15%; top: 66%; --drift: 12px; --delay: -.3s; }
+.share-sparks i:nth-child(2) { left: 26%; top: 50%; --drift: -10px; --delay: -2s; }
+.share-sparks i:nth-child(3) { left: 80%; top: 61%; --drift: 9px; --delay: -1s; }
+.share-sparks i:nth-child(4) { left: 67%; top: 38%; --drift: -8px; --delay: -3s; }
+.share-sparks i:nth-child(5) { left: 17%; top: 29%; --drift: 13px; --delay: -1.6s; }
+.share-sparks i:nth-child(6) { left: 85%; top: 25%; --drift: -11px; --delay: -2.7s; }
+.share-sparks i:nth-child(7) { left: 72%; top: 80%; --drift: 12px; --delay: -.7s; }
+.share-sparks i:nth-child(8) { left: 29%; top: 77%; --drift: -8px; --delay: -3.4s; }
 .share-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
 .share-actions .btn { flex: 1 1 120px; min-height: 42px; gap: 8px; }
 .share-link-label { display: block; margin: 15px 0 6px; color: #c6d0c8; font-size: 12px; }
@@ -18,6 +34,20 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
 .social-confirm-dialog { width: min(430px, calc(100vw - 28px)); }
 .social-confirm-dialog h2 { margin: 0; font-size: 21px; }
 .social-confirm-dialog p { line-height: 1.7; }
+@media (prefers-reduced-motion: no-preference) {
+  .share-dialog[open] { animation: share-dialog-enter .38s ease-out both; }
+  .share-artwork::after { animation: share-sheen 6.5s ease-in-out infinite; }
+  .share-orbit-outer { animation: share-orbit 20s linear infinite; }
+  .share-orbit-inner { animation: share-orbit 14s linear infinite reverse; }
+  .share-sparks i { animation: share-spark 3.8s ease-in-out var(--delay) infinite; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .share-orbit { transform: translate(-50%, -50%); }
+}
+@keyframes share-dialog-enter { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes share-orbit { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+@keyframes share-sheen { 0%, 15% { transform: translateX(-80%); opacity: 0; } 30% { opacity: .8; } 55%, 100% { transform: translateX(80%); opacity: 0; } }
+@keyframes share-spark { 0%, 100% { transform: translate(0, 0) scale(.7); opacity: .35; } 50% { transform: translate(var(--drift), -24px) scale(1.2); opacity: .9; } }
 @media (max-width: 560px) {
   .share-dialog { padding: 18px; }
   .share-dialog .eyebrow { font-size: 9px; letter-spacing: .1em; }
