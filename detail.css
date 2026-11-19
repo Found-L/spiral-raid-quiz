@@ -306,3 +306,52 @@
 @media (prefers-reduced-motion: reduce) {
   .map-route-glow { display: none; }
 }
+
+/* Practice controls and a more expressive collection of raid honors. */
+.exam-restart { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; min-height: 42px; margin-top: 10px; border: 1px solid #58605b; border-radius: 3px; color: #e4d2af; background: #172028; }
+.exam-restart:hover, .exam-restart:focus-visible { border-color: #e3c38a; background: #25302f; }
+.exam-restart .icon { width: 16px; height: 16px; }
+.diagram-motion-note { color: #9eb4b2; font-size: 11px; }
+.map-rotating-danger { transform-box: view-box; transform-origin: 50% 50%; }
+.map-orb { transform-box: fill-box; transform-origin: center; }
+
+.badge-card { overflow: hidden; background: radial-gradient(ellipse at 15% 0%, color-mix(in srgb, var(--badge-color) 14%, transparent), transparent 48%), linear-gradient(145deg, #1c2930, #111923 85%); }
+.badge-card:before { content: ''; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, var(--badge-color), transparent); opacity: .65; }
+.badge-card.locked:before { opacity: .16; }
+.badge-crest { position: relative; isolation: isolate; width: 68px; height: 72px; border-radius: 24px 24px 28px 28px; border: 1px solid color-mix(in srgb, var(--badge-color) 80%, #fff); background: radial-gradient(circle at 40% 25%, color-mix(in srgb, var(--badge-color) 42%, transparent), transparent 62%), linear-gradient(145deg, #303440, #101821 78%); box-shadow: inset 0 0 0 4px #111922, inset 0 0 0 5px color-mix(in srgb, var(--badge-color) 45%, transparent), 0 7px 16px #0007; }
+.badge-crest:before { content: ''; position: absolute; z-index: -1; inset: 9px; border: 1px dashed color-mix(in srgb, var(--badge-color) 60%, transparent); border-radius: 50%; }
+.badge-crest:after { content: '✦'; position: absolute; top: -6px; right: -5px; color: var(--badge-color); font-size: 15px; text-shadow: 0 0 10px currentColor; }
+.badge-crest .icon { width: 31px; height: 31px; filter: drop-shadow(0 2px 5px #000b); }
+.badge-crest .badge-bomb-art { width: 52px; height: 52px; }
+.badge-card.locked .badge-crest:after { opacity: .35; }
+.badge-card.locked .badge-crest { filter: grayscale(.85); opacity: .7; }
+.badge-card.selected .badge-crest { box-shadow: inset 0 0 0 4px #111922, inset 0 0 0 5px var(--badge-color), 0 0 18px color-mix(in srgb, var(--badge-color) 24%, transparent); }
+.badge-card.selected:after { content: '✓'; position: absolute; top: 12px; right: 14px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #261b0e; background: #f3d18d; font-size: 13px; font-weight: 800; }
+.badge-card.selected .badge-info { padding-right: 17px; }
+.badge-chip .badge-bomb-art { width: 17px; height: 17px; }
+.option:focus-within { border-color: #e3c38a; box-shadow: 0 0 0 2px #e3c38a28; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .map-rotating-danger { animation: danger-sweep 16s linear infinite; }
+  .map-orb { animation: orb-pulse 2s ease-in-out infinite alternate; }
+  .map-orb:nth-of-type(even) { animation-delay: -.7s; }
+  .raid-diagram .map-token-ring { animation: token-pulse 2.8s ease-in-out infinite; }
+  .badge-card.earned .badge-crest:before { animation: crest-spin 16s linear infinite; }
+  .badge-card.earned .badge-crest:after { animation: crest-spark 2s ease-in-out infinite; }
+  .badge-card.earned .badge-bomb-art { animation: bomb-bob 2.8s ease-in-out infinite; }
+  .question-enter { animation: question-arrive .35s ease-out; }
+  .question-enter .option { animation: option-arrive .34s backwards; }
+  .question-enter .option:nth-child(2) { animation-delay: .035s; }
+  .question-enter .option:nth-child(3) { animation-delay: .07s; }
+  .question-enter .option:nth-child(4) { animation-delay: .105s; }
+  .question-enter .option:nth-child(5) { animation-delay: .14s; }
+  .option:hover { transform: translateX(3px); }
+}
+@keyframes danger-sweep { to { transform: rotate(360deg); } }
+@keyframes orb-pulse { from { opacity: .68; filter: brightness(1); } to { opacity: 1; filter: brightness(1.4); } }
+@keyframes token-pulse { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
+@keyframes crest-spin { to { transform: rotate(360deg); } }
+@keyframes crest-spark { 0%, 100% { opacity: .55; transform: scale(.8); } 50% { opacity: 1; transform: scale(1.18); } }
+@keyframes bomb-bob { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(4deg) translateY(-2px); } }
+@keyframes question-arrive { from { opacity: .72; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes option-arrive { from { opacity: .5; transform: translateX(-7px); } to { opacity: 1; transform: translateX(0); } }

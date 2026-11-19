@@ -55,11 +55,16 @@ BADGES = [
     {'id': 'doctor', 'name': '妙手回错春', 'description': '选过把治疗珠瞄错目标的选项。绿色指示要对准本侧主 T。', 'icon': 'heart', 'tone': 'teal'},
     {'id': 'direction', 'name': '方向感大师', 'description': '选过外场位面向首领抢入隔离的选项。留在外场要背对首领。', 'icon': 'compass', 'tone': 'violet'},
     {'id': 'boss_healer', 'name': '首领慈善家', 'description': '选过放任大蜘蛛给首领回血的选项。记得及时打断。', 'icon': 'heart', 'tone': 'red'},
+    {'id': 'ball_crasher', 'name': '蹭球积极分子', 'description': '没有分配挡球时，选了主动挤进队友球路。请给挡球位留空间。', 'icon': 'orb', 'tone': 'red'},
+    {'id': 'rush_hour', 'name': '抢跑小能手', 'description': '选了吸人还没结束就抢先过河。等吸引结束再过河。', 'icon': 'wing', 'tone': 'gold'},
+    {'id': 'color_guess', 'name': '颜色盲盒', 'description': '选了碰到飞行球就断定状态已换色。记得区分碰球和挡球。', 'icon': 'orb', 'tone': 'violet'},
+    {'id': 'edge_dancer', 'name': '贴线艺术家', 'description': '选了砸地前贴线或迎着危险线吃击退。先给自己留安全位置。', 'icon': 'laser', 'tone': 'red'},
+    {'id': 'spider_tour', 'name': '蜘蛛旅行社', 'description': '选了把小蜘蛛拉散或带去炸弹位。请按团队分工聚怪。', 'icon': 'spider', 'tone': 'teal'},
     {'id': 'first', 'name': '初入寺院', 'description': '完成第一轮考核。', 'icon': 'temple', 'tone': 'teal'},
 ]
 BADGE_BY_ID = {badge['id']: badge for badge in BADGES}
-# These option IDs apply only to these two explicitly checked answer keys.
-MISTAKE_VERSIONS = {'peak-spiral-2026-11-18-v5', 'peak-spiral-2026-11-18-v6'}
+# These option IDs apply only to the explicitly checked answer keys.
+MISTAKE_VERSIONS = {'peak-spiral-2026-11-18-v5', 'peak-spiral-2026-11-18-v6', 'peak-spiral-2026-11-18-v7'}
 MISTAKE_RULES = {
     'demolition': {'q036': {'b', 'd'}, 'q042': {'a'}, 'q047': {'a'}, 'q050': {'d'},
                    'q066': {'a', 'c'}, 'q089': {'a', 'c'}, 'q090': {'a'}, 'q091': {'b'}},
@@ -67,8 +72,13 @@ MISTAKE_RULES = {
     'laser_runner': {'q060': {'d'}, 'q075': {'c'}, 'q093': {'a', 'b'}},
     'lamp_tourist': {'q047': {'c', 'd'}, 'q090': {'c', 'd'}},
     'doctor': {'q014': {'b', 'c', 'd'}, 'q088': {'b', 'c', 'd'}},
-    'direction': {'q042': {'b'}, 'q091': {'a', 'c'}},
+    'direction': {'q042': {'b'}, 'q091': {'a', 'c'}, 'q098': {'d'}},
     'boss_healer': {'q071': {'d'}, 'q094': {'a', 'b'}},
+    'ball_crasher': {'q095': {'a', 'b'}},
+    'rush_hour': {'q096': {'a', 'd'}},
+    'color_guess': {'q097': {'d'}},
+    'edge_dancer': {'q099': {'b', 'd'}},
+    'spider_tour': {'q100': {'c', 'd'}},
 }
 
 
