@@ -394,3 +394,120 @@
 @keyframes badge-chip-glint { 0%, 80%, 100% { transform: rotate(0); } 90% { transform: rotate(-9deg) scale(1.05); } }
 @keyframes question-arrive { from { opacity: .72; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes option-arrive { from { opacity: .5; transform: translateX(-7px); } to { opacity: 1; transform: translateX(0); } }
+
+/* Keep players and their medals readable at every width. */
+.ranking-row { grid-template-columns: minmax(0, 1fr) 345px; align-items: center; }
+.ranking-stats { display: grid; grid-template-columns: 110px 105px 100px; gap: 15px; align-items: center; min-width: 0; }
+.ranking-stat { min-width: 0; display: grid; gap: 3px; }
+.ranking-stat small { display: none; }
+.ranking-stat b { font-size: inherit; font-weight: 500; white-space: nowrap; }
+.ranking-player { align-items: flex-start; }
+.ranking-player .rank-number { margin-top: 2px; flex: none; }
+.player-text { flex: 1; }
+.player-text strong { overflow-wrap: anywhere; }
+#ranking-page-form { flex-wrap: nowrap; }
+#ranking-page-input { width: 66px; min-width: 66px; min-height: 38px; margin: 0; padding: 5px 8px; border: 1px solid #53635f; border-radius: 5px; color: #f0dcba; background: #142029; text-align: center; }
+.rank-badges { gap: 5px; margin-top: 8px; }
+.badge-chip { gap: 5px; max-width: 100%; padding: 2px 8px 2px 3px; border-radius: 7px; font-size: 12px; line-height: 1.2; }
+.badge-chip-emblem { width: 24px; height: 24px; border: 0; background: transparent; }
+.badge-chip .icon { width: 24px; height: 24px; }
+
+/* Separate record boards use the same artwork as the medal collection. */
+.honor-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin: 68px 0 22px; }
+.honor-heading h3 { font: 600 clamp(24px, 2.5vw, 34px)/1.3 var(--serif); margin: 0; }
+.honor-heading > p { color: #abb6b1; margin: 0; font-size: 13px; }
+.honor-boards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.honor-boards > .empty-state { grid-column: 1/-1; }
+.honor-card { min-width: 0; display: flex; flex-direction: column; padding: 20px; border: 1px solid color-mix(in srgb, var(--badge-color) 35%, #29353a); border-radius: 10px; background: radial-gradient(ellipse at 22% 0%, color-mix(in srgb, var(--badge-color) 16%, transparent), transparent 60%), linear-gradient(145deg, #19242c, #101820); }
+.honor-card-head { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+.honor-emblem { width: 50px; height: 50px; flex: none; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--badge-color) 50%, transparent); border-radius: 15px; background: #0f1b24; box-shadow: 0 0 22px color-mix(in srgb, var(--badge-color) 13%, transparent); }
+.honor-emblem .icon { width: 45px; height: 45px; }
+.honor-card h4 { color: var(--badge-color); margin: 1px 0 4px; font-size: 17px; }
+.honor-card-head p { color: #bdc9c2; font-size: 12px; line-height: 1.6; margin: 0; }
+.honor-list { padding: 10px 0 0; margin: 16px 0 12px; list-style: none; border-top: 1px solid #ffffff12; }
+.honor-list li { min-width: 0; display: flex; align-items: center; gap: 10px; padding: 7px 0; }
+.honor-rank { width: 22px; flex: none; color: var(--badge-color); text-align: center; font: 16px Georgia, serif; }
+.honor-player { min-width: 0; flex: 1; }
+.honor-player b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
+.honor-player small { display: block; color: #93a5a0; font-size: 11px; }
+.honor-list li > strong { white-space: nowrap; color: #f0e6d0; font-size: 14px; }
+.honor-list .honor-empty { min-height: 72px; justify-content: center; color: #9eafaa; font-size: 13px; }
+.honor-holders { margin-top: auto; padding-top: 10px; border-top: 1px solid #ffffff12; color: var(--badge-color); font-size: 12px; }
+.honor-foot { margin: 18px 0 0; font-size: 12px; line-height: 1.8; }
+
+/* Light follows the existing map geometry; it does not change position or timing. */
+.hero-art { position: relative; isolation: isolate; }
+.hero-art:before { content: ''; position: absolute; z-index: -1; inset: 10% 8% 14%; border-radius: 50%; background: radial-gradient(circle, #e6bc7332, #bc8b4310 42%, transparent 72%); filter: blur(22px); pointer-events: none; }
+.hero-aura, .hero-door-glow, .hero-arc { transform-box: fill-box; transform-origin: center; }
+.hero-door-glow { filter: drop-shadow(0 0 5px #e6bb78); }
+.hero-satellite { transform-box: view-box; transform-origin: 285px 218px; filter: drop-shadow(0 0 5px #f4cf87); }
+.guide-card .diagram { background: radial-gradient(ellipse at 50% 48%, color-mix(in srgb, var(--accent) 13%, #10202a), #101922 76%); border-color: color-mix(in srgb, var(--accent) 25%, #26343a); }
+.guide-card .diagram text { font-family: var(--sans); }
+.guide-orb, .guide-lights circle { filter: drop-shadow(0 0 5px currentColor); }
+.guide-witch-ray { filter: drop-shadow(0 0 5px #f0716a); }
+.overview-rings { fill: none; stroke-width: 1.1; stroke-dasharray: 2 7; transform-box: view-box; transform-origin: center; }
+.overview-twins-glint, .overview-spirit-glint, .overview-witch-glint { transform-box: view-box; transform-origin: 180px 80px; }
+.overview-glint-dot { filter: drop-shadow(0 0 6px #f2d396); }
+.raid-diagram { border-color: #59747a; background: radial-gradient(ellipse at 50% 45%, #23424a, #0b151e 85%); box-shadow: inset 0 0 35px #60a99c0b; }
+.raid-diagram .map-field-halo { fill: none; stroke: #82c6bd; stroke-width: 1.2; stroke-dasharray: 2 8; opacity: .4; transform-box: fill-box; transform-origin: center; }
+.raid-diagram .map-token-aura { fill: none; stroke: #d9f0df; stroke-width: 1; opacity: .36; transform-box: fill-box; transform-origin: center; }
+.raid-diagram .map-boss, .raid-diagram .map-lamp { filter: drop-shadow(0 0 5px #d5ab6470); }
+.raid-diagram .map-ally { filter: drop-shadow(0 0 4px #83e5d43f); }
+.raid-diagram .map-hazard { filter: drop-shadow(0 0 4px #ff877b55); }
+.raid-diagram .map-flow-dot { filter: drop-shadow(0 0 5px #f8d99b); }
+.raid-diagram .map-flow-trail { opacity: .48; }
+.diagram-controls { display: flex; align-items: center; gap: 6px; }
+.diagram-pause { min-height: 30px; padding: 3px 9px; color: #d9c8a5; border: 1px solid #596c67; border-radius: 5px; background: #172932; font-size: 12px; }
+.diagram-pause:hover { border-color: #e6c993; color: #fff0c8; }
+.raid-diagram.motion-paused *, .raid-diagram.motion-paused *:before, .raid-diagram.motion-paused *:after { animation-play-state: paused !important; }
+.badge-card.earned .badge-crest { box-shadow: inset 0 0 0 4px #111922, inset 0 0 0 5px color-mix(in srgb, var(--badge-color) 60%, transparent), 0 0 18px color-mix(in srgb, var(--badge-color) 18%, transparent); }
+
+@media (max-width: 1300px) { .honor-boards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 800px) {
+  .leaderboard-header { display: none; }
+  .ranking-row { grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 19px 17px; }
+  .ranking-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; padding: 12px 0 0 44px; border-top: 1px solid #ffffff12; }
+  .ranking-stat small { display: block; color: #9eada7; font-size: 11px; }
+  .ranking-stat b { font-size: 13px; }
+  .ranking-score { font-size: 19px; }
+  .honor-heading { display: block; margin-top: 50px; }
+  .honor-heading > p { margin-top: 10px; }
+}
+@media (max-width: 560px) {
+  .profile-trigger { min-width: 0; }
+  .profile-trigger #header-profile { min-width: 0; max-width: clamp(52px, 20vw, 110px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .art-caption { left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 8px; letter-spacing: .13em; }
+  .art-caption i { width: 18px; margin-inline: 5px; }
+  .ranking-actions { flex-wrap: wrap; row-gap: 7px; }
+  .honor-boards { grid-template-columns: 1fr; }
+  .honor-card { padding: 17px; }
+  .ranking-stats { padding-left: 0; }
+  .rank-badges { margin-top: 8px; }
+  .ranking-page-controls { width: 100%; }
+  .ranking-page-controls label { margin-left: 0; }
+  .guide-card .diagram { max-height: none; }
+  .diagram-zoom { min-height: 34px; padding-inline: 10px; border: 1px solid #7e998d; border-radius: 6px; font-size: 13px; }
+  .badges-actions { top: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-art:before { animation: halo-breathe 5s ease-in-out infinite; }
+  .hero-aura { animation: halo-breathe 5s ease-in-out infinite; }
+  .hero-door-glow { animation: glow-breathe 4s ease-in-out infinite; }
+  .hero-satellite { animation: hero-orbit-spin 30s linear infinite; }
+  .hero-arc { animation: halo-breathe 6s ease-in-out infinite reverse; }
+  .overview-rings { animation: overview-rings 8s ease-in-out infinite; }
+  .overview-twins-glint, .overview-spirit-glint { animation: overview-orbit 18s linear infinite; }
+  .overview-witch-glint { animation: overview-orbit 23s linear infinite reverse; }
+  .raid-diagram .map-field-halo { animation: map-halo 5s ease-in-out infinite; }
+  .raid-diagram .map-token-aura { animation: map-halo 2.8s ease-in-out infinite; }
+  .raid-diagram .map-orb { animation: map-orb-float 2.6s ease-in-out infinite; }
+  .badge-card.earned .badge-crest, .honor-emblem { animation: crest-breathe 4s ease-in-out infinite; }
+}
+@keyframes halo-breathe { 0%, 100% { opacity: .55; transform: scale(.94); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes glow-breathe { 0%, 100% { opacity: .6; filter: drop-shadow(0 0 3px #e6bb78); } 50% { opacity: 1; filter: drop-shadow(0 0 9px #f5ca83); } }
+@keyframes overview-orbit { to { transform: rotate(360deg); } }
+@keyframes overview-rings { 0%,100% { opacity: .28; } 50% { opacity: .9; } }
+@keyframes map-halo { 0%,100% { opacity: .2; } 50% { opacity: .7; } }
+@keyframes map-orb-float { 0%,100% { transform: translateY(-2px); filter: brightness(.9) drop-shadow(0 0 2px currentColor); } 50% { transform: translateY(2px); filter: brightness(1.4) drop-shadow(0 0 7px currentColor); } }
+@keyframes crest-breathe { 0%,100% { filter: brightness(.93); } 50% { filter: brightness(1.18); } }
+@media (prefers-reduced-motion: reduce) { .diagram-pause { display: none; } }

@@ -84,6 +84,53 @@ class BadgeTest(unittest.TestCase):
         server.select_badges(self.db, {**player, 'selected': []})
         self.assertEqual(server.leaderboard(self.db, latest=True)['entries'][0]['badges'], [])
 
+    def test_site_record_boards_count_old_attempts_award_ties_and_change_holders(self):
+        a, b, c = self.player('a'), self.player('b'), self.player('c')
+        self.attempt(a, 87, elapsed=50)
+        self.attempt(a, 87, elapsed=60)
+        self.attempt(b, 87, elapsed=50)
+        self.attempt(b, 20, elapsed=40)
+        self.attempt(c, 87)  # Unknown time never wins a timed board.
+        self.db.execute('UPDATE attempts SET quiz_version = ? WHERE participant_id = ?',
+                        ('peak-spiral-2026-11-18-v3', a['deviceId']))
+        boards, _ = server.honor_boards(self.db)
+        by_id = {board['badge']['id']: board for board in boards['boards']}
+        self.assertEqual([row['nickname'] for row in by_id['quickest']['entries']], ['b', 'a'])
+        self.assertEqual(by_id['site_rounds']['holderCount'], 2)
+        self.assertEqual([row['rank'] for row in by_id['site_rounds']['entries']], [1, 1])
+        self.assertEqual(by_id['site_perfects']['entries'][0]['value'], 2)
+        self.assertEqual(by_id['site_perfect_fast']['holderCount'], 2)
+        self.assertLessEqual({'site_rounds', 'site_perfects', 'site_perfect_fast'}, self.earned(a))
+        self.assertIn('site_perfect_fast', self.earned(b))
+        self.assertNotIn('site_perfect_fast', self.earned(c))
+        server.select_badges(self.db, {**a, 'selected': ['site_rounds', 'site_perfect_fast']})
+        self.attempt(b, 87, elapsed=30)
+        self.assertNotIn('site_rounds', self.earned(a))
+        self.assertNotIn('site_perfect_fast', self.earned(a))
+        self.assertEqual(server.badges(self.db, a)['selected'], [])
+        self.assertLessEqual({'quickest', 'site_rounds', 'site_perfect_fast'}, self.earned(b))
+        with self.assertRaises(server.ApiError):
+            server.select_badges(self.db, {**a, 'selected': ['site_rounds']})
+
+    def test_site_record_board_limits_visible_rows_but_awards_all_tied_winners(self):
+        players = [self.player(str(i)) for i in range(7)]
+        for player in players:
+            self.attempt(player, 87, elapsed=100)
+        boards, winners = server.honor_boards(self.db)
+        fastest = boards['boards'][0]
+        self.assertEqual(len(fastest['entries']), 5)
+        self.assertEqual(fastest['holderCount'], 7)
+        self.assertEqual(len(winners['quickest']), 7)
+        self.assertTrue(all('quickest' in self.earned(player) for player in players))
+        rounds = next(board for board in boards['boards'] if board['badge']['id'] == 'site_rounds')
+        self.assertEqual(rounds['entries'], [])  # One attempt is not enough for the rounds record.
+
+    def test_empty_record_boards_do_not_invent_winners(self):
+        self.player('a')
+        boards, winners = server.honor_boards(self.db)
+        self.assertTrue(all(not board['entries'] and board['holderCount'] == 0 for board in boards['boards']))
+        self.assertTrue(all(not holders for holders in winners.values()))
+
     def test_selection_is_authenticated_and_rejects_invalid_or_locked_badges(self):
         player = self.player('a')
         self.attempt(player, 1)

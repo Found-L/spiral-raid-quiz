@@ -245,6 +245,7 @@ const wait = () => new Promise(resolve => setTimeout(resolve, 30));
   assert.deepEqual(extendedDraft.optionOrder[oldOrder[0]],oldOptions[oldOrder[0]]);
   assert.equal(extendedDraft.index,4);
   assert.deepEqual(extendedDraft.answers[oldOrder[0]],[oldOptions[oldOrder[0]][0]]);
+  extended.click('leave-exam'); // Stop this harness's exam timer before creating another document.
 
   const swap = createHarness('https://www.lysue.com', {
     ':identity':sourceIdentity, ':profile':{nickname:'切换前'},
