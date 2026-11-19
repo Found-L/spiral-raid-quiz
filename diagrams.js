@@ -9,11 +9,26 @@ function drawRaidDiagram(key, caption, questionId = null) {
     const dx = 4 * Math.sin(angle), dy = 4 * Math.cos(angle);
     return line(`M${x1} ${y1}L${x2} ${y2}M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`, style);
   };
-  const token = (x, y, text, style = 'map-ally', radius = 12) => circle(x, y, radius, style) + label(x, y + 4.5, text, 'map-token');
+  const token = (x, y, text, style = 'map-ally', radius = 12) =>
+    circle(x, y, radius, style) + circle(x, y, Math.max(radius - 3, 1), 'map-token-ring') + label(x, y + 4.5, text, 'map-token');
   const arena = (x = 280, y = 135, radius = 106) => circle(x, y, radius, 'map-field') + circle(x, y, radius - 12, 'map-grid');
   const boss = (x = 280, y = 135, text = '首领', style = 'map-boss') => token(x, y, text, style, 24);
   const spider = (x, y) => token(x, y, '大', 'map-boss', 17);
   const swarm = (x, y) => [[-16, -4], [9, -16], [12, 9], [-6, 15]].map(([dx,dy]) => circle(x+dx, y+dy, 5, 'map-hazard')).join('');
+  const legends = {
+    'twins-distance': [['red', '火侧'], ['teal', '冰侧'], ['dash', '约 8 米边界']],
+    'twins-orbs': [['red', '火球'], ['teal', '冰球']],
+    'twins-heal': [['teal', '机制岗位'], ['gold-arrow', '处理顺序']],
+    'twins-swap': [['red', '火侧'], ['teal', '冰侧'], ...(!test ? [['gold-arrow', '转场示意']] : [])],
+    'spirit-select': [['red', '炸弹'], ['teal', '队员'], ['dash', '首领附近'], ...(!test ? [['red-arrow', '撤离示意']] : [])],
+    'spirit-facing': [['red', '带业火'], ['teal', '外场'], ['teal-arrow', '角色面向']],
+    'spirit-lamps': [['gold', '灯位'], ['teal', '队员'], ['gold-arrow', '引导方向']],
+    'spirit-rotation': [['red', '隔离内'], ['teal', '外场'], ['gold-arrow', '轮换方向']],
+    'witch-line': [['red-line', '不祥气息'], ['teal', '队员'], ...(!test ? [['teal-arrow', '带位路线示意']] : [])],
+    'witch-charge': [['gold', '首领'], ['teal', '队员'], ['gold-arrow', '面向']],
+    'witch-bomb': [['red', '被标记'], ['red-line', '不祥气息'], ['teal', '其他队员'], ...(!test ? [['red-arrow', '撤离示意']] : [])],
+    'witch-spiders': [['gold', '大蜘蛛 / 首领'], ['red', '小蜘蛛'], ...(!test ? [['teal-arrow', '聚怪'], ['red-arrow', '转向首领']] : [])],
+  };
   let art;
 
   switch (key) {
@@ -29,12 +44,14 @@ function drawRaidDiagram(key, caption, questionId = null) {
       art = [arena(145, 135, 95), arena(415, 135, 95), boss(145, 135, '灼热剑', 'map-hazard'), boss(415, 135, '酷寒剑', 'map-ally'),
         circle(94, 81, 8, 'map-hazard'), circle(195, 178, 8, 'map-ally'),
         circle(365, 81, 8, 'map-hazard'), circle(465, 178, 8, 'map-ally'),
+        label(145, 26, '灼热剑侧', 'map-gold-text'), label(415, 26, '酷寒剑侧', 'map-soft'),
         label(91, 65, '火球'), label(195, 207, '冰球'), label(365, 65, '火球'), label(465, 207, '冰球')].join('');
       if (!test) art += label(145, 252, '同色挡球 · 异色治疗') + label(415, 252, '同色挡球 · 异色治疗');
       break;
     case 'twins-heal':
       art = [token(118, 112, '花', 'map-ally', 22), token(280, 112, '珠', 'map-ally', 22), token(442, 112, 'T', 'map-boss', 22),
         arrow(149, 112, 248, 112), arrow(312, 112, 410, 112),
+        label(118, 65, '01 踩花', 'map-gold-text'), label(280, 65, '02 拾取', 'map-gold-text'), label(442, 65, '03 治疗', 'map-gold-text'),
         label(118, 154, '同色位踩花'), label(280, 154, '治疗位拾取'), label(442, 154, '指示对准主 T'),
         line('M40 188H520'), label(114, 223, '一刀 · 二刀', 'map-soft'), label(282, 223, '三刀', 'map-gold-text'), label(450, 223, '四刀', 'map-gold-text'),
         label(114, 249, '小加', 'map-soft'), label(282, 249, '准备大加'), label(450, 249, '接续大加')].join('');
@@ -106,5 +123,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       throw new Error(`Unknown raid diagram: ${key}`);
   }
 
-  return `<figure class="raid-diagram"><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${art}</svg><figcaption>${caption}</figcaption></figure>`;
+  const grid = `<path class="map-underlay" d="${[40,80,120,160,200,240,280,320,360,400,440,480,520].map(x => `M${x} 0v270`).join(' ')} ${[45,90,135,180,225].map(y => `M0 ${y}h560`).join(' ')}"/>`;
+  const legend = (legends[key] || []).map(([tone, text]) => `<span><i class="legend-mark legend-${tone}" aria-hidden="true"></i>${text}</span>`).join('');
+  return `<figure class="raid-diagram"><div class="diagram-top"><span>站位与路线示意</span><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${grid}${art}</svg><figcaption><span>${caption}</span>${legend ? `<span class="diagram-legend">${legend}</span>` : ''}</figcaption></figure>`;
 }

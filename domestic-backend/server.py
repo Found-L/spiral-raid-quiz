@@ -31,6 +31,26 @@ DATABASE = Path(os.environ.get('QUIZ_DATABASE', '/var/lib/spiral-raid-quiz/quiz.
 PORT = int(os.environ.get('QUIZ_PORT', '8791'))
 ALLOWED_ORIGINS = {'https://found-l.github.io', 'https://www.lysue.com'}
 MAX_BODY = 20000
+MAX_SHOWN_BADGES = 3
+# Order determines the default selection for players who have not chosen badges yet.
+BADGES = [
+    {'id': 'quickest', 'name': '快枪手', 'description': '全站已计时答卷用时最短，不看分数；并列同得，纪录被超越后让出。', 'icon': 'bolt', 'tone': 'gold'},
+    {'id': 'perfect_fast', 'name': '闪电机制王', 'description': '10 分钟内完成一份满分答卷。', 'icon': 'bolt', 'tone': 'gold'},
+    {'id': 'perfect', 'name': '教科书成精', 'description': '任意一轮获得满分。', 'icon': 'crown', 'tone': 'gold'},
+    {'id': 'almost', 'name': '就差一丢丢', 'description': '任意一轮只错 1 题。', 'icon': 'target', 'tone': 'violet'},
+    {'id': 'knowledge', 'name': '机制小抄本', 'description': '任意一轮达到 90 分。', 'icon': 'book', 'tone': 'teal'},
+    {'id': 'slow_careful', 'name': '慢工出细活', 'description': '用时至少 30 分钟，且本轮达到 90 分。', 'icon': 'hourglass', 'tone': 'teal'},
+    {'id': 'five_minutes', 'name': '手速在线', 'description': '5 分钟内完成一轮，不限分数。', 'icon': 'wing', 'tone': 'red'},
+    {'id': 'ten_rounds', 'name': '寺院编外人员', 'description': '累计完成 10 轮。', 'icon': 'temple', 'tone': 'violet'},
+    {'id': 'five_rounds', 'name': '团本打卡王', 'description': '累计完成 5 轮。', 'icon': 'flag', 'tone': 'teal'},
+    {'id': 'three_rounds', 'name': '重开不算输', 'description': '累计完成 3 轮。', 'icon': 'refresh', 'tone': 'red'},
+    {'id': 'steady', 'name': '稳如老 T', 'description': '累计 3 轮达到 90 分。', 'icon': 'shield', 'tone': 'teal'},
+    {'id': 'comeback', 'name': '咸鱼翻身', 'description': '曾有一轮低于 60 分，之后又有一轮达到 90 分。', 'icon': 'spark', 'tone': 'gold'},
+    {'id': 'zero', 'name': '反向满分', 'description': '任意一轮 0 题答对。', 'icon': 'target', 'tone': 'violet'},
+    {'id': 'brave', 'name': '胆大先开怪', 'description': '任意一轮低于 60 分，开荒勇气可嘉。', 'icon': 'flame', 'tone': 'red'},
+    {'id': 'first', 'name': '初入寺院', 'description': '完成第一轮考核。', 'icon': 'temple', 'tone': 'teal'},
+]
+BADGE_BY_ID = {badge['id']: badge for badge in BADGES}
 
 
 class ApiError(Exception):
@@ -71,8 +91,14 @@ def initialize():
                 attempt_id TEXT PRIMARY KEY REFERENCES attempts(id) ON DELETE CASCADE,
                 elapsed_seconds INTEGER NOT NULL
             );
+            CREATE TABLE IF NOT EXISTS badge_selections (
+                participant_id TEXT PRIMARY KEY REFERENCES participants(id) ON DELETE CASCADE,
+                selections TEXT NOT NULL,
+                updated_at INTEGER NOT NULL
+            );
             CREATE INDEX IF NOT EXISTS attempts_version_participant ON attempts(quiz_version, participant_id);
             CREATE INDEX IF NOT EXISTS attempts_participant_time ON attempts(participant_id, submitted_at, id);
+            CREATE INDEX IF NOT EXISTS attempt_timings_elapsed ON attempt_timings(elapsed_seconds);
         ''')
 
 
@@ -193,6 +219,118 @@ def version_order(version):
     return (match.group(1), int(match.group(2))) if match else ('', 0)
 
 
+def badge_states(db, participant_ids):
+    """Derive achievements from saved attempts and keep only eligible displayed badges."""
+    participant_ids = list(dict.fromkeys(participant_ids))
+    fastest = db.execute('''SELECT MIN(t.elapsed_seconds) FROM attempt_timings t
+                            JOIN attempts a ON a.id = t.attempt_id''').fetchone()[0]
+    if not participant_ids:
+        return {}, fastest
+    placeholders = ','.join('?' for _ in participant_ids)
+    attempts = db.execute('''SELECT a.participant_id, a.correct_count, a.total_count,
+                                    a.submitted_at, a.id, t.elapsed_seconds
+                             FROM attempts a LEFT JOIN attempt_timings t ON t.attempt_id = a.id
+                             WHERE a.participant_id IN (''' + placeholders + ''')
+                             ORDER BY a.submitted_at, a.id''', participant_ids).fetchall()
+    selections = db.execute('SELECT participant_id, selections FROM badge_selections WHERE participant_id IN ('
+                            + placeholders + ')', participant_ids).fetchall()
+    by_player = {participant_id: [] for participant_id in participant_ids}
+    for attempt in attempts:
+        by_player[attempt['participant_id']].append(attempt)
+    saved = {}
+    for row in selections:
+        try:
+            value = json.loads(row['selections'])
+            saved[row['participant_id']] = value if isinstance(value, list) else []
+        except (TypeError, ValueError):
+            saved[row['participant_id']] = []
+    states = {}
+    for participant_id, rows in by_player.items():
+        earned = set()
+        if rows:
+            earned.add('first')
+        if len(rows) >= 3:
+            earned.add('three_rounds')
+        if len(rows) >= 5:
+            earned.add('five_rounds')
+        if len(rows) >= 10:
+            earned.add('ten_rounds')
+        if sum(row['correct_count'] * 100 >= 90 * row['total_count'] for row in rows) >= 3:
+            earned.add('steady')
+        had_low = False
+        for row in rows:
+            correct, total, elapsed = row['correct_count'], row['total_count'], row['elapsed_seconds']
+            high = correct * 100 >= 90 * total
+            if correct == total:
+                earned.add('perfect')
+                if elapsed is not None and elapsed <= 600:
+                    earned.add('perfect_fast')
+            if total - correct == 1:
+                earned.add('almost')
+            if high:
+                earned.add('knowledge')
+                if had_low:
+                    earned.add('comeback')
+                if elapsed is not None and elapsed >= 1800:
+                    earned.add('slow_careful')
+            if correct * 100 < 60 * total:
+                earned.add('brave')
+                had_low = True
+            if correct == 0:
+                earned.add('zero')
+            if elapsed is not None:
+                if elapsed <= 300:
+                    earned.add('five_minutes')
+                if fastest is not None and elapsed == fastest:
+                    earned.add('quickest')
+        ordered = [badge['id'] for badge in BADGES if badge['id'] in earned]
+        if participant_id in saved:
+            selected = list(dict.fromkeys(item for item in saved[participant_id]
+                                          if isinstance(item, str) and item in earned))[:MAX_SHOWN_BADGES]
+        else:
+            selected = ordered[:MAX_SHOWN_BADGES]
+        states[participant_id] = {'earned': earned, 'selected': selected}
+    return states, fastest
+
+
+def badge_catalog(state, fastest):
+    return {'badges': [{**badge, 'earned': badge['id'] in state['earned'],
+                        'selected': badge['id'] in state['selected']} for badge in BADGES],
+            'selected': state['selected'], 'fastestSeconds': fastest, 'maxShown': MAX_SHOWN_BADGES}
+
+
+def badges(db, body):
+    device, secret_hash = credentials(body)
+    authenticated(db, device, secret_hash, '请保存昵称，或恢复原来的身份后查看勋章。')
+    states, fastest = badge_states(db, [device])
+    return badge_catalog(states[device], fastest)
+
+
+def select_badges(db, body):
+    device, secret_hash = credentials(body)
+    selected = body.get('selected')
+    if (not isinstance(selected, list) or len(selected) > MAX_SHOWN_BADGES
+            or any(not isinstance(item, str) or item not in BADGE_BY_ID for item in selected)
+            or len(set(selected)) != len(selected)):
+        raise ApiError(f'请选择不超过 {MAX_SHOWN_BADGES} 枚不同的勋章。')
+    db.execute('BEGIN IMMEDIATE')
+    try:
+        authenticated(db, device, secret_hash, '请保存昵称，或恢复原来的身份后设置勋章。')
+        states, fastest = badge_states(db, [device])
+        if any(item not in states[device]['earned'] for item in selected):
+            raise ApiError('有勋章尚未获得，或最快纪录已被超越，请刷新后重新选择。')
+        db.execute('''INSERT INTO badge_selections (participant_id, selections, updated_at) VALUES (?, ?, ?)
+                      ON CONFLICT(participant_id) DO UPDATE SET selections=excluded.selections,
+                      updated_at=excluded.updated_at''',
+                   (device, json.dumps(selected, ensure_ascii=False), int(time.time() * 1000)))
+        db.execute('COMMIT')
+        states[device]['selected'] = selected
+        return {'ok': True, **badge_catalog(states[device], fastest)}
+    except Exception:
+        db.execute('ROLLBACK')
+        raise
+
+
 def leaderboard(db, requested_version=None, latest=False):
     selected_version = VERSION if requested_version is None and not latest else requested_version
     if selected_version is not None and selected_version not in BANKS:
@@ -214,7 +352,7 @@ def leaderboard(db, requested_version=None, latest=False):
                       (t.elapsed_seconds IS NULL), t.elapsed_seconds ASC, a.submitted_at ASC, a.id ASC) AS rn
                 FROM attempts a LEFT JOIN attempt_timings t ON t.attempt_id = a.id
                 WHERE (? IS NULL OR a.quiz_version = ?)
-            ) SELECT n.number, p.nickname, r.quiz_version, r.correct_count, r.total_count, r.submitted_at, r.elapsed_seconds
+            ) SELECT p.id AS participant_id, n.number, p.nickname, r.quiz_version, r.correct_count, r.total_count, r.submitted_at, r.elapsed_seconds
               FROM ranked r JOIN participants p ON p.id = r.participant_id
               LEFT JOIN participant_numbers n ON n.participant_id = p.id WHERE r.rn = 1
               ORDER BY ROUND(10000.0 * r.correct_count / r.total_count) DESC,
@@ -224,10 +362,12 @@ def leaderboard(db, requested_version=None, latest=False):
     except Exception:
         db.execute('ROLLBACK')
         raise
+    states, _ = badge_states(db, [row['participant_id'] for row in rows])
     entries = [{'rank': index + 1, 'playerNumber': row['number'], 'nickname': row['nickname'],
                 'correctCount': row['correct_count'], 'totalCount': row['total_count'],
                 'quizVersion': row['quiz_version'], 'elapsedSeconds': row['elapsed_seconds'],
-                'submittedAt': row['submitted_at'], 'score': score(row['correct_count'], row['total_count'])}
+                'submittedAt': row['submitted_at'], 'score': score(row['correct_count'], row['total_count']),
+                'badges': [BADGE_BY_ID[item] for item in states[row['participant_id']]['selected']]}
                for index, row in enumerate(rows)]
     return {'version': selected_version or VERSION, 'view': 'latest' if latest else 'version', 'entries': entries}
 
@@ -317,7 +457,8 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(503, {'error': '排行榜暂时不可用，请稍后重试。'})
 
     def do_POST(self):
-        routes = {'/api/profile': profile, '/api/submit': submit,
+        routes = {'/api/profile': profile, '/api/submit': submit, '/api/badges': badges,
+                  '/api/badges/select': select_badges,
                   '/api/history': history, '/api/delete-profile': delete_profile}
         action = routes.get(urlsplit(self.path).path)
         if not action:

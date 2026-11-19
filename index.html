@@ -227,6 +227,75 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   .card-footer { gap: 8px; }
   .card-footer .card-cta { gap: 7px; }
 }
+
+/* Guide maps: a subtle grid, explicit legend and a larger view for small screens. */
+.raid-diagram { border-color: #40545a; background: radial-gradient(ellipse at 50% 42%, #1b3139, #0b151e 82%); }
+.diagram-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border-bottom: 1px solid #36444c; color: #cbb997; font-size: 11px; letter-spacing: .05em; }
+.diagram-top > span:before { content: ''; display: inline-block; width: 5px; height: 5px; margin: 0 7px 2px 0; border-radius: 50%; background: #d9ba82; }
+.diagram-zoom { display: inline-flex; align-items: center; gap: 4px; padding: 3px 6px; border: 0; border-radius: 3px; background: transparent; color: #e4c696; font-size: 11px; }
+.diagram-zoom:hover { background: #283536; }
+.diagram-zoom .icon { width: 14px; height: 14px; }
+.map-underlay { fill: none; stroke: #a8c1bc; stroke-width: .55; opacity: .11; }
+.raid-diagram text { paint-order: stroke; stroke: #101b22; stroke-width: 3px; stroke-linejoin: round; }
+.raid-diagram .map-token { stroke-width: 2px; }
+.map-field { fill: #1c3039; fill-opacity: .76; stroke: #6c8988; stroke-width: 1.4; }
+.map-boss { fill: #655039; stroke: #efd09b; stroke-width: 1.7; }
+.map-ally { fill: #28595c; stroke: #94d6d0; stroke-width: 1.7; }
+.map-hazard { fill: #7a4140; stroke: #ffac99; stroke-width: 1.7; }
+.map-lamp { fill: #6c582a; stroke: #ffe4a3; stroke-width: 1.7; }
+.map-token-ring { fill: none; stroke: #e9f2e8; stroke-width: .8; opacity: .24; }
+.map-ally-line, .map-red-line, .map-gold-line { stroke-linecap: round; stroke-linejoin: round; }
+.map-grid, .map-red-grid { stroke-width: 1.5; }
+.raid-diagram figcaption { display: grid; gap: 9px; line-height: 1.6; }
+.diagram-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; color: #d1d8d1; font-size: 11px; }
+.diagram-legend > span { display: inline-flex; align-items: center; gap: 6px; }
+.legend-mark { display: inline-block; width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.legend-red { background: #e59583; }.legend-teal { background: #8dcac2; }.legend-gold { background: #e5c288; }
+.legend-dash, .legend-red-line, .legend-gold-arrow, .legend-teal-arrow, .legend-red-arrow { position: relative; width: 16px; height: 0; border-radius: 0; border-top: 2px solid #e5c288; }
+.legend-dash { border-top: 1.5px dashed #9bb6b1; }.legend-red-line { border-color: #ff9386; }
+.legend-teal-arrow { border-color: #8ddbd0; }.legend-red-arrow { border-color: #ff9386; }
+.legend-gold-arrow:after, .legend-teal-arrow:after, .legend-red-arrow:after { content: ''; position: absolute; right: 0; top: -4px; width: 5px; height: 5px; border-top: 1.5px solid currentColor; border-right: 1.5px solid currentColor; transform: rotate(45deg); }
+.legend-gold-arrow { color: #e5c288; }.legend-teal-arrow { color: #8ddbd0; }.legend-red-arrow { color: #ff9386; }
+.diagram-dialog { width: min(96vw, 950px); padding: clamp(16px, 3vw, 26px); }
+.diagram-dialog-hint { margin: 10px 0; color: #aab8b2; font-size: 12px; }
+.diagram-dialog-content { overflow: auto; overscroll-behavior-x: contain; }
+.diagram-dialog-content .raid-diagram { min-width: 560px; }
+
+/* Earned badges remain legible both on the leaderboard and in the collection. */
+.badges-view { width: min(100%, 1230px); margin: 0 auto; padding: 52px clamp(18px, 5vw, 62px) 90px; }
+.badge-eyebrow { margin: 35px 0 10px; }
+.badges-view h1 { margin: 0 0 10px; font: 600 clamp(32px, 4.5vw, 54px)/1.22 var(--serif); }
+.badges-view h1:focus { outline: none; }
+.badges-intro { max-width: 700px; margin: 0; color: var(--muted); }
+.badges-status { margin: 20px 0 14px; color: #e1c9a0; font-size: 13px; }
+.badges-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.badge-card { min-width: 0; min-height: 142px; display: flex; align-items: flex-start; gap: 14px; padding: 17px; text-align: left; color: var(--text); background: linear-gradient(135deg, #1a252c, #131c24); border: 1px solid #35413e; border-radius: 5px; transition: border-color .18s, background .18s, transform .18s; }
+.badge-card.earned:hover { border-color: var(--badge-color); transform: translateY(-2px); }
+.badge-card.selected { border-color: var(--badge-color); background: linear-gradient(135deg, #28302c, #172129); }
+.badge-card.locked { opacity: .63; cursor: default; }
+.tone-gold { --badge-color: #e5c488; }.tone-teal { --badge-color: #93cec4; }.tone-red { --badge-color: #e7a092; }.tone-violet { --badge-color: #c9b8e6; }
+.badge-crest { width: 50px; height: 50px; flex: none; display: grid; place-items: center; color: var(--badge-color); border: 1px solid currentColor; border-radius: 15px 15px 19px 19px; background: rgba(223,191,135,.07); box-shadow: inset 0 0 0 4px rgba(10,16,22,.55); }
+.badge-crest .icon { width: 24px; height: 24px; }
+.badge-info { display: grid; gap: 5px; min-width: 0; }
+.badge-title { color: var(--badge-color); font-weight: 700; font-size: 15px; }
+.badge-description { color: #c1c9c3; font-size: 12px; line-height: 1.6; }
+.badge-state { color: #aab2aa; font-size: 11px; }
+.badge-card.selected .badge-state { color: var(--badge-color); }
+.badges-actions { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 15px; padding: 8px 0; background: rgba(11,16,23,.96); }
+.badges-note { margin: 18px 0 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
+.rank-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.badge-chip { display: inline-flex; align-items: center; gap: 3px; max-width: 100%; padding: 2px 6px; border: 1px solid color-mix(in srgb, var(--badge-color) 45%, transparent); border-radius: 3px; color: var(--badge-color); background: rgba(224,196,151,.04); font-size: 10px; line-height: 1.4; white-space: nowrap; }
+.badge-chip .icon { width: 12px; height: 12px; stroke-width: 1.8; }
+#profile-badges { margin-left: 16px; }
+
+@media (max-width: 900px) { .badges-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 680px) {
+  .badges-view { padding-top: 36px; }
+  .badges-grid { grid-template-columns: 1fr; }
+  .badge-card { min-height: 0; }
+  .badge-chip { font-size: 10px; }
+  .diagram-dialog { max-height: 90vh; }
+}
 </style>
 </head>
 <body>
@@ -238,11 +307,24 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
     <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M19.5 9a7.6 7.6 0 0 0-12.9-2L4.5 9M4.5 5.5V9H8M4.5 15a7.6 7.6 0 0 0 12.9 2l2.1-2M19.5 18.5V15H16"/></symbol>
     <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/></symbol>
     <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11m0-11-11 11"/></symbol>
+    <symbol id="icon-zoom" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 4.5 4.5M10.5 7.5v6m-3-3h6"/></symbol>
+    <symbol id="badge-bolt" viewBox="0 0 24 24"><path d="m13.5 2.5-8 11h6L10.5 21.5l8-11h-6z"/></symbol>
+    <symbol id="badge-crown" viewBox="0 0 24 24"><path d="m3.5 7 4.5 3 4-6 4 6 4.5-3-1.5 11h-14zM6 21h12"/></symbol>
+    <symbol id="badge-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></symbol>
+    <symbol id="badge-book" viewBox="0 0 24 24"><path d="M12 6C9 3.8 6.2 3.8 3.5 5v13c2.7-1.1 5.5-1.1 8.5 1 3-2.1 5.8-2.1 8.5-1V5C17.8 3.8 15 3.8 12 6Zm0 0v13"/></symbol>
+    <symbol id="badge-hourglass" viewBox="0 0 24 24"><path d="M6 3.5h12M6 20.5h12M7 4c0 4 1.5 5.5 5 8-3.5 2.5-5 4-5 8m10-16c0 4-1.5 5.5-5 8 3.5 2.5 5 4 5 8"/></symbol>
+    <symbol id="badge-wing" viewBox="0 0 24 24"><path d="M3 8c3 1 5 1 7 1l8-5-2 6 4 1-5 2-3 6-1-6c-3 0-6-1-8-5Z"/></symbol>
+    <symbol id="badge-temple" viewBox="0 0 24 24"><path d="m3 10 9-6 9 6M5.5 10v9h13v-9M9.5 19v-5h5v5M3 21h18"/></symbol>
+    <symbol id="badge-flag" viewBox="0 0 24 24"><path d="M5 21V3m0 1c4-3 6 3 10 0l4 1v9l-4-1c-4 3-6-3-10 0"/></symbol>
+    <symbol id="badge-refresh" viewBox="0 0 24 24"><path d="M19.5 9a7.6 7.6 0 0 0-12.9-2L4.5 9M4.5 5.5V9H8M4.5 15a7.6 7.6 0 0 0 12.9 2l2.1-2M19.5 18.5V15H16"/></symbol>
+    <symbol id="badge-shield" viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 5-3 7.5-7 10-4-2.5-7-5-7-10V6zM9 12l2 2 4-4"/></symbol>
+    <symbol id="badge-spark" viewBox="0 0 24 24"><path d="M12 3c.8 5 2 7.2 7 9-5 1.8-6.2 4-7 9-.8-5-2-7.2-7-9 5-1.8 6.2-4 7-9ZM19 3v4m-2-2h4"/></symbol>
+    <symbol id="badge-flame" viewBox="0 0 24 24"><path d="M12 3c.8 4-3 5.5-3 8-1.4-.5-2-1.5-2-3-2.5 2.1-3.5 4-3.5 6.5a8.5 8.5 0 0 0 17 0c0-3-2-5.5-4-7.5 0 2.5-.7 3.5-2 4 .2-3.5-1-6-2.5-8Z"/></symbol>
   </svg>
   <div class="site-shell">
     <header class="topbar">
       <a href="#home" class="brand" aria-label="螺旋寺院机制考核首页"><span class="brand-mark">旋</span><span><strong>螺旋寺院</strong><small>团队机制考核</small></span></a>
-      <nav class="nav-links" aria-label="主导航"><a href="#guide">机制图解</a><button type="button" data-action="show-leaderboard">排行榜</button><button type="button" data-action="open-history">我的记录</button></nav>
+      <nav class="nav-links" aria-label="主导航"><a href="#guide">机制图解</a><button type="button" data-action="show-leaderboard">排行榜</button><button type="button" data-action="open-history">我的记录</button><button type="button" data-action="open-badges">我的勋章</button></nav>
       <button class="profile-trigger" type="button" data-action="profile" aria-haspopup="dialog"><span class="avatar" aria-hidden="true"><svg class="icon"><use href="#icon-user"/></svg></span><span id="header-profile">设置我的资料</span><svg class="icon profile-arrow" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button>
     </header>
 
@@ -323,6 +405,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       <section id="history-view" class="history-view hidden" aria-labelledby="history-title">
         <button class="back-button" type="button" data-action="close-history"><span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-left"/></svg></span>返回</button>
         <h1 id="history-title" tabindex="-1">我的答题记录</h1>
+        <button class="link-button icon-action" type="button" data-action="open-badges">查看我的勋章 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button>
         <p id="history-player" class="muted" hidden></p>
         <div id="history-summary" class="history-summary" hidden>
           <div><span>已提交</span><strong id="history-count"></strong></div>
@@ -337,6 +420,17 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         <button id="history-more" class="btn btn-ghost" type="button" data-action="history-more" hidden>查看更多</button>
       </section>
 
+      <section id="badges-view" class="badges-view hidden" aria-labelledby="badges-title">
+        <button class="back-button" type="button" data-action="close-badges"><span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-left"/></svg></span>返回</button>
+        <p class="eyebrow badge-eyebrow">RAID HONORS <span class="slash">/</span> 趣味收藏</p>
+        <h1 id="badges-title" tabindex="-1">我的勋章</h1>
+        <p class="badges-intro">答题会自动解锁勋章。选出你喜欢的最多 3 枚，展示在排行榜的昵称下。</p>
+        <p id="badges-status" class="badges-status" role="status" aria-live="polite"></p>
+        <div class="badges-actions"><button id="badges-save" class="btn btn-primary" type="button" data-action="save-badges" hidden>保存展示</button><button id="badges-reload" class="btn btn-ghost" type="button" data-action="reload-badges" hidden>刷新勋章</button><button id="badges-profile" class="btn btn-primary" type="button" data-action="badges-profile" hidden>设置昵称或恢复身份</button></div>
+        <div id="badges-grid" class="badges-grid"></div>
+        <p class="badges-note">勋章根据已上传的答题记录计算。未记录用时的成绩不参与用时勋章；答题用时由浏览器记录，仅供趣味展示。</p>
+      </section>
+
       <section id="exam-view" class="exam-view hidden" aria-label="机制考核">
         <div class="exam-top"><button class="back-button" type="button" data-action="leave-exam"><span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-left"/></svg></span>返回首页</button><div class="exam-meta"><span>螺旋寺院 · 机制考核</span><strong id="exam-profile"></strong><span id="exam-timer">用时 —</span></div><button class="link-button" type="button" data-action="profile">修改资料</button></div>
         <output id="draft-update-notice" class="draft-update-notice" hidden></output>
@@ -345,13 +439,14 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         </div>
       </section>
 
-      <section id="result-view" class="result-view hidden" aria-label="考核结果"><div class="result-head"><p class="eyebrow">ASSESSMENT COMPLETE <span class="slash">/</span> 考核完成</p><h2>这一轮，辛苦了。</h2><p id="result-name" class="muted"></p><div class="score-display"><strong id="result-score">0</strong><span> / 100</span></div><p id="result-detail"></p><p id="sync-status" class="sync-status" aria-live="polite"></p><div class="result-actions"><button class="btn btn-primary" type="button" data-action="retry-upload" id="retry-upload" hidden>重新上传成绩</button><button class="btn btn-secondary" type="button" data-action="restart">再练一次</button><button class="btn btn-ghost" type="button" data-action="open-history">我的答题记录</button><button class="btn btn-ghost" type="button" data-action="results-home">查看排行榜 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div></div><div class="review-head"><div><p class="eyebrow">ANSWER REVIEW</p><h2>答案与解析</h2></div><button id="review-toggle" class="link-button" type="button" data-action="toggle-review">只看错题</button></div><div id="review-list" class="review-list"></div></section>
+      <section id="result-view" class="result-view hidden" aria-label="考核结果"><div class="result-head"><p class="eyebrow">ASSESSMENT COMPLETE <span class="slash">/</span> 考核完成</p><h2>这一轮，辛苦了。</h2><p id="result-name" class="muted"></p><div class="score-display"><strong id="result-score">0</strong><span> / 100</span></div><p id="result-detail"></p><p id="sync-status" class="sync-status" aria-live="polite"></p><div class="result-actions"><button class="btn btn-primary" type="button" data-action="retry-upload" id="retry-upload" hidden>重新上传成绩</button><button class="btn btn-secondary" type="button" data-action="restart">再练一次</button><button class="btn btn-ghost" type="button" data-action="open-history">我的答题记录</button><button class="btn btn-ghost" type="button" data-action="open-badges">我的勋章</button><button class="btn btn-ghost" type="button" data-action="results-home">查看排行榜 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div></div><div class="review-head"><div><p class="eyebrow">ANSWER REVIEW</p><h2>答案与解析</h2></div><button id="review-toggle" class="link-button" type="button" data-action="toggle-review">只看错题</button></div><div id="review-list" class="review-list"></div></section>
     </main>
     <footer><div class="footer-brand">螺旋寺院 <span>·</span> 团队机制考核</div><p>用于团队训练，请结合当前版本实战确认。</p><span>BUILT FOR THE RAID</span></footer>
   </div>
 
-  <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码是以前备份的完整代码，第一次使用只需填写上方昵称。身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><label for="identity-code">身份码</label><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><details id="saved-profiles" class="recovery" hidden><summary>切换本机保留的资料</summary><p class="muted small">切换时会保留当前本机资料和未上传成绩。</p><div id="saved-profiles-list"></div></details><details id="file-import" class="recovery" hidden><summary>导入迁移文件</summary><p class="muted small">选择从原网址下载的迁移文件。文件含有身份资料，请妥善保管。</p><label for="transfer-file">选择迁移文件</label><input id="transfer-file" type="file" accept=".json,application/json"></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="profile-history" class="link-button icon-action" type="button" data-action="open-history" hidden>我的答题记录 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><br><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
+  <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码是以前备份的完整代码，第一次使用只需填写上方昵称。身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><label for="identity-code">身份码</label><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><details id="saved-profiles" class="recovery" hidden><summary>切换本机保留的资料</summary><p class="muted small">切换时会保留当前本机资料和未上传成绩。</p><div id="saved-profiles-list"></div></details><details id="file-import" class="recovery" hidden><summary>导入迁移文件</summary><p class="muted small">选择从原网址下载的迁移文件。文件含有身份资料，请妥善保管。</p><label for="transfer-file">选择迁移文件</label><input id="transfer-file" type="file" accept=".json,application/json"></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="profile-history" class="link-button icon-action" type="button" data-action="open-history" hidden>我的答题记录 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><button id="profile-badges" class="link-button icon-action" type="button" data-action="open-badges" hidden>我的勋章 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><br><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
   <dialog id="transfer-dialog" aria-labelledby="transfer-title"><div class="dialog-top"><div><p class="eyebrow">TRANSFER</p><h2 id="transfer-title">转移本机资料</h2></div><button class="close-button" type="button" data-action="close-transfer" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><output id="transfer-description" class="muted" aria-live="polite">正在读取原网址的资料…</output><p id="transfer-detail" class="profile-note"></p><p id="transfer-error" class="error-text" role="alert"></p><div class="dialog-actions"><button id="transfer-confirm" class="btn btn-primary" type="button" data-action="confirm-transfer" hidden>确认转移并上传</button><button class="btn btn-ghost" type="button" data-action="close-transfer">取消</button></div></dialog>
+  <dialog id="diagram-dialog" class="diagram-dialog" aria-labelledby="diagram-dialog-title"><div class="dialog-top"><div><p class="eyebrow">TACTICAL MAP</p><h2 id="diagram-dialog-title">放大查看示意图</h2></div><button class="close-button" type="button" data-action="close-diagram" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="diagram-dialog-hint">手机可左右滑动查看完整图解。</p><div id="diagram-dialog-content" class="diagram-dialog-content"></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script id="question-bank" type="application/json">{
   "version": "peak-spiral-2026-11-18-v5",
@@ -3144,11 +3239,26 @@ function drawRaidDiagram(key, caption, questionId = null) {
     const dx = 4 * Math.sin(angle), dy = 4 * Math.cos(angle);
     return line(`M${x1} ${y1}L${x2} ${y2}M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`, style);
   };
-  const token = (x, y, text, style = 'map-ally', radius = 12) => circle(x, y, radius, style) + label(x, y + 4.5, text, 'map-token');
+  const token = (x, y, text, style = 'map-ally', radius = 12) =>
+    circle(x, y, radius, style) + circle(x, y, Math.max(radius - 3, 1), 'map-token-ring') + label(x, y + 4.5, text, 'map-token');
   const arena = (x = 280, y = 135, radius = 106) => circle(x, y, radius, 'map-field') + circle(x, y, radius - 12, 'map-grid');
   const boss = (x = 280, y = 135, text = '首领', style = 'map-boss') => token(x, y, text, style, 24);
   const spider = (x, y) => token(x, y, '大', 'map-boss', 17);
   const swarm = (x, y) => [[-16, -4], [9, -16], [12, 9], [-6, 15]].map(([dx,dy]) => circle(x+dx, y+dy, 5, 'map-hazard')).join('');
+  const legends = {
+    'twins-distance': [['red', '火侧'], ['teal', '冰侧'], ['dash', '约 8 米边界']],
+    'twins-orbs': [['red', '火球'], ['teal', '冰球']],
+    'twins-heal': [['teal', '机制岗位'], ['gold-arrow', '处理顺序']],
+    'twins-swap': [['red', '火侧'], ['teal', '冰侧'], ...(!test ? [['gold-arrow', '转场示意']] : [])],
+    'spirit-select': [['red', '炸弹'], ['teal', '队员'], ['dash', '首领附近'], ...(!test ? [['red-arrow', '撤离示意']] : [])],
+    'spirit-facing': [['red', '带业火'], ['teal', '外场'], ['teal-arrow', '角色面向']],
+    'spirit-lamps': [['gold', '灯位'], ['teal', '队员'], ['gold-arrow', '引导方向']],
+    'spirit-rotation': [['red', '隔离内'], ['teal', '外场'], ['gold-arrow', '轮换方向']],
+    'witch-line': [['red-line', '不祥气息'], ['teal', '队员'], ...(!test ? [['teal-arrow', '带位路线示意']] : [])],
+    'witch-charge': [['gold', '首领'], ['teal', '队员'], ['gold-arrow', '面向']],
+    'witch-bomb': [['red', '被标记'], ['red-line', '不祥气息'], ['teal', '其他队员'], ...(!test ? [['red-arrow', '撤离示意']] : [])],
+    'witch-spiders': [['gold', '大蜘蛛 / 首领'], ['red', '小蜘蛛'], ...(!test ? [['teal-arrow', '聚怪'], ['red-arrow', '转向首领']] : [])],
+  };
   let art;
 
   switch (key) {
@@ -3164,12 +3274,14 @@ function drawRaidDiagram(key, caption, questionId = null) {
       art = [arena(145, 135, 95), arena(415, 135, 95), boss(145, 135, '灼热剑', 'map-hazard'), boss(415, 135, '酷寒剑', 'map-ally'),
         circle(94, 81, 8, 'map-hazard'), circle(195, 178, 8, 'map-ally'),
         circle(365, 81, 8, 'map-hazard'), circle(465, 178, 8, 'map-ally'),
+        label(145, 26, '灼热剑侧', 'map-gold-text'), label(415, 26, '酷寒剑侧', 'map-soft'),
         label(91, 65, '火球'), label(195, 207, '冰球'), label(365, 65, '火球'), label(465, 207, '冰球')].join('');
       if (!test) art += label(145, 252, '同色挡球 · 异色治疗') + label(415, 252, '同色挡球 · 异色治疗');
       break;
     case 'twins-heal':
       art = [token(118, 112, '花', 'map-ally', 22), token(280, 112, '珠', 'map-ally', 22), token(442, 112, 'T', 'map-boss', 22),
         arrow(149, 112, 248, 112), arrow(312, 112, 410, 112),
+        label(118, 65, '01 踩花', 'map-gold-text'), label(280, 65, '02 拾取', 'map-gold-text'), label(442, 65, '03 治疗', 'map-gold-text'),
         label(118, 154, '同色位踩花'), label(280, 154, '治疗位拾取'), label(442, 154, '指示对准主 T'),
         line('M40 188H520'), label(114, 223, '一刀 · 二刀', 'map-soft'), label(282, 223, '三刀', 'map-gold-text'), label(450, 223, '四刀', 'map-gold-text'),
         label(114, 249, '小加', 'map-soft'), label(282, 249, '准备大加'), label(450, 249, '接续大加')].join('');
@@ -3241,7 +3353,9 @@ function drawRaidDiagram(key, caption, questionId = null) {
       throw new Error(`Unknown raid diagram: ${key}`);
   }
 
-  return `<figure class="raid-diagram"><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${art}</svg><figcaption>${caption}</figcaption></figure>`;
+  const grid = `<path class="map-underlay" d="${[40,80,120,160,200,240,280,320,360,400,440,480,520].map(x => `M${x} 0v270`).join(' ')} ${[45,90,135,180,225].map(y => `M0 ${y}h560`).join(' ')}"/>`;
+  const legend = (legends[key] || []).map(([tone, text]) => `<span><i class="legend-mark legend-${tone}" aria-hidden="true"></i>${text}</span>`).join('');
+  return `<figure class="raid-diagram"><div class="diagram-top"><span>站位与路线示意</span><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${grid}${art}</svg><figcaption><span>${caption}</span>${legend ? `<span class="diagram-legend">${legend}</span>` : ''}</figcaption></figure>`;
 }
 </script>
   <script>(() => {
@@ -3322,12 +3436,22 @@ function drawRaidDiagram(key, caption, questionId = null) {
   let historyReturn = 'home';
   let historyCursor = null;
   let historyRequest = 0;
+  let badgesReturn = 'home';
+  let badgesRequest = 0;
+  let badgeData = null;
+  let selectedBadges = [];
+  let badgesDirty = false;
   let uploading = false;
   let connecting = false;
   let rankingRequest = 0;
   let lastUploadError = '';
   let examTimer = null;
   const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame']);
+  const badgeTones = new Set(['gold','teal','red','violet']);
+  const badgeTone = badge => badgeTones.has(badge.tone) ? badge.tone : 'gold';
+  const badgeIcon = badge => `<svg class="icon" aria-hidden="true"><use href="#badge-${badgeIcons.has(badge.icon) ? badge.icon : 'spark'}"/></svg>`;
+  const badgeChip = badge => `<span class="badge-chip tone-${badgeTone(badge)}" title="${escape(badge.description || '')}">${badgeIcon(badge)}${escape(badge.name)}</span>`;
   const sectionOf = (id) => SECTIONS.find(x=>x.id===id);
   const formatPlayerNumber = (number) => Number.isSafeInteger(number) && number > 0
     ? `#${String(number).padStart(6, '0')}` : '';
@@ -3372,7 +3496,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
     if (examTimer !== null) { clearInterval(examTimer); examTimer = null; }
     if (which === 'exam') { updateExamTimer(); examTimer = setInterval(updateExamTimer, 1000); }
     if (which === 'home' && location.hash.startsWith('#guide-')) window.history.replaceState(null, '', '#guide');
-    for (const section of ['home', 'exam', 'result', 'guide', 'history']) {
+    for (const section of ['home', 'exam', 'result', 'guide', 'history', 'badges']) {
       $(section + '-view').classList.toggle('hidden', section !== which);
     }
     window.scrollTo({top:0,behavior:'instant'});
@@ -3382,6 +3506,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
     $('exam-profile').textContent = profile ? profile.nickname : '';
     $('delete-profile').classList.toggle('hidden',!profile);
     $('profile-history').hidden = !profile;
+    $('profile-badges').hidden = false;
   }
   async function request(path, body) {
     const controller = new AbortController(); const timer=setTimeout(()=>controller.abort(),12000);
@@ -3459,6 +3584,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
     const number = formatPlayerNumber(profile.playerNumber);
     toast(localOnly ? '昵称已保存在本机，可以开始答题。' : number ? `资料已保存 · 榜单编号 ${number}` : '资料已保存');
     if(next==='start') beginExam();
+    else if (next==='badges') openBadges();
     else if (view === 'history') loadHistory();
     else refreshRanking();
     if (!localOnly && nextPendingAttempt()) uploadPending();
@@ -3581,6 +3707,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       $('sync-status').textContent=lastUploadError || '成绩已上传，排行榜保留你的最高分。';
       void refreshRanking();
       if (view === 'history') void loadHistory();
+      if (view === 'badges' && !badgesDirty) void loadBadges();
     } catch(err) {
       if (identity === participant) {
         lastUploadError = err.message;
@@ -3642,7 +3769,9 @@ function drawRaidDiagram(key, caption, questionId = null) {
         const row=document.createElement('div');row.className='ranking-row';
         const number = formatPlayerNumber(entry.playerNumber);
         const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
-        row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
+        const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
+        const badgeList = shownBadges.length ? `<div class="rank-badges" aria-label="展示的勋章">${shownBadges.map(badgeChip).join('')}</div>` : '';
+        row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
       }
     } catch(err){
       if(requestId !== rankingRequest) return;
@@ -3734,6 +3863,108 @@ function drawRaidDiagram(key, caption, questionId = null) {
     } finally {
       if (requestId === historyRequest) more.disabled = false;
     }
+  }
+  function openBadges() {
+    if ($('profile-dialog').open) closeProfile();
+    if (view !== 'badges') badgesReturn = view;
+    setView('badges');
+    $('badges-title').focus({preventScroll:true});
+    void loadBadges();
+  }
+  function closeBadges() {
+    ++badgesRequest;
+    setView(badgesReturn);
+    if (badgesReturn === 'home') { void refreshRanking(); $('leaderboard').scrollIntoView(); }
+  }
+  function renderBadges() {
+    const grid = $('badges-grid');
+    grid.replaceChildren();
+    const earned = badgeData.badges.filter(badge => badge.earned).length;
+    const fastest = Number.isSafeInteger(badgeData.fastestSeconds) ? formatDuration(badgeData.fastestSeconds) : '暂无';
+    $('badges-status').textContent = `已获得 ${earned} / ${badgeData.badges.length} 枚 · 已选 ${selectedBadges.length} / ${badgeData.maxShown} 枚 · 全站最快 ${fastest}`;
+    $('badges-save').textContent = `保存展示（${selectedBadges.length}/${badgeData.maxShown}）`;
+    for (const badge of badgeData.badges) {
+      const selected = selectedBadges.includes(badge.id);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `badge-card tone-${badgeTone(badge)}${badge.earned ? ' earned' : ' locked'}${selected ? ' selected' : ''}`;
+      button.dataset.action = 'toggle-badge';
+      button.dataset.badge = badge.id;
+      button.disabled = !badge.earned;
+      button.setAttribute('aria-pressed', String(selected));
+      button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${!badge.earned ? '未获得' : selected ? '已选择展示' : '已获得'}</span></span>`;
+      grid.append(button);
+    }
+  }
+  async function loadBadges() {
+    const requestId = ++badgesRequest;
+    badgeData = null;
+    $('badges-grid').replaceChildren();
+    $('badges-save').hidden = true;
+    $('badges-reload').hidden = !profile;
+    $('badges-profile').hidden = Boolean(profile);
+    if (!profile) { $('badges-status').textContent = '设置昵称或恢复原来的身份后，即可查看和展示勋章。'; return; }
+    $('badges-status').textContent = '正在读取勋章…';
+    const who = {...identity};
+    try {
+      const data = await request('/api/badges', who);
+      if (requestId !== badgesRequest || view !== 'badges' || !activeIdentity(who)) return;
+      if (!Array.isArray(data.badges) || !Array.isArray(data.selected) || !Number.isSafeInteger(data.maxShown)) {
+        throw new Error('暂时无法读取勋章，请稍后刷新。');
+      }
+      badgeData = data;
+      selectedBadges = data.selected.slice();
+      badgesDirty = false;
+      $('badges-save').hidden = false;
+      $('badges-save').disabled = false;
+      renderBadges();
+    } catch (error) {
+      if (requestId !== badgesRequest || view !== 'badges') return;
+      $('badges-status').textContent = profile.localOnly && error.status === 403
+        ? '资料和成绩还没有上传，连接成功后即可查看勋章。' : error.message;
+      if (error.unavailable) setConnectionUnavailable(true);
+    }
+  }
+  function toggleBadge(id) {
+    if (!badgeData || !badgeData.badges.some(badge => badge.id === id && badge.earned)) return;
+    if (selectedBadges.includes(id)) selectedBadges = selectedBadges.filter(item => item !== id);
+    else if (selectedBadges.length < badgeData.maxShown) selectedBadges.push(id);
+    else { toast(`最多展示 ${badgeData.maxShown} 枚勋章。`); return; }
+    badgesDirty = true;
+    renderBadges();
+    $('badges-status').textContent += ' · 更改后请保存';
+    const button = [...$('badges-grid').children].find(item => item.dataset.badge === id);
+    if (button) button.focus({preventScroll:true});
+  }
+  async function saveBadges() {
+    if (!badgeData || !activeIdentity()) return;
+    const requestId = ++badgesRequest;
+    const who = {...identity};
+    $('badges-save').disabled = true;
+    try {
+      const data = await request('/api/badges/select', {...who, selected:selectedBadges});
+      if (requestId !== badgesRequest || view !== 'badges' || !activeIdentity(who)) return;
+      badgeData = data;
+      selectedBadges = data.selected.slice();
+      badgesDirty = false;
+      renderBadges();
+      void refreshRanking();
+      toast('勋章展示已保存。');
+    } catch (error) {
+      if (requestId !== badgesRequest || view !== 'badges') return;
+      $('badges-status').textContent = error.message;
+      if (error.unavailable) setConnectionUnavailable(true);
+    } finally {
+      if (requestId === badgesRequest) $('badges-save').disabled = false;
+    }
+  }
+  function openDiagram(target) {
+    const figure = target.closest('.raid-diagram');
+    if (!figure) return;
+    const copy = figure.cloneNode(true);
+    copy.querySelector('[data-action="zoom-diagram"]')?.remove();
+    $('diagram-dialog-content').replaceChildren(copy);
+    $('diagram-dialog').showModal();
   }
   function renderGuide(chapterId) {
     const guide = RAID_GUIDE[chapterId];
@@ -4032,6 +4263,14 @@ function drawRaidDiagram(key, caption, questionId = null) {
       case 'refresh-history': loadHistory();uploadPending();break;
       case 'history-more': loadHistory(true);break;
       case 'history-profile': showProfile();break;
+      case 'open-badges': openBadges();break;
+      case 'close-badges': closeBadges();break;
+      case 'badges-profile': showProfile('badges');break;
+      case 'reload-badges': loadBadges();break;
+      case 'toggle-badge': toggleBadge(target.dataset.badge);break;
+      case 'save-badges': saveBadges();break;
+      case 'zoom-diagram': openDiagram(target);break;
+      case 'close-diagram': $('diagram-dialog').close();break;
       case 'guide-stage': {
         const stage = $('guide-stage-' + target.dataset.stage);
         stage.scrollIntoView({block:'start'});
