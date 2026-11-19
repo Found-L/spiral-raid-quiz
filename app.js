@@ -430,7 +430,7 @@
     if(missing.length) { toast(`还有 ${missing.length} 题未作答，已跳到第一道未答题。`); goto(qs.findIndex(q=>!answered(q))); return; }
     const answers=JSON.parse(JSON.stringify(draft.answers));
     const elapsedSeconds=elapsedTime();
-    const pending={attemptId:hex(16),version:bank.version,answers,elapsedSeconds,localSubmittedAt:Date.now()};
+    const pending={attemptId:hex(16),version:bank.version,answers,questionOrder:draft.order.slice(),elapsedSeconds,localSubmittedAt:Date.now()};
     if (!save(':pending', [...pendingAttempts(), pending])) return;
     result={...grade(answers),answers,order:draft.order.slice(),elapsedSeconds,attemptId:pending.attemptId}; save(':last-result',result);
     pauseTimer(); remove(':draft');
@@ -448,7 +448,7 @@
       let attempt = nextPendingAttempt();
       while (attempt) {
         const data = await request('/api/submit', {...participant, attemptId:attempt.attemptId,
-          version:attempt.version, answers:attempt.answers, elapsedSeconds:attempt.elapsedSeconds ?? null,
+          version:attempt.version, answers:attempt.answers, questionOrder:attempt.questionOrder, elapsedSeconds:attempt.elapsedSeconds ?? null,
           completedAt:attempt.localSubmittedAt ?? null});
         if (identity !== participant || !activeIdentity(participant)) return;
         if (result?.attemptId === attempt.attemptId && (data.correctCount !== result.correctCount || data.totalCount !== result.totalCount)) {
@@ -820,6 +820,16 @@
     const fastest = Number.isSafeInteger(badgeData.fastestSeconds) ? formatDuration(badgeData.fastestSeconds) : '暂无';
     $('badges-status').textContent = `已获得 ${earned} / ${badgeData.badges.length} 枚 · 已选 ${selectedBadges.length} / ${badgeData.maxShown} 枚 · 全站最快 ${fastest}${badgesDirty ? ' · 更改后请保存' : ''}`;
     $('badges-save').textContent = `保存展示（${selectedBadges.length}/${badgeData.maxShown}）`;
+    const repeated = Array.isArray(badgeData.repeatQuestions) ? badgeData.repeatQuestions : [];
+    const review = $('repeat-review');
+    review.hidden = repeated.length === 0;
+    $('repeat-review-count').textContent = `${repeated.length} 题`;
+    const reviewList = $('repeat-review-list');
+    const reviewSignature = JSON.stringify(repeated);
+    if (reviewList.dataset.signature !== reviewSignature) {
+      reviewList.innerHTML = repeated.map(item => `<details><summary><span>${escape(sectionOf(item.section)?.short || '题目')}</span>${escape(item.question)}</summary><p><strong>正确答案：</strong>${escape(item.answer)}</p><p>${escape(item.explanation)}</p>${item.currentVersion ? '' : '<small>来自旧版题库，请以当前攻略为准。</small>'}</details>`).join('');
+      reviewList.dataset.signature = reviewSignature;
+    }
     badgeData.badges.forEach((badge, index) => {
       const selected = selectedBadges.includes(badge.id);
       const shell = existing.get(badge.id) || document.createElement('div');
@@ -863,6 +873,9 @@
       selectedBadges = [];
       badgesDirty = false;
       $('badges-grid').replaceChildren();
+      $('repeat-review').hidden = true;
+      $('repeat-review-list').replaceChildren();
+      delete $('repeat-review-list').dataset.signature;
       $('badges-save').hidden = true;
     }
     $('badges-reload').hidden = !profile;
@@ -1035,6 +1048,11 @@
       return `<a href="#guide-${chapter.id}"${active}><span class="chapter-number">${String(i + 1).padStart(2,'0')}</span><span class="chapter-copy"><strong>${escape(chapter.short)}</strong><small>${chapterNotes[chapter.id]}</small></span></a>`;
     }).join('');
     $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}"${i === 0 ? ' aria-current="step"' : ''}><span class="timeline-number">${String(i + 1).padStart(2,'0')}</span><span>${escape(stage.navLabel || stage.timing)}</span></button>`).join('');
+    const guardNotes = $('guard-notes');
+    guardNotes.hidden = chapterId !== 'spirit';
+    guardNotes.innerHTML = chapterId === 'spirit' ? `<details class="guard-card"><summary><span><small>EN ROUTE / 看门怪补充</small><strong>血魔灵：留意连线与地面预警</strong></span><em>不计入考核</em><b aria-hidden="true">＋</b></summary>
+      <div class="guard-content"><figure class="guard-figure"><svg viewBox="0 0 480 250" role="img" aria-label="场地示意：留意连线两端及地面预警，具体站位以实战为准"><circle class="guard-arena" cx="240" cy="125" r="104"/><circle class="guard-danger guard-danger-one" cx="155" cy="105" r="33"/><circle class="guard-danger guard-danger-two" cx="300" cy="174" r="27"/><path class="guard-tether" d="M248 124 L343 79"/><circle class="guard-enemy" cx="240" cy="125" r="25"/><text x="240" y="131" text-anchor="middle">怪</text><circle class="guard-player" cx="343" cy="79" r="15"/><text x="343" y="84" text-anchor="middle">人</text><circle class="guard-ally" cx="203" cy="179" r="9"/><circle class="guard-ally" cx="215" cy="191" r="9"/><text class="guard-label" x="349" y="57">连线</text><text class="guard-label" x="94" y="64">地面预警</text></svg><figcaption>观察提示示意，位置和出现顺序以实战为准。</figcaption></figure>
+      <div class="guard-copy"><p>巅峰服通关录像中可见连线与多处地面预警。出现时先观察连线两端，避开地面红圈，并给队友留出移动空间。</p><p>具体点名和走位听从团队指挥；距离、触发条件与其他看门怪的细节仍需实战确认。</p><a href="https://www.bilibili.com/video/BV1Xexh66E7w/?t=825" target="_blank" rel="noopener noreferrer">查看巅峰服实战 <span aria-hidden="true">↗</span></a></div></div></details>` : '';
     $('guide-stages').innerHTML = guide.stages.map((stage, i) => `<article class="guide-stage" id="guide-stage-${i}">
       <p class="eyebrow">${escape(stage.timing)}</p>
       <h2 tabindex="-1">${escape(stage.title)}</h2>
@@ -1083,6 +1101,9 @@
       if (!item || !/^[a-f0-9]{32}$/.test(item.attemptId || '') ||
           typeof item.version !== 'string' || !item.answers || typeof item.answers !== 'object' || Array.isArray(item.answers)) {
         throw new Error('待上传成绩格式不正确，请保留原页面并联系团长。');
+      }
+      if (item.questionOrder !== undefined && !isPermutation(item.questionOrder, Object.keys(item.answers))) {
+        throw new Error('待上传成绩的试卷顺序有误，请保留原页面并联系团长。');
       }
     }
     if (JSON.stringify(value).length > transferLimit) throw new Error('迁移资料过大，请先上传部分成绩。');
@@ -1155,6 +1176,10 @@
       if (existing && (existing.version !== attempt.version || JSON.stringify(existing.answers) !== JSON.stringify(attempt.answers))) {
         throw new Error('两处有相同编号但内容不同的成绩，未执行转移。请保留原页面并联系团长。');
       }
+      if (existing?.questionOrder && attempt.questionOrder && JSON.stringify(existing.questionOrder) !== JSON.stringify(attempt.questionOrder)) {
+        throw new Error('两处成绩的试卷顺序不同，未执行转移。请保留原页面并联系团长。');
+      }
+      if (existing && !existing.questionOrder && attempt.questionOrder) existing.questionOrder = attempt.questionOrder;
       if (!existing) pending.push(attempt);
     }
     const currentHasDraft = Object.keys(current.draft.answers || {}).length > 0;

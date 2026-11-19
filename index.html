@@ -105,6 +105,36 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .stage-roles dt { font-weight: 700; color: var(--gold); }
 .stage-roles dd { margin: 3px 0 0; font-size: 14px; color: #d0d5d0; }
 .stage-check { margin: 14px 0 0; padding: 10px 13px; border-left: 3px solid #9f8258; background: #231f1c; color: #e2cda8; font-size: 13px; }
+.guard-notes { margin: 0 0 20px; }
+.guard-notes[hidden] { display: none; }
+.guard-card { border: 1px solid #736650; border-radius: 12px; background: linear-gradient(115deg, #292a28, #142129 70%); overflow: hidden; }
+.guard-card > summary { display: flex; align-items: center; gap: 18px; padding: 18px 22px; cursor: pointer; list-style: none; }
+.guard-card > summary::-webkit-details-marker { display: none; }
+.guard-card > summary span { display: grid; gap: 5px; }
+.guard-card > summary small { color: #d4b47a; font-size: 11px; letter-spacing: .09em; }
+.guard-card > summary strong { color: #f1e6d2; font: 600 18px/1.4 var(--serif); }
+.guard-card > summary em { margin-left: auto; color: #a6c8b9; font-size: 12px; font-style: normal; white-space: nowrap; }
+.guard-card > summary b { color: #dfc58f; font-size: 22px; font-weight: 400; transition: transform .2s; }
+.guard-card[open] > summary b { transform: rotate(45deg); }
+.guard-content { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; padding: 0 22px 24px; align-items: center; }
+.guard-figure { margin: 0; padding: 10px 12px; border-radius: 9px; background: radial-gradient(ellipse at 50% 48%, #254348, #101c23 70%); }
+.guard-figure svg { display: block; width: 100%; max-height: 250px; }
+.guard-figure text { fill: #f6ede0; font-size: 16px; font-weight: 700; }
+.guard-figure .guard-label { fill: #d8c29e; font-size: 12px; font-weight: 400; }
+.guard-figure figcaption { color: #a5bab0; font-size: 12px; line-height: 1.6; text-align: center; }
+.guard-arena { fill: #142931; stroke: #64877e; stroke-width: 1.5; }
+.guard-danger { fill: #dc655a; fill-opacity: .19; stroke: #f18b7e; stroke-opacity: .75; stroke-width: 2; animation: guard-warning 3s ease-in-out infinite; }
+.guard-danger-two { animation-delay: -.9s; }
+.guard-tether { fill: none; stroke: #85dfdd; stroke-width: 3; stroke-dasharray: 6 5; }
+.guard-enemy { fill: #905149; stroke: #ffb7a0; stroke-width: 2; }
+.guard-player { fill: #387b79; stroke: #b6f0df; stroke-width: 2; }
+.guard-ally { fill: #719e93; stroke: #cae8d8; }
+.guard-copy p { color: #cad6ce; line-height: 1.8; margin: 0 0 12px; }
+.guard-copy a { display: inline-block; margin-top: 4px; color: #efca88; text-decoration: none; }
+.guard-copy a:hover { text-decoration: underline; }
+@keyframes guard-warning { 50% { fill-opacity: .32; stroke-opacity: 1; } }
+@media (max-width: 700px) { .guard-content { grid-template-columns: 1fr; gap: 16px; } .guard-card > summary { gap: 10px; padding: 16px; } .guard-card > summary strong { font-size: 16px; } .guard-content { padding: 0 16px 18px; } }
+@media (prefers-reduced-motion: reduce) { .guard-danger { animation: none; } }
 
 .raid-diagram {
   margin: 0;
@@ -260,6 +290,19 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .badges-intro { max-width: 700px; margin: 0; color: var(--muted); }
 .badges-status { display: block; margin: 20px 0 14px; color: #e1c9a0; font-size: 13px; }
 .badges-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.repeat-review { margin: 0 0 22px; padding: 0 20px; border: 1px solid #6f7160; border-radius: 12px; background: linear-gradient(115deg, #283535, #14212a 65%); }
+.repeat-review[hidden] { display: none; }
+.repeat-review > summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 62px; color: #f3d59c; font-weight: 700; cursor: pointer; }
+.repeat-review > summary::after { content: '⌄'; color: #c4d5cb; transition: transform .2s; }
+.repeat-review[open] > summary::after { transform: rotate(180deg); }
+.repeat-review > summary strong { margin-left: auto; color: #bbded1; white-space: nowrap; }
+.repeat-review > p { margin: 0 0 14px; color: #b6c9c0; font-size: 13px; }
+.repeat-review-list { display: grid; gap: 8px; max-height: 440px; overflow-y: auto; padding: 0 0 18px; }
+.repeat-review-list details { padding: 13px 15px; border-radius: 8px; background: #0e1a21b8; }
+.repeat-review-list summary { color: #edf2e9; line-height: 1.55; cursor: pointer; }
+.repeat-review-list summary span { display: inline-block; margin-right: 10px; color: #8dd1bf; font-size: 12px; }
+.repeat-review-list p, .repeat-review-list small { margin: 9px 0 0; color: #b8ccc1; line-height: 1.7; }
+.repeat-review-list strong { color: #e4c693; }
 .badge-card { position: relative; overflow: hidden; min-width: 0; min-height: 167px; display: flex; align-items: flex-start; gap: 15px; padding: 20px 17px; text-align: left; color: var(--text); background: radial-gradient(ellipse at 15% 0%, color-mix(in srgb, var(--badge-color) 14%, transparent), transparent 48%), linear-gradient(145deg, #1c2930, #111923 85%); border: 1px solid #43605c; border-radius: 10px; transition: border-color .18s, background .18s, transform .18s, box-shadow .18s; }
 .badge-card.earned:hover { border-color: var(--badge-color); transform: translateY(-2px); box-shadow: 0 8px 25px #0003; }
 .badge-card.selected { border: 2px solid #e9c77f; padding: 19px 16px; background: linear-gradient(135deg, #3b3428, #202a2b 60%, #18232a); box-shadow: inset 0 0 22px #e8c27c12, 0 0 0 3px #e7c27415; }
@@ -1322,6 +1365,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         <p id="guide-intro" class="guide-intro"></p>
         <nav id="guide-chapters" class="guide-chapters" aria-label="切换首领"></nav>
         <nav id="guide-timeline" class="guide-timeline" aria-label="阶段索引"></nav>
+        <aside id="guard-notes" class="guard-notes" hidden></aside>
         <div id="guide-stages"></div>
         <button class="btn btn-primary" type="button" data-action="start">开始机制考核 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button>
       </section>
@@ -1349,8 +1393,9 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         <p class="badges-intro">答题会自动解锁勋章。选出你喜欢的最多 3 枚，展示在排行榜的昵称下。</p>
         <output id="badges-status" class="badges-status" aria-live="polite"></output>
         <div class="badges-actions"><button id="badges-save" class="btn btn-primary" type="button" data-action="save-badges" hidden>保存展示</button><button id="badges-reload" class="btn btn-ghost" type="button" data-action="reload-badges" hidden>刷新勋章</button><button id="badges-profile" class="btn btn-primary" type="button" data-action="badges-profile" hidden>设置昵称或恢复身份</button></div>
+        <details id="repeat-review" class="repeat-review" hidden><summary><span>✦ 最近三轮的反复错题</span><strong id="repeat-review-count"></strong></summary><p>仅你可见，按同一题库最近三次上传的答卷统计。</p><div id="repeat-review-list" class="repeat-review-list"></div></details>
         <div id="badges-grid" class="badges-grid"></div>
-        <p class="badges-note">人数按已上传且保留的身份统计。纪录勋章会随排名变化，曾获得人数根据现存答卷和纪录留档计算，已删除的资料无法还原。错题勋章只统计保存了选项的答卷；未记录用时的成绩不参与用时勋章。</p>
+        <p class="badges-note">人数按已上传且保留的身份统计。纪录勋章会随排名变化。首领、专项和连续答题勋章根据新版提交的逐题结果计算，旧成绩无法还原逐题记录；连对、连错以试卷展示顺序为准，重复错题按上传顺序计算。趣味错题勋章需自行选择才会展示。未记录用时的成绩不参与用时勋章。</p>
       </section>
 
       <section id="exam-view" class="exam-view hidden" aria-label="机制考核">
@@ -5229,6 +5274,15 @@ const RAID_BADGE_ART = {
   five_rounds: `<path d="M13 16h38v31H13Z" fill="#91c5b4" stroke="#d7f5de"/><path d="M20 11v10M44 11v10M13 26h38" stroke="#fff0c2" stroke-width="3"/><circle cx="32" cy="36" r="8" fill="#e8bd80"/><path d="m28 36 3 3 5-6" stroke="#654b3e" stroke-width="3"/>`,
   three_rounds: `<circle cx="32" cy="33" r="18" fill="#824d51" stroke="#ffc3a7"/><path d="M19 31a13 13 0 0 1 21-8l4 4m0-8v8h-8M45 35a13 13 0 0 1-21 8l-4-4m0 8v-8h8" stroke="#ffe6b4" stroke-width="3"/><circle cx="32" cy="33" r="4" fill="#e9c783"/>`,
   steady: `<path d="m32 12 18 7v12q0 15-18 23-18-8-18-23V19Z" fill="#47877f" stroke="#c4f4df" stroke-width="2"/><path d="M24 32 30 38 41 26" stroke="#fff1ba" stroke-width="4"/><path d="M18 20h4m20 0h4" stroke="#f6d38c"/>`,
+  twins_expert: `<path d="m17 13 5 3 8 21-4 2-9-20Zm30 0-5 3-8 21 4 2 9-20Z" fill="#e7b27d" stroke="#fff0c4"/><path d="m19 36 14 13m12-13L31 49M15 30l12-5m10 0 12 5" stroke="#a8e1d8" stroke-width="3"/><circle cx="32" cy="36" r="8" fill="#786251" stroke="#ffe2ab"/><path d="m28 36 3 3 5-6" stroke="#fff4d1" stroke-width="2"/>`,
+  spirit_expert: `<path d="M22 19 32 12l10 7v25l-10 7-10-7Z" fill="#a8814f" stroke="#ffdfa2"/><path d="M26 24h12v15H26Z" fill="#355a61" stroke="#b1e6d9"/><path d="M32 18v-6m-8 38h16" stroke="#ffe3a7"/><circle cx="13" cy="28" r="3" fill="#9bdccd"/><circle cx="51" cy="28" r="3" fill="#9bdccd"/><circle cx="32" cy="32" r="3" fill="#ffe29b"/>`,
+  witch_expert: `<circle cx="32" cy="32" r="20" fill="#383f5c" stroke="#d9c4ed"/><path d="M14 39 49 23" stroke="#fa998d" stroke-width="4"/><circle cx="32" cy="32" r="8" fill="#bd8dba" stroke="#f7d6e9"/><path d="M24 16q8-7 16 0M41 45l4 3m-25-3-4 3" stroke="#ffe2af"/>`,
+  heal_expert: `<path d="M32 50S13 39 13 27q0-12 11-12 5 0 8 5 3-5 8-5 11 0 11 12Q51 39 32 50Z" fill="#69a99c" stroke="#dcfae8"/><path d="M32 24v15M24 31h16" stroke="#fff3cc" stroke-width="4"/><path d="m46 10 2 4 4 1-4 2-2 4-1-4-4-2 4-1Z" fill="#ffdb90"/>`,
+  lamp_expert: `<path d="M24 20q8-5 16 0v21q-8 5-16 0Z" fill="#e0b16a" stroke="#fff0c1"/><path d="M32 13v7m-5 25h10M28 20v22m8-22v22" stroke="#fff0c1"/><path d="M12 34q2-13 9-15m22 0q7 2 9 15M15 30l-3 4 5 1m32-5 3 4-5 1" stroke="#92dbcf" stroke-width="2"/>`,
+  spider_expert: `<path d="m21 26-9-8-5 2m12 14H8l-4 4m16 5-8 8m31-25 9-8 5 2M45 34h11l4 4m-16 5 8 8" stroke="#d9c4ed" stroke-width="3"/><ellipse cx="32" cy="34" rx="13" ry="12" fill="#9983ad" stroke="#f0d9f4"/><path d="m27 34 4 4 7-9" stroke="#fff0bb" stroke-width="3"/>`,
+  right_streak: `<path d="m10 37 8 8 15-18m-6 10 8 8 18-22" fill="none" stroke="#9ee2cf" stroke-width="4"/><path d="m48 9 2 4 4 1-4 2-2 4-1-4-4-2 4-1Z" fill="#ffe097"/>`,
+  wrong_streak: `<path d="M13 37q8-12 16-4t18-3" fill="none" stroke="#cdb7e6" stroke-width="3" stroke-dasharray="4 4"/><circle cx="15" cy="37" r="5" fill="#e8b1a1"/><circle cx="48" cy="29" r="6" fill="#86c1bc" stroke="#dff8e7"/><path d="M41 15q3-4 7 0t7 0" fill="none" stroke="#ffe4ac" stroke-width="2"/>`,
+  repeat_wrong: `<circle cx="32" cy="33" r="19" fill="#744e5c" stroke="#f4bfbb"/><path d="M21 29a12 12 0 0 1 20-5l4 4m0-8v8h-8M43 36a12 12 0 0 1-20 5l-4-4m0 8v-8h8" stroke="#ffe0b2" stroke-width="3"/><path d="M32 26v10m0 4v1" stroke="#d9f2e7" stroke-width="3"/>`,
   comeback: `<path d="M13 33q12-17 28-7l9-8v27l-9-8q-16 12-28-4Z" fill="#ecab77" stroke="#ffe4ba"/><circle cx="25" cy="31" r="2" fill="#39313b" stroke="none"/><path d="M29 38q4 3 8 0M22 21q7-9 17-7m-3-4 4 4-5 4" stroke="#c7f4eb"/><path d="m50 11 2 3 3 1-3 2-1 3-1-3-3-2 3-1Z" fill="#ffe9ae"/>`,
   zero: `<circle cx="32" cy="33" r="21" fill="#5d536f" stroke="#ddd0ed"/><circle cx="32" cy="33" r="13" fill="#a283ad" stroke="#f2ddfa"/><path d="M27 27q5-6 10 0v12q-5 6-10 0Z" fill="#343242" stroke="#fbe4d9" stroke-width="2"/><path d="m13 14 7 2-5 5M51 50l-7-2 5-5" stroke="#f6cb94"/>`,
   brave: `<path d="M32 10q4 9-3 14 10-2 10-10 12 11 12 23a19 19 0 0 1-38 0q0-11 10-20-1 11 5 13 1-10 4-20Z" fill="#eb805e" stroke="#ffd2a6"/><path d="M23 37h1m16 0h1M26 43q6 5 12 0" stroke="#5d3434" stroke-width="3"/><path d="M28 48q4-7 8 0" fill="#fbe08f"/>`,
@@ -6201,7 +6255,7 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     if(missing.length) { toast(`还有 ${missing.length} 题未作答，已跳到第一道未答题。`); goto(qs.findIndex(q=>!answered(q))); return; }
     const answers=JSON.parse(JSON.stringify(draft.answers));
     const elapsedSeconds=elapsedTime();
-    const pending={attemptId:hex(16),version:bank.version,answers,elapsedSeconds,localSubmittedAt:Date.now()};
+    const pending={attemptId:hex(16),version:bank.version,answers,questionOrder:draft.order.slice(),elapsedSeconds,localSubmittedAt:Date.now()};
     if (!save(':pending', [...pendingAttempts(), pending])) return;
     result={...grade(answers),answers,order:draft.order.slice(),elapsedSeconds,attemptId:pending.attemptId}; save(':last-result',result);
     pauseTimer(); remove(':draft');
@@ -6219,7 +6273,7 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
       let attempt = nextPendingAttempt();
       while (attempt) {
         const data = await request('/api/submit', {...participant, attemptId:attempt.attemptId,
-          version:attempt.version, answers:attempt.answers, elapsedSeconds:attempt.elapsedSeconds ?? null,
+          version:attempt.version, answers:attempt.answers, questionOrder:attempt.questionOrder, elapsedSeconds:attempt.elapsedSeconds ?? null,
           completedAt:attempt.localSubmittedAt ?? null});
         if (identity !== participant || !activeIdentity(participant)) return;
         if (result?.attemptId === attempt.attemptId && (data.correctCount !== result.correctCount || data.totalCount !== result.totalCount)) {
@@ -6591,6 +6645,16 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     const fastest = Number.isSafeInteger(badgeData.fastestSeconds) ? formatDuration(badgeData.fastestSeconds) : '暂无';
     $('badges-status').textContent = `已获得 ${earned} / ${badgeData.badges.length} 枚 · 已选 ${selectedBadges.length} / ${badgeData.maxShown} 枚 · 全站最快 ${fastest}${badgesDirty ? ' · 更改后请保存' : ''}`;
     $('badges-save').textContent = `保存展示（${selectedBadges.length}/${badgeData.maxShown}）`;
+    const repeated = Array.isArray(badgeData.repeatQuestions) ? badgeData.repeatQuestions : [];
+    const review = $('repeat-review');
+    review.hidden = repeated.length === 0;
+    $('repeat-review-count').textContent = `${repeated.length} 题`;
+    const reviewList = $('repeat-review-list');
+    const reviewSignature = JSON.stringify(repeated);
+    if (reviewList.dataset.signature !== reviewSignature) {
+      reviewList.innerHTML = repeated.map(item => `<details><summary><span>${escape(sectionOf(item.section)?.short || '题目')}</span>${escape(item.question)}</summary><p><strong>正确答案：</strong>${escape(item.answer)}</p><p>${escape(item.explanation)}</p>${item.currentVersion ? '' : '<small>来自旧版题库，请以当前攻略为准。</small>'}</details>`).join('');
+      reviewList.dataset.signature = reviewSignature;
+    }
     badgeData.badges.forEach((badge, index) => {
       const selected = selectedBadges.includes(badge.id);
       const shell = existing.get(badge.id) || document.createElement('div');
@@ -6634,6 +6698,9 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
       selectedBadges = [];
       badgesDirty = false;
       $('badges-grid').replaceChildren();
+      $('repeat-review').hidden = true;
+      $('repeat-review-list').replaceChildren();
+      delete $('repeat-review-list').dataset.signature;
       $('badges-save').hidden = true;
     }
     $('badges-reload').hidden = !profile;
@@ -6806,6 +6873,11 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
       return `<a href="#guide-${chapter.id}"${active}><span class="chapter-number">${String(i + 1).padStart(2,'0')}</span><span class="chapter-copy"><strong>${escape(chapter.short)}</strong><small>${chapterNotes[chapter.id]}</small></span></a>`;
     }).join('');
     $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}"${i === 0 ? ' aria-current="step"' : ''}><span class="timeline-number">${String(i + 1).padStart(2,'0')}</span><span>${escape(stage.navLabel || stage.timing)}</span></button>`).join('');
+    const guardNotes = $('guard-notes');
+    guardNotes.hidden = chapterId !== 'spirit';
+    guardNotes.innerHTML = chapterId === 'spirit' ? `<details class="guard-card"><summary><span><small>EN ROUTE / 看门怪补充</small><strong>血魔灵：留意连线与地面预警</strong></span><em>不计入考核</em><b aria-hidden="true">＋</b></summary>
+      <div class="guard-content"><figure class="guard-figure"><svg viewBox="0 0 480 250" role="img" aria-label="场地示意：留意连线两端及地面预警，具体站位以实战为准"><circle class="guard-arena" cx="240" cy="125" r="104"/><circle class="guard-danger guard-danger-one" cx="155" cy="105" r="33"/><circle class="guard-danger guard-danger-two" cx="300" cy="174" r="27"/><path class="guard-tether" d="M248 124 L343 79"/><circle class="guard-enemy" cx="240" cy="125" r="25"/><text x="240" y="131" text-anchor="middle">怪</text><circle class="guard-player" cx="343" cy="79" r="15"/><text x="343" y="84" text-anchor="middle">人</text><circle class="guard-ally" cx="203" cy="179" r="9"/><circle class="guard-ally" cx="215" cy="191" r="9"/><text class="guard-label" x="349" y="57">连线</text><text class="guard-label" x="94" y="64">地面预警</text></svg><figcaption>观察提示示意，位置和出现顺序以实战为准。</figcaption></figure>
+      <div class="guard-copy"><p>巅峰服通关录像中可见连线与多处地面预警。出现时先观察连线两端，避开地面红圈，并给队友留出移动空间。</p><p>具体点名和走位听从团队指挥；距离、触发条件与其他看门怪的细节仍需实战确认。</p><a href="https://www.bilibili.com/video/BV1Xexh66E7w/?t=825" target="_blank" rel="noopener noreferrer">查看巅峰服实战 <span aria-hidden="true">↗</span></a></div></div></details>` : '';
     $('guide-stages').innerHTML = guide.stages.map((stage, i) => `<article class="guide-stage" id="guide-stage-${i}">
       <p class="eyebrow">${escape(stage.timing)}</p>
       <h2 tabindex="-1">${escape(stage.title)}</h2>
@@ -6854,6 +6926,9 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
       if (!item || !/^[a-f0-9]{32}$/.test(item.attemptId || '') ||
           typeof item.version !== 'string' || !item.answers || typeof item.answers !== 'object' || Array.isArray(item.answers)) {
         throw new Error('待上传成绩格式不正确，请保留原页面并联系团长。');
+      }
+      if (item.questionOrder !== undefined && !isPermutation(item.questionOrder, Object.keys(item.answers))) {
+        throw new Error('待上传成绩的试卷顺序有误，请保留原页面并联系团长。');
       }
     }
     if (JSON.stringify(value).length > transferLimit) throw new Error('迁移资料过大，请先上传部分成绩。');
@@ -6926,6 +7001,10 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
       if (existing && (existing.version !== attempt.version || JSON.stringify(existing.answers) !== JSON.stringify(attempt.answers))) {
         throw new Error('两处有相同编号但内容不同的成绩，未执行转移。请保留原页面并联系团长。');
       }
+      if (existing?.questionOrder && attempt.questionOrder && JSON.stringify(existing.questionOrder) !== JSON.stringify(attempt.questionOrder)) {
+        throw new Error('两处成绩的试卷顺序不同，未执行转移。请保留原页面并联系团长。');
+      }
+      if (existing && !existing.questionOrder && attempt.questionOrder) existing.questionOrder = attempt.questionOrder;
       if (!existing) pending.push(attempt);
     }
     const currentHasDraft = Object.keys(current.draft.answers || {}).length > 0;

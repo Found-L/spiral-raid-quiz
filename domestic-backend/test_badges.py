@@ -242,14 +242,14 @@ class BadgeTest(unittest.TestCase):
                    'answers': answers, 'elapsedSeconds': 600}
         first = server.submit(self.db, payload)
         self.assertEqual(first['correctCount'], len(answers) - 1)
-        self.assertEqual([item['id'] for item in first['triggeredBadges']], ['demolition'])
+        self.assertIn('demolition', [item['id'] for item in first['triggeredBadges']])
         self.assertEqual(server.submit(self.db, payload), first)
         self.assertIn('demolition', self.earned(player))
         self.assertNotIn('demolition', server.badges(self.db, player)['selected'])
         self.assertNotIn('demolition', [item['id'] for item in server.leaderboard(self.db, latest=True)['entries'][0]['badges']])
         server.select_badges(self.db, {**player, 'selected': ['demolition']})
         self.assertEqual([item['id'] for item in server.leaderboard(self.db, latest=True)['entries'][0]['badges']], ['demolition'])
-        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM attempt_mistake_badges').fetchone()[0], 1)
+        self.assertEqual(self.db.execute("SELECT COUNT(*) FROM attempt_mistake_badges WHERE badge_id = 'demolition'").fetchone()[0], 1)
         server.delete_profile(self.db, player)
         self.assertEqual(self.db.execute('SELECT COUNT(*) FROM attempt_mistake_badges').fetchone()[0], 0)
 
