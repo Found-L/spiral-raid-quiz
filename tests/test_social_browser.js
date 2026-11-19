@@ -10,6 +10,10 @@ const root = path.resolve(__dirname, '..');
 const python = process.env.PYTHON_BIN || 'python';
 const screenshotDir = process.env.SOCIAL_SCREENSHOT_DIR;
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'raid-social-test-'));
+const resolvedTmp = path.resolve(tmp), tmpBase = path.resolve(os.tmpdir()) + path.sep;
+if (!resolvedTmp.startsWith(tmpBase) || !path.basename(resolvedTmp).startsWith('raid-social-test-')) {
+  throw new Error('unsafe temporary path');
+}
 const database = path.join(tmp, 'quiz.sqlite3');
 const children = [];
 
@@ -194,8 +198,6 @@ async function context(browser, code, viewport) {
   } finally {
     if (browser) await browser.close();
     for (const child of children) child.kill();
-    const resolved = path.resolve(tmp), base = path.resolve(os.tmpdir()) + path.sep;
-    if (!resolved.startsWith(base) || !path.basename(resolved).startsWith('raid-social-test-')) throw new Error('unsafe temporary path');
-    fs.rmSync(resolved, {recursive:true, force:true, maxRetries:10, retryDelay:100});
+    fs.rmSync(resolvedTmp, {recursive:true, force:true, maxRetries:10, retryDelay:100});
   }
 })().catch(error => { console.error(error); process.exitCode = 1; });
