@@ -1,0 +1,76 @@
+/* Player profile and personal history. */
+.profile-dialog { width: min(620px, calc(100vw - 28px)); padding: clamp(22px, 4vw, 32px); border: 1px solid #9aab875c; border-radius: 14px; background: radial-gradient(ellipse at 12% 0%, #31564b80, transparent 47%), linear-gradient(155deg, #182a2d, #101a21 72%); box-shadow: 0 30px 90px #000c, 0 0 48px #7da99520; }
+.profile-heading { display: flex; align-items: center; gap: 14px; }
+.profile-heading .eyebrow { margin: 0 0 4px; font-size: 10px; letter-spacing: .13em; }
+.profile-heading h2 { font-size: clamp(23px, 4vw, 28px); }
+.profile-emblem { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border: 1px solid #d7c18a85; border-radius: 15px; color: #e5cb99; background: #263d37; box-shadow: inset 0 0 18px #d2b2791a; }
+.profile-emblem .icon { width: 23px; height: 23px; }
+.profile-dialog .close-button { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; color: #aabdb2; }
+.profile-dialog .close-button:hover { color: #f5dfb6; background: #263b38; }
+.profile-intro { margin: 20px 0 16px; color: #aebeb5; font-size: 13px; }
+.profile-identity { padding: 16px; border: 1px solid #9db9a62e; border-radius: 10px; background: #0d191e99; }
+.profile-dialog .profile-identity label { margin: 0; color: #e6dcc7; }
+.profile-dialog #nickname { min-height: 46px; border-color: #78958866; border-radius: 7px; background: #0d171d; }
+.profile-identity .profile-note { margin: 8px 0 0; }
+.profile-identity #profile-player-number { color: #dcc18e; }
+.profile-recovery { margin-top: 15px; padding: 0 2px; }
+.profile-recovery > p { margin: 0 0 8px; color: #9eafa7; font-size: 12px; line-height: 1.6; }
+.profile-dialog .recovery { margin: 0; padding: 10px 0; border-top: 1px solid #a2bdb32b; }
+.profile-dialog .recovery summary { color: #d9c298; font-size: 13px; }
+.profile-dialog .recovery label { margin-top: 12px; }
+.profile-dialog .error-text:empty { display: none; }
+.profile-dialog .dialog-actions { margin-top: 18px; }
+.profile-dialog .dialog-actions .btn { min-height: 43px; border-radius: 7px; }
+.profile-quick-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 18px; }
+.profile-quick-links button { display: flex; align-items: center; gap: 9px; min-width: 0; min-height: 45px; padding: 9px 11px; border: 1px solid #86aa9838; border-radius: 8px; color: #d0ded4; background: #1a302f99; text-align: left; font-size: 12px; }
+.profile-quick-links button:hover { border-color: #d3bb7f91; background: #29473e; color: #f6e4bf; }
+.profile-quick-links #profile-badges { margin-left: 0; }
+.profile-quick-links button span { flex: 1; }
+.profile-quick-links .icon { width: 16px; height: 16px; flex: none; color: #9cc5ae; }
+.profile-dialog .subtle-delete { margin-top: 18px; }
+
+.history-view { max-width: 1020px; }
+.history-heading { display: flex; align-items: end; justify-content: space-between; gap: 20px; margin-top: 34px; }
+.history-heading .eyebrow { margin-bottom: 8px; }
+.history-heading h1 { margin: 0; }
+.history-heading #history-player { margin: 9px 0 0; font-size: 13px; color: #a5beb0; }
+.history-badges-link, .history-refresh { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 12px; border: 1px solid #829c8955; border-radius: 7px; color: #dbc89f; background: #172c2c; font-size: 12px; white-space: nowrap; }
+.history-badges-link:hover, .history-refresh:not(:disabled):hover { border-color: #d4bb82; background: #294238; }
+.history-badges-link .icon, .history-refresh .icon { width: 16px; height: 16px; }
+.history-refresh:disabled { cursor: wait; color: #a9b8ad; opacity: .75; }
+.history-summary { gap: 14px; margin: 26px 0; }
+.history-summary > div { position: relative; overflow: hidden; padding: 21px 22px; border: 1px solid #82aa953b; border-radius: 10px; background: radial-gradient(ellipse at 100% 0%, #466c4f46, transparent 60%), linear-gradient(135deg, #1c302e, #111c22); }
+.history-summary > div::after { content: ''; position: absolute; top: 0; left: 22px; width: 44px; height: 2px; background: #d4b579; }
+.history-summary span { color: #b5c8bc; }
+.history-summary strong { margin-top: 6px; font-family: Georgia, var(--serif); font-size: clamp(25px, 3vw, 34px); font-weight: 500; }
+.history-summary small { display: block; margin-top: 2px; color: #8fa79b; font-size: 11px; }
+.history-toolbar { align-items: center; margin: 18px 0 10px; }
+.history-toolbar p { margin: 0; min-height: 1.6em; color: #a4b6ad; }
+.history-list { display: grid; gap: 10px; }
+.history-list li.history-entry { display: flex; gap: 18px; padding: 17px 20px; border: 1px solid #8aab9936; border-radius: 9px; background: linear-gradient(110deg, #192b2b, #111c23 80%); }
+.history-entry-details { min-width: 0; }
+.history-entry-heading { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.history-entry time { color: #e5e4d8; font-size: 13px; font-weight: 650; }
+.history-entry-tag { padding: 2px 8px; border: 1px solid #7ca38c4f; border-radius: 99px; color: #b6d4c3; background: #28473b75; font-size: 11px; white-space: nowrap; }
+.history-list li.history-entry small { margin-top: 7px; color: #9eafa8; font-size: 12px; }
+.history-list li.history-entry strong { color: #e9c78d; font: 600 20px Georgia, var(--serif); white-space: nowrap; }
+.badge-people { justify-self: start; padding: 2px 7px; border: 1px solid #85a89a2e; border-radius: 5px; color: #b7c8bd; background: #162724; }
+.badges-note { max-width: 960px; color: #a5b7ae; line-height: 1.8; }
+
+@media (max-width: 560px) {
+  .profile-dialog { padding: 20px; max-height: 90dvh; }
+  .profile-heading { gap: 10px; }
+  .profile-heading .eyebrow { letter-spacing: .06em; }
+  .profile-emblem { width: 42px; height: 42px; border-radius: 12px; }
+  .profile-quick-links { grid-template-columns: 1fr; }
+  .history-heading { align-items: start; flex-direction: column; gap: 12px; margin-top: 26px; }
+  .history-summary { gap: 8px; margin: 20px 0; }
+  .history-summary > div { padding: 16px 13px; }
+  .history-summary > div::after { left: 13px; }
+  .history-summary small { font-size: 10px; }
+  .history-toolbar { gap: 8px; }
+  .history-toolbar p { font-size: 11px; }
+  .history-refresh { padding: 0 9px; }
+  .history-list li.history-entry { gap: 8px; padding: 14px 12px; }
+  .history-list li.history-entry strong { font-size: 17px; }
+}

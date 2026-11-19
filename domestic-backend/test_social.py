@@ -147,16 +147,21 @@ class SocialTest(unittest.TestCase):
         self.assertIsNone(self.view('b')['ownComment'])
         self.assertEqual(self.db.execute('SELECT COUNT(*) FROM social_likes').fetchone()[0], 0)
 
-    def test_badge_counts_deduplicate_mask_and_preserve_record_events(self):
+    def test_badge_counts_deduplicate_and_preserve_record_events(self):
         b = self.attempt('b', 2, 10)
         c = self.attempt('c', 3, 10)
+        result = {item['id']: item['stats'] for item in server.badges(self.db, self.actor('a'))['badges']}
+        self.assertEqual(result['demolition'], {'count': 0})
         self.db.execute('INSERT INTO attempt_mistake_badges VALUES (?, ?)', (b, 'demolition'))
+        badge_metrics.invalidate()
+        result = {item['id']: item['stats'] for item in server.badges(self.db, self.actor('a'))['badges']}
+        self.assertEqual(result['demolition'], {'count': 1})
         self.db.execute('INSERT INTO attempt_mistake_badges VALUES (?, ?)', (c, 'demolition'))
         badge_metrics.invalidate()
         result = {item['id']: item['stats'] for item in server.badges(self.db, self.actor('a'))['badges']}
         self.assertEqual(result['first']['count'], 3)
         self.assertEqual(result['quickest'], {'historyCount': 3, 'currentCount': 2})
-        self.assertEqual(result['demolition'], {'masked': True})
+        self.assertEqual(result['demolition'], {'count': 2})
         self.db.execute('INSERT INTO attempt_mistake_badges VALUES (?, ?)', (f'{1:032x}', 'demolition'))
         badge_metrics.invalidate()
         result = {item['id']: item['stats'] for item in server.badges(self.db, self.actor('a'))['badges']}
@@ -164,7 +169,12 @@ class SocialTest(unittest.TestCase):
         server.delete_profile(self.db, self.actor('b'))
         result = {item['id']: item['stats'] for item in server.badges(self.db, self.actor('a'))['badges']}
         self.assertEqual(result['quickest'], {'historyCount': 2, 'currentCount': 1})
-        self.assertEqual(result['demolition'], {'masked': True})
+        self.assertEqual(result['demolition'], {'count': 2})
+        repeat = self.attempt('c', 4, 8)
+        self.db.execute('INSERT INTO attempt_mistake_badges VALUES (?, ?)', (repeat, 'demolition'))
+        badge_metrics.invalidate()
+        result = {item['id']: item['stats'] for item in server.badges(self.db, self.actor('a'))['badges']}
+        self.assertEqual(result['demolition'], {'count': 2})
 
     def test_recorded_history_and_badge_count_agree_after_late_upload(self):
         self.attempt('b', 2, 10)

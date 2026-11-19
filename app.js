@@ -81,6 +81,10 @@
   let historyReturn = 'home';
   let historyCursor = null;
   let historyRequest = 0;
+  let historyOwner = null;
+  let historyLoadingOwner = null;
+  let historyReloadQueued = false;
+  let historyFirstPage = null;
   let badgesReturn = 'home';
   let badgesRequest = 0;
   let badgeData = null;
@@ -273,6 +277,7 @@
   }
   function showProfile(next=null) {
     candidate=identity; afterProfile=next; $('nickname').value=profile?.nickname||'';
+    $('profile-title').textContent = profile ? '我的资料' : '设置你的昵称';
     renderSavedProfiles();
     const number = formatPlayerNumber(profile?.playerNumber);
     $('profile-player-number').textContent = number ? `我的榜单编号 ${number}` : '';
@@ -669,23 +674,34 @@
   }
   function closeHistory() {
     ++historyRequest;
-    $('history-list').replaceChildren();
+    historyLoadingOwner = null;
+    historyReloadQueued = false;
+    $('history-refresh').disabled = false;
+    $('history-more').disabled = false;
     setView(historyReturn);
     if (historyReturn === 'home') $('leaderboard').scrollIntoView();
   }
   function historyRow(entry) {
     const row = document.createElement('li');
+    row.className = 'history-entry';
     const time = document.createElement('time');
     if (Number.isSafeInteger(entry.submittedAt)) {
       time.dateTime = new Date(entry.submittedAt).toISOString();
       time.textContent = attemptDate.format(entry.submittedAt);
     } else time.textContent = '本机记录';
+    const tag = document.createElement('span');
+    tag.className = 'history-entry-tag';
+    tag.textContent = entry.currentVersion ? '当前题库' : '旧题库';
+    if (entry.pending) tag.textContent = '待上传';
+    const heading = document.createElement('div');
+    heading.className = 'history-entry-heading';
+    heading.append(time, tag);
     const context = document.createElement('small');
-    const kind = entry.currentVersion ? '新题库' : '旧题库';
-    context.textContent = entry.pending && !entry.currentVersion ? `${kind} · 待上传`
-      : `${kind}${entry.pending ? ' · 待上传' : ''} · 答对 ${entry.correctCount} / ${entry.totalCount} · 用时 ${formatDuration(entry.elapsedSeconds)}`;
+    context.textContent = entry.pending && !entry.currentVersion ? '旧题库 · 等待上传'
+      : `答对 ${entry.correctCount} / ${entry.totalCount} 题 · 用时 ${formatDuration(entry.elapsedSeconds)}`;
     const details = document.createElement('div');
-    details.append(time, context);
+    details.className = 'history-entry-details';
+    details.append(heading, context);
     const score = document.createElement('strong');
     score.textContent = entry.score == null ? '待上传' : `${formatScore(entry.score)} 分`;
     row.append(details, score);
@@ -694,12 +710,23 @@
   async function loadHistory(append = false) {
     const cursor = append ? historyCursor : null;
     if (append && !cursor) return;
+    const who = {...identity};
+    const owner = `${who.deviceId}:${who.secret}`;
+    if (profile && historyLoadingOwner === owner) {
+      if (!append) historyReloadQueued = true;
+      return;
+    }
     const requestId = ++historyRequest;
     const list = $('history-list');
     const status = $('history-status');
     const more = $('history-more');
-    if (!append) {
+    const refresh = $('history-refresh');
+    const sameOwner = Boolean(profile) && historyOwner === owner;
+    if (!sameOwner) {
       historyCursor = null;
+      historyFirstPage = null;
+      historyOwner = null;
+      historyReloadQueued = false;
       list.replaceChildren();
       $('history-summary').hidden = true;
       more.hidden = true;
@@ -708,40 +735,66 @@
     $('history-player').hidden = !profile;
     $('history-refresh').hidden = !profile;
     if (!profile) {
+      historyLoadingOwner = null;
+      historyReloadQueued = false;
+      refresh.disabled = false;
+      more.disabled = false;
       status.textContent = '保存昵称或恢复原来的身份后，即可查看你的记录。';
       return;
     }
     const number = formatPlayerNumber(profile.playerNumber);
     $('history-player').textContent = [profile.nickname, number].filter(Boolean).join(' · ');
-    status.textContent = '正在读取答题记录…';
+    const hasPrevious = sameOwner && (list.childElementCount > 0 || !$('history-summary').hidden);
+    status.textContent = hasPrevious ? '正在刷新记录…' : '正在读取答题记录…';
+    if (hasPrevious && append) status.textContent = '正在读取更多记录…';
+    historyLoadingOwner = owner;
+    refresh.disabled = true;
     more.disabled = true;
     try {
-      const data = await request('/api/history', {...identity, cursor});
+      const data = await request('/api/history', {...who, cursor});
       if (requestId !== historyRequest || view !== 'history') return;
+      setConnectionUnavailable(false);
       $('history-count').textContent = `${data.attemptCount} 次`;
       $('history-best').textContent = data.bestScore == null ? '—' : `${formatScore(data.bestScore)} 分`;
       $('history-summary').hidden = false;
-      list.append(...data.entries.map(historyRow));
+      const signature = JSON.stringify(data.entries);
+      if (append) {
+        list.append(...data.entries.map(historyRow));
+        historyCursor = data.nextCursor;
+      } else if (!sameOwner || historyFirstPage !== signature) {
+        list.replaceChildren(...data.entries.map(historyRow));
+        historyFirstPage = signature;
+        historyCursor = data.nextCursor;
+      }
+      historyOwner = owner;
       if (pendingAttempts().length) status.textContent = lastUploadError
         ? `有成绩尚未上传：${lastUploadError}` : '有成绩尚未上传。上传成功后会出现在这里。';
       else status.textContent = data.attemptCount ? '按上传时间从新到旧排列 · 北京时间' : '还没有已提交的成绩。';
-      historyCursor = data.nextCursor;
       more.hidden = !historyCursor;
     } catch (error) {
       if (requestId !== historyRequest || view !== 'history') return;
       const local = pendingAttempts();
-      if (!append && error.unavailable && local.length) {
+      if (!hasPrevious && !append && error.unavailable && local.length) {
         const rows = local.slice().reverse().map(attempt => {
           if (attempt.version !== bank.version) return {currentVersion:false, pending:true, submittedAt:attempt.localSubmittedAt || null};
           const item = grade(attempt.answers);
           return {...item, currentVersion:true, pending:true, elapsedSeconds:attempt.elapsedSeconds, submittedAt:attempt.localSubmittedAt || null};
         });
         list.replaceChildren(...rows.map(historyRow));
+        historyOwner = owner;
         status.textContent = '暂时无法读取线上记录，以下是保存在本机、待上传的成绩。';
-      } else status.textContent = error.message;
+      } else status.textContent = hasPrevious ? `${append ? '读取更多失败' : '刷新失败'}，已保留原有记录：${error.message}` : error.message;
       if (error.unavailable) setConnectionUnavailable(true);
     } finally {
-      if (requestId === historyRequest) more.disabled = false;
+      if (requestId === historyRequest) {
+        historyLoadingOwner = null;
+        refresh.disabled = false;
+        more.disabled = false;
+        if (historyReloadQueued && view === 'history') {
+          historyReloadQueued = false;
+          void loadHistory();
+        }
+      }
     }
   }
   function openBadges() {
@@ -757,6 +810,7 @@
     $('badges-save').disabled = false;
     setView(badgesReturn);
     if (badgesReturn === 'home') { void refreshRanking(); $('leaderboard').scrollIntoView(); }
+    else if (badgesReturn === 'history') void loadHistory();
   }
   function renderBadges() {
     const grid = $('badges-grid');
@@ -781,7 +835,9 @@
         button.setAttribute('aria-pressed', String(selected));
         const state = badge.earned ? (selected ? '✓ 展示中' : '＋ 已获得 · 可展示') : '未获得';
         const stats = badge.stats || {};
-        const count = stats.masked ? '少于 3 人' : Number.isSafeInteger(stats.historyCount) ? `历史推算 ${stats.historyCount} 人 · 当前 ${stats.currentCount} 人` : Number.isSafeInteger(stats.count) ? `${stats.count} 人获得` : '人数暂不可用';
+        let count = '人数暂不可用';
+        if (Number.isSafeInteger(stats.historyCount)) count = `历史 ${stats.historyCount} 人`;
+        else if (Number.isSafeInteger(stats.count)) count = `${stats.count} 人获得`;
         button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span><span class="badge-people">${escape(count)}</span></span>`;
         button.dataset.signature = signature;
       }
