@@ -142,6 +142,16 @@ async function ready(url) {
     const page=await layout.context.newPage(); await page.goto(domestic+'/spiral-raid-quiz/');
     for (const width of [320,360,390,680,768,1024,1100,1101,1280,1440]) {
       await page.setViewportSize({width,height:900});
+      await page.evaluate(() => window.scrollTo({top:1000,behavior:'instant'}));
+      assert(await page.evaluate(() => scrollY > 100),`page did not scroll at ${width}px`);
+      const header=await page.locator('.topbar').boundingBox();
+      assert(header && Math.abs(header.y) < 1,`header did not stay at the top at ${width}px`);
+      const switchButton=page.locator('#site-switch summary');
+      const switchBox=await switchButton.boundingBox();
+      assert(switchBox && switchBox.width <= 44 && switchBox.height >= 40,`site switch is not a compact touch target at ${width}px`);
+      assert.equal(await switchButton.locator('svg').count(),1);
+      assert.equal(await page.locator('#site-current').isVisible(),false);
+      assert.match(await switchButton.getAttribute('aria-label'),/当前国内站/);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true,`page overflows at ${width}px`);
       const boxes=[];
       for (const selector of ['.brand','#main-nav','#site-switch summary','.profile-trigger','#nav-toggle']) {
@@ -154,7 +164,8 @@ async function ready(url) {
       for (let i=1;i<boxes.length;i++) assert(boxes[i-1].rect.x+boxes[i-1].rect.width <= boxes[i].rect.x+1, `${boxes[i-1].selector} overlaps ${boxes[i].selector} at ${width}px`);
       await page.locator('#site-switch summary').click();
       const panel=await page.locator('.site-switch-panel').boundingBox();
-      assert(panel && panel.x >= 0 && panel.x+panel.width <= width,`site menu clipped at ${width}px`);
+      assert(panel && panel.x >= 0 && panel.x+panel.width <= width && panel.y >= header.height,`site menu clipped at ${width}px`);
+      assert.equal(await page.locator('#site-domestic .site-current-tag').isVisible(),true);
       await page.keyboard.press('Escape');
       assert.equal(await page.locator('#site-switch').evaluate(node=>node.open),false);
       if (await page.locator('#nav-toggle').isVisible()) {
@@ -162,18 +173,49 @@ async function ready(url) {
         assert.equal(await page.locator('#nav-toggle').getAttribute('aria-expanded'),'true');
         await page.locator('#main-nav [data-action="open-badges"]').click();
         assert.equal(await page.locator('#nav-toggle').getAttribute('aria-expanded'),'false');
+        await page.locator('.badge-card').first().waitFor();
+        await page.evaluate(() => window.scrollTo({top:1000,behavior:'instant'}));
+        const badgeBar=await page.locator('.badges-actions').boundingBox();
+        const stickyHeader=await page.locator('.topbar').boundingBox();
+        assert(badgeBar && stickyHeader && Math.abs(badgeBar.y-stickyHeader.height) < 1,`badge controls hidden by header at ${width}px`);
         await page.locator('[data-action="close-badges"]').click();
       }
+    }
+    for (const width of [390,1440]) {
+      await page.setViewportSize({width,height:900});
+      await page.goto(domestic+'/spiral-raid-quiz/');
+      if (await page.locator('#nav-toggle').isVisible()) await page.locator('#nav-toggle').click();
+      await page.locator('#main-nav a[href="#guide"]').click();
+      await page.waitForFunction(() => {
+        const header=document.querySelector('.topbar').getBoundingClientRect();
+        const target=document.querySelector('#guide').getBoundingClientRect();
+        return scrollY > 100 && target.top >= header.bottom && target.top <= header.bottom + 25;
+      });
+      if (await page.locator('#nav-toggle').isVisible()) await page.locator('#nav-toggle').click();
+      await page.locator('#main-nav [data-action="show-leaderboard"]').click();
+      await page.waitForFunction(() => {
+        const header=document.querySelector('.topbar').getBoundingClientRect();
+        const target=document.querySelector('#leaderboard').getBoundingClientRect();
+        return target.top >= header.bottom && target.top <= header.bottom + 25;
+      });
+      await page.goto(domestic+'/spiral-raid-quiz/#guide-spirit');
+      await page.locator('#guide-timeline [data-stage="1"]').click();
+      await page.waitForFunction(() => {
+        const header=document.querySelector('.topbar').getBoundingClientRect();
+        const target=document.querySelector('#guide-stage-1').getBoundingClientRect();
+        return target.top >= header.bottom && target.top <= header.bottom + 25;
+      });
     }
     const screenshots=process.env.SITE_NAV_SCREENSHOT_DIR;
     if (screenshots) {
       await page.setViewportSize({width:1440,height:900}); await page.goto(domestic+'/spiral-raid-quiz/');
       await page.locator('.hero-landscape').evaluate(img=>img.decode()); await page.waitForTimeout(700);
+      await page.evaluate(() => window.scrollTo({top:900,behavior:'instant'}));
       await page.locator('#site-switch summary').click();
       await page.screenshot({path:path.join(screenshots,'site-navigation-desktop.png')});
-      await page.setViewportSize({width:390,height:844}); await page.locator('#site-switch summary').click();
-      await page.locator('#nav-toggle').click();
+      await page.setViewportSize({width:390,height:844});
       await page.screenshot({path:path.join(screenshots,'site-navigation-mobile.png')});
+      await page.keyboard.press('Escape');
     }
     await page.locator('#site-switch summary').click();
     await page.locator('[data-action="download-transfer"]').click();
@@ -184,7 +226,7 @@ async function ready(url) {
     assert.equal(await page.locator('#backup-dialog').evaluate(node=>node.open),false);
     assert.equal(await page.locator('#transfer-notice').count(),0);
     await layout.context.close();
-    console.log('PASS site navigation, both transfer directions, offline upload and responsive menus');
+    console.log('PASS sticky navigation, anchor offsets, badge controls, site switching and responsive menus');
   } finally {
     if (browser) await browser.close();
     if (server) server.kill();

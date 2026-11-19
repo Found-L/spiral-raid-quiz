@@ -95,8 +95,6 @@ def counts(db, badges, mistakes, badge_states, honor_boards, categories):
             badge_id = badge['id']
             if badge_id in history:
                 result[badge_id] = {'historyCount': len(history[badge_id]), 'currentCount': len(winners[badge_id])}
-            elif badge_id in mistakes and all_counts[badge_id] < 3:
-                result[badge_id] = {'masked': True}
             else:
                 result[badge_id] = {'count': all_counts[badge_id]}
         if started:
