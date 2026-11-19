@@ -1,0 +1,104 @@
+/* Full-bleed encounter scenes keep the motion and its explanation together. */
+.guide-grid { align-items: stretch; gap: 18px; }
+.guide-card {
+  display: flex; flex-direction: column; padding: 0; border-radius: 10px;
+  background: linear-gradient(155deg, #1a2830, #101820 75%);
+  border-color: #66827a3d; box-shadow: 0 18px 42px #0004;
+}
+.guide-card:before { height: 2px; z-index: 2; }
+.guide-card:after { display: none; }
+.guide-card .chapter-heading {
+  position: absolute; z-index: 3; inset: 0 0 auto; padding: 22px 22px 12px;
+  text-shadow: 0 2px 8px #000; pointer-events: none;
+}
+.guide-card h3 { margin: 16px 0 7px; font-size: 23px; color: #fff4df; }
+.guide-card p { min-height: 0; color: #d6dfd8; font-size: 12px; }
+.guide-card .card-top span:first-child { color: #e4c18d; }
+.guide-card .overview-placeholder { margin-top: 0; }
+.guide-card .chapter-art { margin: 0; border: 0; border-radius: 0; box-shadow: none; background: #0b151b; }
+.chapter-scene { position: relative; isolation: isolate; overflow: hidden; padding-top: 145px; background: #0b151b; }
+.chapter-scene-image {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+  opacity: 1; transform: scale(1.035); pointer-events: none;
+}
+.twins .chapter-scene-image, .witch .chapter-scene-image { object-position: 72% center; }
+.chapter-art .chapter-scene:after {
+  z-index: 0; background: linear-gradient(180deg, #07121de8, #0a16198a 38%, #0711199c);
+  opacity: 1;
+}
+.chapter-art .sequence-svg {
+  position: relative; z-index: 1; width: 100%; display: block;
+  background: linear-gradient(90deg, #07121755, #07121722 48%, #07121755);
+}
+.chapter-art .scene-zone { fill: #0b2227; fill-opacity: .33; stroke: #b7e2d3; stroke-opacity: .48; stroke-width: 2; filter: drop-shadow(0 0 5px #a2dbbd55); }
+.twins .scene-zone:nth-of-type(1) { fill: #4a2522; stroke: #ffb39d; filter: drop-shadow(0 0 7px #ff998044); }
+.twins .scene-zone:nth-of-type(2) { fill: #173a40; stroke: #9be8e3; filter: drop-shadow(0 0 7px #80d8dd44); }
+.spirit .scene-zone { fill: #42351e; stroke: #e7c589; filter: drop-shadow(0 0 7px #eac37a55); }
+.chapter-art .scene-river { stroke-opacity: .45; stroke-width: 2; }
+.chapter-art .scene-piece { filter: drop-shadow(0 0 9px #b8f8dc80); }
+.chapter-art .scene-piece.hazard { filter: drop-shadow(0 0 9px #ff9a8388); }
+.chapter-art .scene-piece.boss, .chapter-art .scene-piece.lamp { filter: drop-shadow(0 0 12px #ffd78c99); }
+.chapter-art .scene-label { fill: #f0eee0; stroke: #091318; stroke-width: 5px; font-size: 21px; font-weight: 600; }
+.chapter-art .scene-piece-text { stroke: #101a1b; stroke-width: 4px; font-size: 20px; }
+.chapter-status { min-height: 66px; padding: 14px 17px 5px; gap: 12px; align-items: flex-start; background: transparent; }
+.chapter-counter { color: #e9ca92; font: 13px/1.65 Georgia, serif; }
+.chapter-status-text { color: #edf1e9; font-size: 13px; line-height: 1.7; }
+.chapter-playback { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 5px 17px 14px; }
+.chapter-progress { display: flex; align-items: center; gap: 5px; }
+.chapter-progress span { margin-right: 5px; color: #aebfb4; font-size: 10px; white-space: nowrap; }
+.chapter-progress i { display: block; width: 18px; height: 3px; border-radius: 3px; background: #72877b55; transition: background .3s, box-shadow .3s; }
+.chapter-art[data-step="0"] .chapter-progress i:nth-of-type(1),
+.chapter-art[data-step="1"] .chapter-progress i:nth-of-type(2),
+.chapter-art[data-step="2"] .chapter-progress i:nth-of-type(3) { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.chapter-step-controls { display: flex; align-items: center; gap: 0; padding: 2px; border: 1px solid #8aa29859; border-radius: 999px; background: #172a2be8; }
+.chapter-step-controls button, .chapter-step-controls .diagram-pause {
+  width: 34px; height: 34px; min-height: 34px; padding: 0; border: 0;
+  border-radius: 999px; background: transparent; color: #e1ece3; font-size: 16px;
+}
+.chapter-step-controls .diagram-pause { width: 44px; font-size: 11px; }
+.chapter-step-controls button:hover, .chapter-step-controls button:focus-visible { background: #456559; color: #fff4db; }
+.guide-card .card-footer { margin: 0 22px; padding: 15px 0 18px; align-items: center; gap: 10px; }
+.guide-card .card-footer .card-roles { font-size: 11px; color: #abb8af; }
+.guide-card .card-footer .card-cta { white-space: nowrap; }
+.chapter-art.motion-paused .chapter-scene-image { animation-play-state: paused; }
+@media (prefers-reduced-motion: no-preference) {
+  .chapter-scene-image { animation: encounter-pan 16s ease-in-out infinite alternate; }
+  .chapter-scene:after { animation: encounter-light 5s ease-in-out infinite alternate; }
+  .chapter-art .scene-zone { animation: arena-light 3.8s ease-in-out infinite alternate; }
+}
+@keyframes encounter-pan { from { transform: scale(1.035); } to { transform: scale(1.1) translateX(-1%); } }
+@keyframes encounter-light { from { opacity: .65; } to { opacity: 1; } }
+@keyframes arena-light { from { opacity: .7; } to { opacity: 1; } }
+@media (min-width: 681px) and (max-width: 1050px) {
+  .guide-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .guide-card:last-child { grid-column: 1 / -1; width: calc((100% - 12px) / 2); justify-self: center; }
+}
+@media (max-width: 900px) {
+  .guide-grid { gap: 12px; }
+  .guide-card .chapter-heading { padding: 19px 16px 12px; }
+  .guide-card h3 { font-size: 19px; }
+  .guide-card .card-footer { margin-inline: 16px; }
+  .chapter-status { display: flex; flex-wrap: nowrap; padding-inline: 14px; }
+  .chapter-status-text { flex-basis: auto; }
+  .chapter-playback { padding-inline: 14px; }
+}
+@media (max-width: 680px) {
+  .guide-grid { gap: 16px; }
+  .guide-card .chapter-heading { padding: 20px 18px 12px; }
+  .guide-card h3 { font-size: 22px; }
+  .guide-card p { min-height: 0; }
+  .guide-card .card-footer { margin-inline: 18px; }
+  .chapter-status { min-height: 59px; padding: 12px 15px 4px; }
+  .chapter-status-text { font-size: 13px; }
+  .chapter-playback { padding: 5px 15px 13px; }
+}
+@media (max-width: 360px) {
+  .chapter-progress { gap: 3px; }
+  .chapter-progress span { margin-right: 2px; }
+  .chapter-progress i { width: 10px; }
+  .chapter-step-controls { gap: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chapter-scene-image, .chapter-scene:after { animation: none; }
+  .chapter-progress i { transition: none; }
+}
