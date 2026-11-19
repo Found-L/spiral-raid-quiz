@@ -565,11 +565,11 @@
 .chapter-copy { min-width: 0; display: grid; gap: 3px; }
 .chapter-copy strong { color: inherit; font-size: 14px; }
 .chapter-copy small { color: #9dafaa; font-size: 11px; }
-.guide-timeline { display: flex; flex-wrap: nowrap; gap: 7px; overflow-x: auto; overscroll-behavior-x: contain; padding: 5px 0 10px; margin: 17px 0 20px; scrollbar-width: none; }
-.guide-timeline::-webkit-scrollbar { display: none; }
-.guide-timeline button { flex: 0 0 auto; gap: 8px; min-height: 40px; padding: 8px 12px; border-color: transparent; border-radius: 7px; background: #18232a; color: #b8c5bf; }
+.guide-timeline { display: flex; flex-wrap: wrap; gap: 7px; padding: 5px 0 10px; margin: 17px 0 20px; }
+.guide-timeline button { flex: 0 1 auto; gap: 8px; min-width: 0; max-width: 100%; min-height: 44px; padding: 8px 12px; border-color: transparent; border-radius: 7px; background: #18232a; color: #b8c5bf; text-align: left; line-height: 1.35; }
+.guide-timeline button > span:last-child { min-width: 0; overflow-wrap: anywhere; }
 .guide-timeline button[aria-current] { border-color: #b59d72; background: #302f27; color: #f6d49b; }
-.timeline-number { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #29383a; color: #b6c5be; font: 12px Georgia, serif; }
+.timeline-number { display: grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: #29383a; color: #b6c5be; font: 12px Georgia, serif; }
 .guide-timeline button[aria-current] .timeline-number { background: #dfc28d; color: #24251e; }
 .guide-chapters a:focus-visible, .guide-timeline button:focus-visible { outline: 2px solid #f1d29a; outline-offset: 3px; }
 
@@ -581,6 +581,8 @@
 @media (max-width: 560px) {
   .guide-chapters { gap: 6px; }
   .guide-chapters a { min-height: 58px; gap: 6px; padding: 9px 7px; }
+  .guide-timeline { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .guide-timeline button { width: 100%; }
   .chapter-number { font-size: 12px; }
   .chapter-copy strong { font-size: 12px; }
   .chapter-copy small { display: none; }

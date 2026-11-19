@@ -42,10 +42,12 @@ assert.ok(!spiders.steps[2].hidden?.includes('boss') && !spiders.steps[2].hidden
   'later frame must show the concurrent boss and bomb');
 
 const current = JSON.parse(fs.readFileSync(path.join(root, 'questions.json'), 'utf8'));
-const previous = JSON.parse(fs.readFileSync(path.join(root, 'domestic-backend/banks/peak-spiral-2026-11-18-v8.json'), 'utf8'));
+const previous = JSON.parse(fs.readFileSync(path.join(root, 'domestic-backend/banks/peak-spiral-2026-11-18-v9.json'), 'utf8'));
 const byId = new Map(current.questions.map(q => [q.id, q]));
-assert.deepEqual(current.draft_migrations[previous.version], ['q103']);
-assert.equal(current.questions.length, previous.questions.length + 1);
+assert.deepEqual(current.draft_migrations[previous.version], ['q104','q105']);
+assert.equal(current.questions.length, previous.questions.length + 2);
 for (const oldQuestion of previous.questions) assert.deepEqual(byId.get(oldQuestion.id), oldQuestion);
 assert.match(byId.get('q103').question, /抓起本侧主 T/);
-console.log('PASS paired actions, field references, and preservation of v8 questions');
+assert.match(byId.get('q104').explanation, /漏球过多/);
+assert.match(byId.get('q105').explanation, /持续时间/);
+console.log('PASS paired actions, field references, and preservation of v9 questions');

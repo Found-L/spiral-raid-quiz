@@ -41,6 +41,26 @@ async function waitReady(url) {
       assert.deepEqual(errors, []);
       await page.close();
     }
+    for (const width of [320,390,560,768,1024]) {
+      const page = await browser.newPage({viewport:{width,height:900}});
+      for (const [chapter,count] of [['spirit',4],['witch',5]]) {
+        await page.goto(url + '#guide-' + chapter);
+        const nav = page.locator('#guide-timeline');
+        const buttons = nav.locator('button');
+        assert.equal(await buttons.count(), count);
+        assert.equal(await nav.evaluate(el => el.scrollWidth <= el.clientWidth), true, `hidden stages at ${width}`);
+        const navBox = await nav.boundingBox();
+        for (const button of await buttons.all()) {
+          const box = await button.boundingBox();
+          assert.ok(box && box.x >= navBox.x - 1 && box.x + box.width <= navBox.x + navBox.width + 1,
+            `clipped stage control at ${width}`);
+        }
+        await buttons.last().click();
+        await page.waitForFunction(index => document.querySelector(`#guide-stage-${index} h2`) === document.activeElement, count - 1);
+        assert.equal(await buttons.last().getAttribute('aria-current'), 'step');
+      }
+      await page.close();
+    }
     const page = await browser.newPage({viewport:{width:1440,height:900}});
     await page.goto(url);
     const spiderQuestion = await page.evaluate(() => drawRaidDiagram('witch-spiders','蜘蛛示意','q071'));

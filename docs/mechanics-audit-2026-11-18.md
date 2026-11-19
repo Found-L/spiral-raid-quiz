@@ -16,7 +16,8 @@
 ## 2026-11-19：再次检查视频画面和机制遗漏
 
 - 重新检查了上线后视频的画面及口述，而非只检索文字：双剑 [1:07](https://www.bilibili.com/video/BV15uny6qENV/?t=67)、[5:38](https://www.bilibili.com/video/BV15uny6qENV/?t=338) 和 [7:05](https://www.bilibili.com/video/BV15uny6qENV/?t=425)，超魔灵 [0:55](https://www.bilibili.com/video/BV1rFWY6REex/?t=55)、[2:04](https://www.bilibili.com/video/BV1rFWY6REex/?t=124) 和 [5:38](https://www.bilibili.com/video/BV1rFWY6REex/?t=338)，魔女 [2:38](https://www.bilibili.com/video/BV1Gh4x6wEAt/?t=158)、[5:08](https://www.bilibili.com/video/BV1Gh4x6wEAt/?t=308) 与 [16:26](https://www.bilibili.com/video/BV1Gh4x6wEAt/?t=986)。
-- 双剑两个来源均提到漏球与狂暴风险，及主 T 需在被抓前维持三层同色状态：[讲解 5:38](https://www.bilibili.com/video/BV15uny6qENV/?t=338)、[另一讲解 1:47](https://www.bilibili.com/video/BV1d9n265EyM/?t=107)。此前图解没有明确提醒漏球与状态剩余时间，已补充。对漏球次数的具体计数口径暂不设成唯一答案。
+- 双剑两个来源均提到漏球与狂暴风险，及主 T 需在被抓前维持三层同色状态：[讲解 5:38](https://www.bilibili.com/video/BV15uny6qENV/?t=338)、[另一讲解 1:47](https://www.bilibili.com/video/BV1d9n265EyM/?t=107)。此前图解和题库没有明确考查漏球与状态剩余时间，已补充指引及 q104—q105。对漏球次数的具体计数口径暂不设成唯一答案。
+- v9 题库完整归档，原有 103 题不变；未交卷进度保留原题顺序、选项顺序与答案，新加两题置于原题之后。旧题库待上传成绩继续使用原题库评分。
 - 超魔灵[讲解 0:55](https://www.bilibili.com/video/BV1rFWY6REex/?t=55)说业火和波动炸弹同时点名，详情及总览明确同时发生；染灯和隔离继续在同一场地示意。
 - 魔女讲解提到多条不祥气息，但抽帧和口述不足以可靠验证各阶段的准确数量和位置。总览只以一条标明“不祥气息”的局部方向示意，具体方向以场内为准；不把箭头或装饰线当作新机制。
 - 排查发现部分蜘蛛题的静态配图把首领画在地面，而题目并未限定是飞天还是后期落地，容易误导；已改为用箭头表示首领方向，飞天时不再画成首领站在地面。图解中仍单独展示后期可与蜘蛛同场的情况。

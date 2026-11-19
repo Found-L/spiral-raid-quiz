@@ -241,11 +241,27 @@ const wait = () => new Promise(resolve => setTimeout(resolve, 30));
   extended.online(); extended.click('start');
   const extendedDraft = read(extended, ':draft');
   assert.deepEqual(extendedDraft.order.slice(0,oldOrder.length),oldOrder);
-  assert.deepEqual(new Set(extendedDraft.order.slice(oldOrder.length)),new Set(['q101','q102','q103']));
+  assert.deepEqual(new Set(extendedDraft.order.slice(oldOrder.length)),new Set(['q101','q102','q103','q104','q105']));
   assert.deepEqual(extendedDraft.optionOrder[oldOrder[0]],oldOptions[oldOrder[0]]);
   assert.equal(extendedDraft.index,4);
   assert.deepEqual(extendedDraft.answers[oldOrder[0]],[oldOptions[oldOrder[0]][0]]);
   extended.click('leave-exam'); // Stop this harness's exam timer before creating another document.
+
+  const latestOldBank = JSON.parse(fs.readFileSync(path.join(root, 'domestic-backend/banks/peak-spiral-2026-11-18-v9.json'), 'utf8'));
+  const latestOldOrder = latestOldBank.questions.map(q => q.id).reverse();
+  const latestOldOptions = Object.fromEntries(latestOldBank.questions.map(q => [q.id, q.options.map(o => o.id).reverse()]));
+  const latestDraft = createHarness('https://www.lysue.com', {
+    ':identity':sourceIdentity, ':profile':{nickname:'保留新版进度'},
+    ':draft':{version:latestOldBank.version,index:4,answers:{[latestOldOrder[0]]:[latestOldOptions[latestOldOrder[0]][0]]},
+      order:latestOldOrder,optionOrder:latestOldOptions,elapsedMs:1000}
+  });
+  latestDraft.online(); latestDraft.click('start');
+  const migratedLatest = read(latestDraft, ':draft');
+  assert.deepEqual(migratedLatest.order.slice(0,latestOldOrder.length),latestOldOrder);
+  assert.deepEqual(new Set(migratedLatest.order.slice(latestOldOrder.length)),new Set(['q104','q105']));
+  assert.deepEqual(migratedLatest.optionOrder[latestOldOrder[0]],latestOldOptions[latestOldOrder[0]]);
+  assert.deepEqual(migratedLatest.answers[latestOldOrder[0]],[latestOldOptions[latestOldOrder[0]][0]]);
+  latestDraft.click('leave-exam');
 
   const swap = createHarness('https://www.lysue.com', {
     ':identity':sourceIdentity, ':profile':{nickname:'切换前'},

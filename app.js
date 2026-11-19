@@ -974,7 +974,7 @@
       const active = chapter.id === chapterId ? ' aria-current="page"' : '';
       return `<a href="#guide-${chapter.id}"${active}><span class="chapter-number">${String(i + 1).padStart(2,'0')}</span><span class="chapter-copy"><strong>${escape(chapter.short)}</strong><small>${chapterNotes[chapter.id]}</small></span></a>`;
     }).join('');
-    $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}"${i === 0 ? ' aria-current="step"' : ''}><span class="timeline-number">${String(i + 1).padStart(2,'0')}</span><span>${escape(stage.timing)}</span></button>`).join('');
+    $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}"${i === 0 ? ' aria-current="step"' : ''}><span class="timeline-number">${String(i + 1).padStart(2,'0')}</span><span>${escape(stage.navLabel || stage.timing)}</span></button>`).join('');
     $('guide-stages').innerHTML = guide.stages.map((stage, i) => `<article class="guide-stage" id="guide-stage-${i}">
       <p class="eyebrow">${escape(stage.timing)}</p>
       <h2 tabindex="-1">${escape(stage.title)}</h2>

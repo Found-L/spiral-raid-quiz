@@ -603,11 +603,11 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .chapter-copy { min-width: 0; display: grid; gap: 3px; }
 .chapter-copy strong { color: inherit; font-size: 14px; }
 .chapter-copy small { color: #9dafaa; font-size: 11px; }
-.guide-timeline { display: flex; flex-wrap: nowrap; gap: 7px; overflow-x: auto; overscroll-behavior-x: contain; padding: 5px 0 10px; margin: 17px 0 20px; scrollbar-width: none; }
-.guide-timeline::-webkit-scrollbar { display: none; }
-.guide-timeline button { flex: 0 0 auto; gap: 8px; min-height: 40px; padding: 8px 12px; border-color: transparent; border-radius: 7px; background: #18232a; color: #b8c5bf; }
+.guide-timeline { display: flex; flex-wrap: wrap; gap: 7px; padding: 5px 0 10px; margin: 17px 0 20px; }
+.guide-timeline button { flex: 0 1 auto; gap: 8px; min-width: 0; max-width: 100%; min-height: 44px; padding: 8px 12px; border-color: transparent; border-radius: 7px; background: #18232a; color: #b8c5bf; text-align: left; line-height: 1.35; }
+.guide-timeline button > span:last-child { min-width: 0; overflow-wrap: anywhere; }
 .guide-timeline button[aria-current] { border-color: #b59d72; background: #302f27; color: #f6d49b; }
-.timeline-number { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #29383a; color: #b6c5be; font: 12px Georgia, serif; }
+.timeline-number { display: grid; place-items: center; flex: 0 0 24px; width: 24px; height: 24px; border-radius: 50%; background: #29383a; color: #b6c5be; font: 12px Georgia, serif; }
 .guide-timeline button[aria-current] .timeline-number { background: #dfc28d; color: #24251e; }
 .guide-chapters a:focus-visible, .guide-timeline button:focus-visible { outline: 2px solid #f1d29a; outline-offset: 3px; }
 
@@ -619,6 +619,8 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 @media (max-width: 560px) {
   .guide-chapters { gap: 6px; }
   .guide-chapters a { min-height: 58px; gap: 6px; padding: 9px 7px; }
+  .guide-timeline { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .guide-timeline button { width: 100%; }
   .chapter-number { font-size: 12px; }
   .chapter-copy strong { font-size: 12px; }
   .chapter-copy small { display: none; }
@@ -1122,7 +1124,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
   <dialog id="restart-dialog" aria-labelledby="restart-title"><div class="dialog-top"><div><p class="eyebrow">A FRESH START</p><h2 id="restart-title">重新开始这一轮？</h2></div><button class="close-button" type="button" data-action="cancel-restart" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted restart-description">本轮未交卷的答案将清空，题目和选项会重新打乱，计时归零。已提交的成绩和勋章会保留。</p><div class="dialog-actions"><button class="btn btn-primary" type="button" data-action="confirm-restart">重新考核</button><button class="btn btn-ghost" type="button" data-action="cancel-restart">继续答题</button></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script id="question-bank" type="application/json">{
-  "version": "peak-spiral-2026-11-18-v9",
+  "version": "peak-spiral-2026-11-18-v10",
   "title": "剑灵巅峰服螺旋寺院机制考核",
   "draft_migrations": {
     "peak-spiral-2026-11-18-v2": [
@@ -1228,7 +1230,9 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
       "q100",
       "q101",
       "q102",
-      "q103"
+      "q103",
+      "q104",
+      "q105"
     ],
     "peak-spiral-2026-11-18-v3": [
       "q009",
@@ -1264,7 +1268,9 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
       "q100",
       "q101",
       "q102",
-      "q103"
+      "q103",
+      "q104",
+      "q105"
     ],
     "peak-spiral-2026-11-18-v4": [
       "q018",
@@ -1284,7 +1290,9 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
       "q100",
       "q101",
       "q102",
-      "q103"
+      "q103",
+      "q104",
+      "q105"
     ],
     "peak-spiral-2026-11-18-v5": [
       "q088",
@@ -1302,7 +1310,9 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
       "q100",
       "q101",
       "q102",
-      "q103"
+      "q103",
+      "q104",
+      "q105"
     ],
     "peak-spiral-2026-11-18-v6": [
       "q095",
@@ -1313,15 +1323,25 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
       "q100",
       "q101",
       "q102",
-      "q103"
+      "q103",
+      "q104",
+      "q105"
     ],
     "peak-spiral-2026-11-18-v7": [
       "q101",
       "q102",
-      "q103"
+      "q103",
+      "q104",
+      "q105"
     ],
     "peak-spiral-2026-11-18-v8": [
-      "q103"
+      "q103",
+      "q104",
+      "q105"
+    ],
+    "peak-spiral-2026-11-18-v9": [
+      "q104",
+      "q105"
     ]
   },
   "questions": [
@@ -2333,6 +2353,64 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         "d"
       ],
       "explanation": "首领抓起主 T 后，治疗位应瞄准本侧主 T，关注血量与刀数，按团队安排衔接治疗。"
+    },
+    {
+      "id": "q104",
+      "section": "twins",
+      "role": "挡球位",
+      "type": "single",
+      "question": "双剑挡球阶段，如果同一侧连续漏掉太多来球，团队可能遇到什么风险？",
+      "options": [
+        {
+          "id": "a",
+          "text": "队员会自动进入灵魂隔离"
+        },
+        {
+          "id": "b",
+          "text": "本侧首领可能狂暴，影响团队生存"
+        },
+        {
+          "id": "c",
+          "text": "所有治疗珠会自动变多"
+        },
+        {
+          "id": "d",
+          "text": "首领会立即停止攻击并换边"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "两侧都要按分工持续处理来球。漏球过多可能导致首领狂暴，挡球位要及时沟通并补位。"
+    },
+    {
+      "id": "q105",
+      "section": "twins",
+      "role": "主 T",
+      "type": "single",
+      "question": "双剑主 T 已有三层同色状态，但发现剩余时间不足以维持到被抓阶段，应怎么做？",
+      "options": [
+        {
+          "id": "a",
+          "text": "随意挡异色球替换当前状态"
+        },
+        {
+          "id": "b",
+          "text": "按团队安排续同色球，确保被抓前仍有三层同色状态"
+        },
+        {
+          "id": "c",
+          "text": "停止关注状态时间，只看输出"
+        },
+        {
+          "id": "d",
+          "text": "等待状态自然消失再进入被抓阶段"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "主 T 的同色状态有持续时间，应按分工续球并确认被抓前仍有三层。"
     },
     {
       "id": "q031",
@@ -4303,7 +4381,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
     intro: '两边同时打。先分清本侧首领与球的颜色，接着处理球花、四刀治疗和换边。每次换边后都要重新确认主 T 与治疗的位置。',
     stages: [
       {
-        timing: '开场与每次换边后', title: '两侧主 T 就位', diagram: 'twins-distance',
+        timing: '开场与每次换边后', navLabel: '开场与换边后', title: '两侧主 T 就位', diagram: 'twins-distance',
         caption: '以各自主 T 到本侧首领的距离为准。圆圈表示约 8 米的距离边界。',
         roles: [
           ['冰 T', '常规阶段贴近酷寒剑，避免拉到约 8 米之外。被击退后尽快沿安全方向回位。'],
@@ -4313,7 +4391,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         check: '首领换了边时，以首领颜色重新找位置，别把开场的左右位置当成固定分组。',
       },
       {
-        timing: '挡球与叠状态', title: '同色挡球，异色准备治疗', diagram: 'twins-orbs',
+        timing: '挡球与叠状态', navLabel: '挡球与叠状态', title: '同色挡球，异色准备治疗', diagram: 'twins-orbs',
         caption: '图中的颜色代表球的属性。先认首领颜色，再确认自己的岗位和当前状态。',
         roles: [
           ['两侧主 T 与挡球协助位', '火侧挡火球，冰侧挡冰球。单人挡球通常获得 2 层，两人同挡通常各分 1 层。按团长安排轮换，提前叠好状态并留意剩余时间；主 T 在被抓前要保持三层同色状态。'],
@@ -4324,7 +4402,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         check: '开怪前排好挡球、踩花和治疗位。两侧都要持续处理来球，漏球过多可能导致首领狂暴；临时补球先报颜色与层数。',
       },
       {
-        timing: '球花出现至第四刀', title: '踩花、拾珠，主 T 被抓后抬血', diagram: 'twins-heal',
+        timing: '球花出现至第四刀', navLabel: '踩花与抬血', title: '踩花、拾珠，主 T 被抓后抬血', diagram: 'twins-heal',
         caption: '以河道和两只首领为参照，两侧各自处理。四个亮点表示四刀计数，闪动间隔并非实战节奏；花点数量与位置以场内为准。',
         roles: [
           ['踩花位', '三层同色状态就绪后处理分配到的同色花点。误踩异色花点可能受到伤害，注意站位。'],
@@ -4335,7 +4413,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         check: '可安排一名治疗位负责第三刀大加，其他人辅助，第四刀由后续治疗位接手。具体人数随团队调整。',
       },
       {
-        timing: '一轮机制结束，首领互换', title: '等吸人结束，再跨到对岸', diagram: 'twins-swap',
+        timing: '一轮机制结束，首领互换', navLabel: '首领互换', title: '等吸人结束，再跨到对岸', diagram: 'twins-swap',
         caption: '图中的左右是相对位置。关键是区分会被吸引的队员与需要自行过河的治疗位。',
         roles: [
           ['主 T 与同色位', '两只首领互换位置时，注意被吸到另一侧的落点。转场后恢复仇恨、距离与挡球分工。'],
@@ -4351,7 +4429,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
     intro: '主 T 带染灯路线，业火组按击倒窗口轮换进出隔离，近点炸弹位负责把爆炸拉离内外场队员。染灯和隔离会重叠，两套机制要同时处理。',
     stages: [
       {
-        timing: '业火与波动同时点名', title: '远点接业火，近点拉炸弹', diagram: 'spirit-select',
+        timing: '业火与波动同时点名', navLabel: '业火与波动点名', title: '远点接业火，近点拉炸弹', diagram: 'spirit-select',
         caption: '按与首领的距离分近点与远点。团队可以在开打前标记炸弹撤离方向。',
         roles: [
           ['业火组', '让三名指定人员保持最远站位，留一名备份可提高容错。业火约 45 秒，应在到期前按击倒机制进入隔离。'],
@@ -4362,7 +4440,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         check: '两种点名分别看远近。业火要等控制窗口，炸弹要在约 5 秒内撤离。',
       },
       {
-        timing: '控制条开放，击倒切换', title: '按身上状态决定面向', diagram: 'spirit-facing',
+        timing: '控制条开放，击倒切换', navLabel: '击倒切换', title: '按身上状态决定面向', diagram: 'spirit-facing',
         caption: '箭头表示角色面向。确认自己身上的业火状态后再转向。',
         roles: [
           ['控制位', '按指挥接控制。采用先眩晕再击倒的队伍，可让业火组先确认状态，随后在约定的击倒窗口换场。漏控时，外场留意额外惩罚圈。'],
@@ -4373,7 +4451,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         check: '开控前报“谁进、谁留”。不要把所有队员的面向统一成同一个方向。',
       },
       {
-        timing: '约 90% 后，持续至染灯阶段结束', title: '主 T 引导攻击给六盏灯染色', diagram: 'spirit-lamps',
+        timing: '约 90% 后，持续至染灯阶段结束', navLabel: '主 T 染灯', title: '主 T 引导攻击给六盏灯染色', diagram: 'spirit-lamps',
         caption: '六盏灯是机制目标。图中的路线表示一轮引导的方向示意，实际起点和次序按团队标记。',
         roles: [
           ['主 T', '约 90% 进入染灯阶段后，按机制持续引导首领攻击覆盖灯位。提前报路线，逐一检查灯的状态，确认各轮处理完成。'],
@@ -4383,7 +4461,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         check: '进入阶段后留意六个灯位与主 T 的面向，持续处理至后期染灯结束；不要把 60% 和 30% 当作新的必然触发点。',
       },
       {
-        timing: '出隔离后约 30 秒', title: '用两组轮换避开后遗症', diagram: 'spirit-rotation',
+        timing: '出隔离后约 30 秒', navLabel: '隔离轮换', title: '用两组轮换避开后遗症', diagram: 'spirit-rotation',
         caption: 'A、B 是同一场地中不同隔离状态的两组，图不是两个并排房间或固定移动路线。队员出隔离后需留意后遗症。',
         roles: [
           ['刚出隔离的一组', '出场后约 30 秒内有后遗症，此时再次进入隔离有死亡风险。先在外场站回约定位置并准备控制、躲惩罚。'],
@@ -4399,7 +4477,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
     intro: '主 T 控首领与不祥气息的距离，控制位决定何时击倒触发冲锋，炸弹位与蜘蛛组各走自己的路线。约 71% 和 41% 两次飞天，第二次落地后首领与蜘蛛可以同场。',
     stages: [
       {
-        timing: '常规阶段，全程留意', title: '普攻循环、走内侧、避开不祥气息', diagram: 'witch-line',
+        timing: '常规阶段，全程留意', navLabel: '常规带位', title: '普攻循环、走内侧、避开不祥气息', diagram: 'witch-line',
         caption: '红线表示不祥气息。方向与当前位置以场内为准，图未指定开怪钟点或转动速度。',
         roles: [
           ['主 T', '沿危险线移动方向带位，利用内侧缩短跑动距离，同时给首领留出安全间隔。首领碰线可能狂暴。'],
@@ -4409,7 +4487,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         check: '危险线对玩家和首领都有威胁。压血、砸地和转场时都要先看线，再决定站位。',
       },
       {
-        timing: '击倒后至扇形扫描', title: '识别前冲或后冲，把扫描带向空地', diagram: 'witch-charge',
+        timing: '击倒后至扇形扫描', navLabel: '前后冲锋', title: '识别前冲或后冲，把扫描带向空地', diagram: 'witch-charge',
         caption: '前后以首领当前面向为准。扇形范围只作走位示意。',
         roles: [
           ['主 T', '击倒后观察起身动作、台词和首领面向，判断前冲或后冲。根据预判落点与活跃的线调整身位。'],
@@ -4418,7 +4496,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         ],
       },
       {
-        timing: '常规阶段，出现小虫子提示', title: '中圈认标记，炸弹带到空处', diagram: 'witch-bomb',
+        timing: '常规阶段，出现小虫子提示', navLabel: '炸弹点名', title: '中圈认标记，炸弹带到空处', diagram: 'witch-bomb',
         caption: '撤离路径应避开危险线、其他炸弹位和蜘蛛小组。图中的外撤方向只用于解释分工。',
         roles: [
           ['中圈点名候选', '按开怪前约定就位，看到投放小虫子的提示，先看头顶标记。选中的队员立刻向约定的空处撤离。'],
@@ -4428,7 +4506,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         ],
       },
       {
-        timing: '约 71% 与 41% 飞天，第二次落地后持续处理', title: '先分点，聚小蜘蛛并打断大蜘蛛回血', diagram: 'witch-spiders',
+        timing: '约 71% 与 41% 飞天，第二次落地后持续处理', navLabel: '飞天与蜘蛛', title: '先分点，聚小蜘蛛并打断大蜘蛛回血', diagram: 'witch-spiders',
         caption: '图示一个蜘蛛处理区：飞天时首领暂离地面，第二次落地后可与蜘蛛同场。实际出生点和分组以场内标记为准。',
         roles: [
           ['蜘蛛组', '飞天时到各自分点。先接住大蜘蛛，小蜘蛛出现后聚到大蜘蛛附近，用范围输出同时处理。分配好聚怪、控制、输出，避免多人追同一只小怪。'],
@@ -4440,7 +4518,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
         ],
       },
       {
-        timing: '约 41% 飞天结束后', title: '远点留意震荡波，掌握起跳时机', diagram: 'witch-wave',
+        timing: '约 41% 飞天结束后', navLabel: '后期震荡波', title: '远点留意震荡波，掌握起跳时机', diagram: 'witch-wave',
         caption: '首领与远点位的示意位置；范围、出招时机以场内显示为准。',
         roles: [
           ['远点位', '后期按团队分工保持远点，留意可能锁定最远玩家的震荡波。观察首领的出招预兆和波纹到达时机，起跳躲避。'],
@@ -6401,7 +6479,7 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
       const active = chapter.id === chapterId ? ' aria-current="page"' : '';
       return `<a href="#guide-${chapter.id}"${active}><span class="chapter-number">${String(i + 1).padStart(2,'0')}</span><span class="chapter-copy"><strong>${escape(chapter.short)}</strong><small>${chapterNotes[chapter.id]}</small></span></a>`;
     }).join('');
-    $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}"${i === 0 ? ' aria-current="step"' : ''}><span class="timeline-number">${String(i + 1).padStart(2,'0')}</span><span>${escape(stage.timing)}</span></button>`).join('');
+    $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}"${i === 0 ? ' aria-current="step"' : ''}><span class="timeline-number">${String(i + 1).padStart(2,'0')}</span><span>${escape(stage.navLabel || stage.timing)}</span></button>`).join('');
     $('guide-stages').innerHTML = guide.stages.map((stage, i) => `<article class="guide-stage" id="guide-stage-${i}">
       <p class="eyebrow">${escape(stage.timing)}</p>
       <h2 tabindex="-1">${escape(stage.title)}</h2>
