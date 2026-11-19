@@ -110,6 +110,10 @@
     return seconds <= 365 * 24 * 3600 ? seconds : null;
   }
   function updateExamTimer() { $('exam-timer').textContent = `用时 ${formatDuration(elapsedTime())}`; }
+  function scrollToLeaderboard() {
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    requestAnimationFrame(() => $('leaderboard').scrollIntoView({behavior:reduceMotion ? 'auto' : 'smooth'}));
+  }
   const attemptDate = new Intl.DateTimeFormat('zh-CN', {
     timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
@@ -530,7 +534,7 @@
     setView(badgesReturn);
     if (badgesReturn === 'home') { void refreshRanking(); $('leaderboard').scrollIntoView(); }
   }
-  function renderBadges() {
+  function renderBadges(enter = false) {
     const grid = $('badges-grid');
     grid.replaceChildren();
     const earned = badgeData.badges.filter(badge => badge.earned).length;
@@ -542,6 +546,7 @@
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `badge-card tone-${badgeTone(badge)}${badge.earned ? ' earned' : ' locked'}${selected ? ' selected' : ''}`;
+      if (enter) button.classList.add('badge-enter');
       button.dataset.action = 'toggle-badge';
       button.dataset.badge = badge.id;
       button.disabled = !badge.earned;
@@ -573,7 +578,7 @@
       badgesDirty = false;
       $('badges-save').hidden = false;
       $('badges-save').disabled = false;
-      renderBadges();
+      renderBadges(true);
     } catch (error) {
       if (requestId !== badgesRequest || view !== 'badges') return;
       $('badges-status').textContent = profile.localOnly && error.status === 403
@@ -590,7 +595,7 @@
     renderBadges();
     $('badges-status').textContent += ' · 更改后请保存';
     const button = [...$('badges-grid').children].find(item => item.dataset.badge === id);
-    if (button) button.focus({preventScroll:true});
+    if (button) { button.classList.add('badge-change'); button.focus({preventScroll:true}); }
   }
   async function saveBadges() {
     if (!badgeData || !activeIdentity()) return;
@@ -919,12 +924,12 @@
       case 'next': if(index===qs.length-1)submitExam();else goto(index+1);break;
       case 'submit': submitExam();break;
       case 'leave-exam': setView('home');refreshRanking();break;
-      case 'show-leaderboard': setView('home');refreshRanking();requestAnimationFrame(()=>$('leaderboard').scrollIntoView({behavior:'smooth'}));break;
+      case 'show-leaderboard': setView('home');refreshRanking();scrollToLeaderboard();break;
       case 'refresh-ranking': refreshRanking();break;
       case 'retry-upload': uploadPending();break;
       case 'retry-connection': retryConnection();break;
       case 'restart': draft={version:bank.version,index:0,answers:{}};index=0;save(':draft',draft);beginExam();break;
-      case 'results-home': setView('home');refreshRanking();requestAnimationFrame(()=>$('leaderboard').scrollIntoView({behavior:'smooth'}));break;
+      case 'results-home': setView('home');refreshRanking();scrollToLeaderboard();break;
       case 'toggle-review': onlyWrong=!onlyWrong;renderResult();break;
       case 'open-history': openHistory();break;
       case 'close-history': closeHistory();break;

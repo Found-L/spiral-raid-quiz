@@ -3,11 +3,14 @@ function drawRaidDiagram(key, caption, questionId = null) {
   const circle = (x, y, radius, style) => `<circle cx="${x}" cy="${y}" r="${radius}" class="${style}"/>`;
   const line = (path, style = 'map-rule') => `<path d="${path}" class="${style}"/>`;
   const label = (x, y, text, style = '') => `<text x="${x}" y="${y}" class="${style}">${text}</text>`;
-  const arrow = (x1, y1, x2, y2, style = 'map-gold-line') => {
+  const arrow = (x1, y1, x2, y2, style = 'map-gold-line', animate = true) => {
     const angle = Math.atan2(y2 - y1, x2 - x1);
     const base = [x2 - 10 * Math.cos(angle), y2 - 10 * Math.sin(angle)];
     const dx = 4 * Math.sin(angle), dy = 4 * Math.cos(angle);
-    return line(`M${x1} ${y1}L${x2} ${y2}M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`, style);
+    const shaft = `M${x1} ${y1}L${x2} ${y2}`;
+    const arrowhead = `M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`;
+    // Only the teaching guide adds a moving highlight; the underlying arrow stays visible.
+    return line(shaft + arrowhead, style) + (!test && animate ? line(shaft, 'map-route-glow') : '');
   };
   const token = (x, y, text, style = 'map-ally', radius = 12) =>
     circle(x, y, radius, style) + circle(x, y, Math.max(radius - 3, 1), 'map-token-ring') + label(x, y + 4.5, text, 'map-token');
@@ -72,7 +75,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       break;
     case 'spirit-facing':
       art = [boss(), token(128, 135, '火', 'map-hazard', 18), token(431, 135, '外', 'map-ally', 18),
-        arrow(157, 135, 244, 135, 'map-red-line'), arrow(458, 135, 516, 135, 'map-ally-line'),
+        arrow(157, 135, 244, 135, 'map-red-line', false), arrow(458, 135, 516, 135, 'map-ally-line', false),
         label(128, 182, '带业火 · 进隔离'), label(431, 182, '留外场 · 背对'), label(280, 222, '击倒切换时')].join('');
       break;
     case 'spirit-lamps': {
@@ -92,10 +95,11 @@ function drawRaidDiagram(key, caption, questionId = null) {
     case 'witch-line':
       art = [arena(), boss(305, 154, '首领'), line('M280 135L184 90 M280 135L323 38', 'map-red-line'),
         token(340, 156, 'T'), token(293, 192, '近'), token(234, 164, '队'), label(113, 72, '不祥气息'), line('M155 76l25 12')].join('');
-      if (!test) art += line('M348 168q6 37-35 50', 'map-ally-line') + arrow(334, 207, 313, 218, 'map-ally-line') + label(448, 208, '沿内侧带位');
+      if (!test) art += line('M348 168q6 37-35 50', 'map-ally-line') + line('M348 168q6 37-35 50', 'map-route-glow')
+        + arrow(334, 207, 313, 218, 'map-ally-line', false) + label(448, 208, '沿内侧带位');
       break;
     case 'witch-charge':
-      art = [arena(280, 135, 108), boss(), arrow(308, 135, 348, 135), label(360, 162, '面向'),
+      art = [arena(280, 135, 108), boss(), arrow(308, 135, 348, 135, 'map-gold-line', false), label(360, 162, '面向'),
         token(216, 197, '队'), token(241, 217, '队'), label(117, 214, '队友区')].join('');
       if (!test) art += arrow(252, 135, 188, 135, 'map-ally-line') + label(110, 138, '后冲方向') + label(449, 137, '前冲方向')
         + line('M304 126L372 74A112 112 0 0 1 386 121Z', 'map-scan') + label(458, 65, '扇面朝空处');
@@ -116,7 +120,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       art = [arena(), boss(280, 125, '首领'), spider(364, 178), swarm(399, 191),
         spider(195, 150), swarm(160, 172), spider(279, 49), swarm(312, 51),
         label(417, 162, '小蜘蛛'), label(379, 231, '处理区 A'), label(176, 222, '处理区 B'), label(223, 40, '处理区 C')].join('');
-      if (!test) art += arrow(412, 204, 385, 186, 'map-ally-line') + arrow(349, 166, 306, 140, 'map-red-line') + label(440, 86, '大蜘蛛转向首领');
+      if (!test) art += arrow(412, 204, 385, 186, 'map-ally-line') + arrow(349, 166, 306, 140, 'map-red-line', false) + label(440, 86, '大蜘蛛转向首领');
       if (questionId === 'q071') art += arrow(349, 166, 306, 140, 'map-red-line');
       break;
     default:
