@@ -6,6 +6,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const bank = JSON.parse(fs.readFileSync(path.join(root, 'questions.json'), 'utf8'));
 const old = JSON.parse(fs.readFileSync(path.join(root, 'domestic-backend/banks/peak-spiral-2026-11-18-v3.json'), 'utf8'));
+const previousBank = JSON.parse(fs.readFileSync(path.join(root, 'domestic-backend/banks/peak-spiral-2026-11-18-v7.json'), 'utf8'));
 const key = 'spiral-temple-quiz-v1';
 const sourceIdentity = {deviceId:'a'.repeat(32), secret:'b'.repeat(64)};
 const destinationIdentity = {deviceId:'d'.repeat(32), secret:'e'.repeat(64)};
@@ -229,6 +230,21 @@ const wait = () => new Promise(resolve => setTimeout(resolve, 30));
   assert.deepEqual(active.submissions[0].answers, completeAnswers);
   assert.equal(active.submissions[0].elapsedSeconds, 7);
   assert.deepEqual(read(active, ':last-result').order, fresh.order);
+
+  const oldOrder = previousBank.questions.map(q => q.id).reverse();
+  const oldOptions = Object.fromEntries(previousBank.questions.map(q => [q.id, q.options.map(o => o.id).reverse()]));
+  const extended = createHarness('https://www.lysue.com', {
+    ':identity':sourceIdentity, ':profile':{nickname:'延续旧题'},
+    ':draft':{version:previousBank.version,index:4,answers:{[oldOrder[0]]:[oldOptions[oldOrder[0]][0]]},
+      order:oldOrder,optionOrder:oldOptions,elapsedMs:1000}
+  });
+  extended.online(); extended.click('start');
+  const extendedDraft = read(extended, ':draft');
+  assert.deepEqual(extendedDraft.order.slice(0,oldOrder.length),oldOrder);
+  assert.deepEqual(new Set(extendedDraft.order.slice(oldOrder.length)),new Set(['q101','q102']));
+  assert.deepEqual(extendedDraft.optionOrder[oldOrder[0]],oldOptions[oldOrder[0]]);
+  assert.equal(extendedDraft.index,4);
+  assert.deepEqual(extendedDraft.answers[oldOrder[0]],[oldOptions[oldOrder[0]][0]]);
 
   const swap = createHarness('https://www.lysue.com', {
     ':identity':sourceIdentity, ':profile':{nickname:'切换前'},

@@ -67,6 +67,31 @@ class LeaderboardTimingTest(unittest.TestCase):
             with self.assertRaises(server.ApiError):
                 server.submit(db, {**payload, 'attemptId':'1' * 32, 'elapsedSeconds':True})
 
+    def test_thousand_players_have_stable_global_ranks_across_pages(self):
+        with closing(server.database()) as db:
+            players = [(f'{i:032x}', 'secret', f'{i:032x}', f'{i:032x}', f'玩家{i}', i, i)
+                       for i in range(1003)]
+            db.executemany('INSERT INTO participants VALUES (?, ?, ?, ?, ?, ?, ?)', players)
+            db.executemany('INSERT INTO attempts VALUES (?, ?, ?, ?, ?, ?)',
+                [(f'{i + 10000:032x}', player[0], server.VERSION, i % 101, 100, i)
+                 for i, player in enumerate(players)])
+            db.executemany('INSERT INTO attempt_timings VALUES (?, ?)',
+                           [(f'{i + 10000:032x}', 1003 - i) for i in range(1003)])
+            db.commit()
+            legacy = server.leaderboard(db, latest=True)
+            self.assertEqual(len(legacy['entries']), 100)  # Old clients keep their original limit.
+            pages = [server.leaderboard(db, latest=True, page=i, page_size=20) for i in range(1, 52)]
+            self.assertEqual((pages[-1]['total'], pages[-1]['pages']), (1003, 51))
+            rows = [entry for result in pages for entry in result['entries']]
+            self.assertEqual([entry['rank'] for entry in rows], list(range(1, 1004)))
+            self.assertEqual(len({entry['playerNumber'] for entry in rows}), 1003)
+            self.assertEqual([entry['nickname'] for entry in legacy['entries']],
+                             [entry['nickname'] for entry in rows[:100]])
+            self.assertEqual(server.leaderboard(db, latest=True, page=999, page_size=20)['page'], 51)
+            for args in ({'page': 0}, {'page': -1}, {'page': True}, {'page_size': 101}, {'page_size': 0}):
+                with self.assertRaises(server.ApiError):
+                    server.leaderboard(db, latest=True, **args)
+
     def test_existing_database_keeps_rows_and_original_schema(self):
         legacy = Path(self.temp.name) / 'legacy.sqlite3'
         with closing(sqlite3.connect(legacy)) as db:

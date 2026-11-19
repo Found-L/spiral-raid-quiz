@@ -2,7 +2,7 @@ from pathlib import Path
 root=Path(__file__).resolve().parent
 template=(root/'template.html').read_text(encoding='utf-8')
 css='\n'.join((root/name).read_text(encoding='utf-8') for name in ('style.css','detail.css'))
-js=(root/'app.js').read_text(encoding='utf-8')
+js='\n'.join((root/name).read_text(encoding='utf-8') for name in ('badge-art.js','app.js'))
 guide_js='\n'.join((root/name).read_text(encoding='utf-8') for name in ('guide.js','diagrams.js'))
 data=(root/'questions.json').read_text(encoding='utf-8').replace('</','<\\/')
 for marker,value in [('/*__APP_CSS__*/',css),('/*__APP_JS__*/',js),('/*__GUIDE_JS__*/',guide_js),('/*__QUESTION_BANK__*/',data)]:

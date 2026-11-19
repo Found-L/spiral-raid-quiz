@@ -141,6 +141,10 @@ one('twins','普通输出',169,'双剑挡球阶段，队友已有两层火状态
 one('spirit','普通输出',130,'超魔灵击倒切换时，你没有业火且分工要求留在外场，应该怎么做？','背对首领，留在外场并避开机制路线',['面向首领冲进隔离，隔离观光现在开始','追着主 T 站在染灯路线正前方','带着波动炸弹靠近隔离内队友'],'无业火且需要留在外场时，应背对首领，避免误入隔离。')
 one('witch','近战输出',383,'黑风魔女砸地前，你正在首领附近输出，发现不祥气息靠近，应该怎么做？','提前留出安全位置，按职业技能躲避击退',['继续贴着危险线输出，看看能不能弹射起飞','主动迎着危险线吃击退','把炸弹队友叫到身边帮忙挡线'],'砸地击退可能把人带到不祥气息上，应预留安全空间并按职业技能规避。')
 one('witch','普通输出',317,'黑风魔女蜘蛛阶段，团队已安排聚怪位处理小蜘蛛，普通输出应怎样配合？','在分配的区域协助集中输出，并避开炸弹路线',['把小蜘蛛各自拉散，给它们安排自由行','追着炸弹位跑并把小蜘蛛带过去','不看分工，独自抢走所有小蜘蛛'],'按团队分点和聚怪安排输出，避免拆散小蜘蛛或干扰炸弹位。')
+# Later-phase shockwave: the peak-server walkthrough calls for the farthest player
+# to watch the telegraph and jump; avoid unverified claims about other defenses.
+one('witch','远点位',986,'黑风魔女第二次飞天结束后的常规阶段，哪名玩家应特别留意震荡波点名？','距离首领最远的玩家',['距离首领最近的玩家','只有主 T 会被点名','仅正在治疗的玩家'],'后期震荡波可能锁定距离首领最远的玩家，远点位要留意出招预兆。')
+one('witch','远点位',933,'黑风魔女后期震荡波即将到达时，远点位应如何处理？','观察波纹到达时机并起跳躲避',['站在原地等待波纹经过','冲到炸弹位身边共同承受','不看出招，贴着危险线继续输出'],'观察首领出招与波纹到达时机，使用跳跃规避，并留意附近危险线。')
 
 assert len(questions) >= 70
 assert all(q['options'] and len(q['answer']) >= 1 for q in questions)
@@ -155,7 +159,7 @@ for path in sorted((root/'domestic-backend'/'banks').glob('*.json')):
     migrations[old['version']] = sorted(qid for qid in old_questions.keys() | current_questions.keys()
                                       if old_questions.get(qid) != current_questions.get(qid))
 assert 'peak-spiral-2026-11-18-v4' in migrations
-data = {'version':'peak-spiral-2026-11-18-v7','title':'剑灵巅峰服螺旋寺院机制考核',
+data = {'version':'peak-spiral-2026-11-18-v8','title':'剑灵巅峰服螺旋寺院机制考核',
         'draft_migrations': migrations, 'questions':questions}
 payload = json.dumps(data,ensure_ascii=False,indent=2) + '\n'
 (root/'questions.json').write_text(payload,encoding='utf-8')

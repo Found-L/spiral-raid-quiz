@@ -86,20 +86,19 @@
   let uploading = false;
   let connecting = false;
   let rankingRequest = 0;
+  let rankingPage = 1;
+  let rankingPages = 1;
   let lastUploadError = '';
   let examTimer = null;
   let runningSince = null;
   let timerTicks = 0;
   const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame','bomb','spider','laser','lantern','heart','compass','orb']);
   const badgeTones = new Set(['gold','teal','red','violet']);
   const badgeTone = badge => badgeTones.has(badge.tone) ? badge.tone : 'gold';
   function badgeIcon(badge) {
-    if (badge.icon === 'bomb') return `<svg class="icon badge-bomb-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="30" cy="37" r="21" fill="#ec7358" stroke="#ffd1a0" stroke-width="2"/><path d="M39 18c1-6 4-9 10-10" fill="none" stroke="#ffda8c" stroke-width="3" stroke-linecap="round"/><path d="M50 3v5m-4-1 4 2 4-2m-2 5 3 2" fill="none" stroke="#fff2bb" stroke-width="2.3" stroke-linecap="round"/><path d="M17 30q4-4 8-1m7 0q4-4 8-1" fill="none" stroke="#4c2525" stroke-width="2.5" stroke-linecap="round"/><circle cx="21" cy="34" r="2.4" fill="#3b2222" stroke="none"/><circle cx="37" cy="34" r="2.4" fill="#3b2222" stroke="none"/><path d="M22 41q8 10 17 0Z" fill="#53242c" stroke="none"/><path d="M25 42q5 3 11 0" fill="none" stroke="#fff0c7" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="39" r="2.5" fill="#ffb192" stroke="none"/><circle cx="43" cy="39" r="2.5" fill="#ffb192" stroke="none"/></svg>`;
-    const symbol = badgeIcons.has(badge.icon) ? badge.icon : 'spark';
-    return `<svg class="icon" aria-hidden="true"><use href="#badge-${symbol}"/></svg>`;
+    return drawBadgeArtwork(badge);
   }
-  const badgeChip = badge => `<span class="badge-chip tone-${badgeTone(badge)}" title="${escape(badge.description || '')}">${badgeIcon(badge)}${escape(badge.name)}</span>`;
+  const badgeChip = badge => `<span class="badge-chip tone-${badgeTone(badge)}" title="${escape(badge.description || '')}"><span class="badge-chip-emblem">${badgeIcon(badge)}</span><span>${escape(badge.name)}</span></span>`;
   const sectionOf = (id) => SECTIONS.find(x=>x.id===id);
   const formatPlayerNumber = (number) => Number.isSafeInteger(number) && number > 0
     ? `#${String(number).padStart(6, '0')}` : '';
@@ -149,10 +148,12 @@
   }
   function prepareExam() {
     const ids = bankQuestions.map(q => q.id);
-    const previousId = isPermutation(draft.order, ids) ? draft.order[index] : bankQuestions[index]?.id;
+    const previousId = Array.isArray(draft.order) ? draft.order[index] : bankQuestions[index]?.id;
     if (!isPermutation(draft.order, ids)) {
-      draft.order = shuffle(ids);
-      index = previousId && Object.keys(draft.answers).length ? Math.max(0, draft.order.indexOf(previousId)) : 0;
+      const canExtend = Array.isArray(draft.order) && draft.order.length < ids.length &&
+        new Set(draft.order).size === draft.order.length && draft.order.every(id => ids.includes(id));
+      draft.order = canExtend ? [...draft.order, ...shuffle(ids.filter(id => !draft.order.includes(id)))] : shuffle(ids);
+      index = previousId && (canExtend || Object.keys(draft.answers).length) ? Math.max(0, draft.order.indexOf(previousId)) : 0;
     }
     if (!draft.optionOrder || typeof draft.optionOrder !== 'object' || Array.isArray(draft.optionOrder)) draft.optionOrder = {};
     for (const question of bankQuestions) {
@@ -511,6 +512,7 @@
   }
   function rankingRow(entry) {
     const row=document.createElement('div'); row.className='ranking-row';
+    row.dataset.rank = String(entry.rank);
     const number = formatPlayerNumber(entry.playerNumber);
     const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
     const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
@@ -518,14 +520,23 @@
     row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`;
     return row;
   }
-  async function refreshRanking() {
+  async function refreshRanking(page = rankingPage) {
     const requestId = ++rankingRequest;
+    $('ranking-pagination').hidden = true;
     const list=$('ranking-list'); list.replaceChildren(); const loading=document.createElement('p'); loading.className='empty-state'; loading.textContent='正在读取榜单…'; list.append(loading);
     try {
-      const data=await request('/api/leaderboard?view=latest');
+      const data=await request(`/api/leaderboard?view=latest&page=${page}&pageSize=20`);
       if (requestId !== rankingRequest) return;
       list.replaceChildren();
       if(!data.entries?.length){loading.textContent='还没有成绩，来做第一个上榜的人。';list.append(loading);return;}
+      rankingPage = Number.isSafeInteger(data.page) ? data.page : 1;
+      rankingPages = Number.isSafeInteger(data.pages) ? data.pages : 1;
+      $('ranking-page-status').textContent = `共 ${data.total ?? data.entries.length} 人 · 第 ${rankingPage} / ${rankingPages} 页`;
+      $('ranking-previous').disabled = rankingPage <= 1;
+      $('ranking-next').disabled = rankingPage >= rankingPages;
+      $('ranking-page-input').value = String(rankingPage);
+      $('ranking-page-input').max = String(rankingPages);
+      $('ranking-pagination').hidden = rankingPages <= 1;
       for(const entry of data.entries) list.append(rankingRow(entry));
     } catch(err){
       if(requestId !== rankingRequest) return;
@@ -534,6 +545,11 @@
       if(err.unavailable) setConnectionUnavailable(true);
     }
   }
+  $('ranking-page-form').addEventListener('submit', event => {
+    event.preventDefault();
+    const page = Number($('ranking-page-input').value);
+    if (Number.isSafeInteger(page) && page >= 1 && page <= rankingPages) void refreshRanking(page);
+  });
   function openHistory() {
     if ($('profile-dialog').open) closeProfile();
     if (view !== 'history') historyReturn = view;
@@ -1034,6 +1050,8 @@
       case 'leave-exam': setView('home');refreshRanking();break;
       case 'show-leaderboard': setView('home');void refreshRanking();scrollToLeaderboard();break;
       case 'refresh-ranking': refreshRanking();break;
+      case 'ranking-previous': if (rankingPage > 1) void refreshRanking(rankingPage - 1);break;
+      case 'ranking-next': if (rankingPage < rankingPages) void refreshRanking(rankingPage + 1);break;
       case 'retry-upload': uploadPending();break;
       case 'retry-connection': retryConnection();break;
       case 'restart': restartExam();break;

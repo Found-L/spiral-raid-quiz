@@ -64,7 +64,7 @@ BADGES = [
 ]
 BADGE_BY_ID = {badge['id']: badge for badge in BADGES}
 # These option IDs apply only to the explicitly checked answer keys.
-MISTAKE_VERSIONS = {'peak-spiral-2026-11-18-v5', 'peak-spiral-2026-11-18-v6', 'peak-spiral-2026-11-18-v7'}
+MISTAKE_VERSIONS = {'peak-spiral-2026-11-18-v5', 'peak-spiral-2026-11-18-v6', 'peak-spiral-2026-11-18-v7', 'peak-spiral-2026-11-18-v8'}
 MISTAKE_RULES = {
     'demolition': {'q036': {'b', 'd'}, 'q042': {'a'}, 'q047': {'a'}, 'q050': {'d'},
                    'q066': {'a', 'c'}, 'q089': {'a', 'c'}, 'q090': {'a'}, 'q091': {'b'}},
@@ -394,10 +394,13 @@ def select_badges(db, body):
         raise
 
 
-def leaderboard(db, requested_version=None, latest=False):
+def leaderboard(db, requested_version=None, latest=False, page=1, page_size=100):
     selected_version = VERSION if requested_version is None and not latest else requested_version
     if selected_version is not None and selected_version not in BANKS:
         raise ApiError('题库版本不存在。')
+    if (not isinstance(page, int) or isinstance(page, bool) or page < 1 or
+            not isinstance(page_size, int) or isinstance(page_size, bool) or not 1 <= page_size <= 100):
+        raise ApiError('榜单页码无效。')
     order = sorted((version for version in BANKS if version != VERSION), key=version_order) + [VERSION]
     priorities = {version: index for index, version in enumerate(order)}
     db.create_function('quiz_version_rank', 1, lambda version: priorities.get(version, -1), deterministic=True)
@@ -408,6 +411,13 @@ def leaderboard(db, requested_version=None, latest=False):
                       SELECT DISTINCT p.id FROM participants p JOIN attempts a ON a.participant_id = p.id
                       WHERE NOT EXISTS
                       (SELECT 1 FROM participant_numbers n WHERE n.participant_id = p.id)''')
+        total = db.execute('''SELECT COUNT(DISTINCT a.participant_id)
+                              FROM attempts a JOIN participants p ON p.id = a.participant_id
+                              WHERE (? IS NULL OR a.quiz_version = ?)''',
+                           (selected_version, selected_version)).fetchone()[0]
+        pages = max(1, (total + page_size - 1) // page_size)
+        page = min(page, pages)
+        offset = (page - 1) * page_size
         rows = db.execute('''WITH ranked AS (
                 SELECT a.participant_id, a.quiz_version, a.correct_count, a.total_count, a.submitted_at, t.elapsed_seconds,
                   ROW_NUMBER() OVER (PARTITION BY a.participant_id
@@ -419,20 +429,21 @@ def leaderboard(db, requested_version=None, latest=False):
               FROM ranked r JOIN participants p ON p.id = r.participant_id
               LEFT JOIN participant_numbers n ON n.participant_id = p.id WHERE r.rn = 1
               ORDER BY ROUND(10000.0 * r.correct_count / r.total_count) DESC,
-                (r.elapsed_seconds IS NULL), r.elapsed_seconds ASC, r.submitted_at ASC, p.id ASC LIMIT 100''',
-                (selected_version, selected_version)).fetchall()
+                (r.elapsed_seconds IS NULL), r.elapsed_seconds ASC, r.submitted_at ASC, p.id ASC LIMIT ? OFFSET ?''',
+                (selected_version, selected_version, page_size, offset)).fetchall()
         db.execute('COMMIT')
     except Exception:
         db.execute('ROLLBACK')
         raise
     states, _ = badge_states(db, [row['participant_id'] for row in rows])
-    entries = [{'rank': index + 1, 'playerNumber': row['number'], 'nickname': row['nickname'],
+    entries = [{'rank': offset + index + 1, 'playerNumber': row['number'], 'nickname': row['nickname'],
                 'correctCount': row['correct_count'], 'totalCount': row['total_count'],
                 'quizVersion': row['quiz_version'], 'elapsedSeconds': row['elapsed_seconds'],
                 'submittedAt': row['submitted_at'], 'score': score(row['correct_count'], row['total_count']),
                 'badges': [BADGE_BY_ID[item] for item in states[row['participant_id']]['selected']]}
                for index, row in enumerate(rows)]
-    return {'version': selected_version or VERSION, 'view': 'latest' if latest else 'version', 'entries': entries}
+    return {'version': selected_version or VERSION, 'view': 'latest' if latest else 'version', 'entries': entries,
+            'page': page, 'pageSize': page_size, 'total': total, 'pages': pages}
 
 
 def history(db, body):
@@ -505,14 +516,25 @@ class Handler(BaseHTTPRequestHandler):
         if url.path != '/api/leaderboard':
             return self.respond(404, {'error': '页面不存在。'})
         try:
-            requested = parse_qs(url.query, keep_blank_values=True).get('version')
-            view = parse_qs(url.query, keep_blank_values=True).get('view')
+            params = parse_qs(url.query, keep_blank_values=True)
+            requested = params.get('version')
+            view = params.get('view')
             if requested and len(requested) != 1:
                 raise ApiError('题库版本无效。')
             if view and (view != ['latest'] or requested):
                 raise ApiError('榜单类型无效。')
+            def positive_param(name, default):
+                value = params.get(name)
+                if value is None:
+                    return default
+                if len(value) != 1 or not re.fullmatch(r'[0-9]{1,9}', value[0]):
+                    raise ApiError('榜单页码无效。')
+                return int(value[0])
+            page = positive_param('page', 1)
+            page_size = positive_param('pageSize', 100)
             with closing(database()) as db:
-                self.respond(200, leaderboard(db, requested[0] if requested else None, latest=bool(view)))
+                self.respond(200, leaderboard(db, requested[0] if requested else None, latest=bool(view),
+                                              page=page, page_size=page_size))
         except ApiError as error:
             self.respond(error.status, {'error': str(error)})
         except Exception:
