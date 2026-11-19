@@ -53,6 +53,15 @@ BADGES = [
     {'id': 'five_rounds', 'name': '团本打卡王', 'description': '累计完成 5 轮。', 'icon': 'flag', 'tone': 'teal'},
     {'id': 'three_rounds', 'name': '重开不算输', 'description': '累计完成 3 轮。', 'icon': 'refresh', 'tone': 'red'},
     {'id': 'steady', 'name': '稳如老 T', 'description': '累计 3 轮达到 90 分。', 'icon': 'shield', 'tone': 'teal'},
+    {'id': 'twins_expert', 'name': '双剑指挥家', 'description': '一轮中双剑区间的题目全部答对。', 'icon': 'shield', 'tone': 'red'},
+    {'id': 'spirit_expert', 'name': '超魔灵通关手', 'description': '一轮中超魔灵区间的题目全部答对。', 'icon': 'spark', 'tone': 'gold'},
+    {'id': 'witch_expert', 'name': '魔女观察员', 'description': '一轮中黑风魔女区间的题目全部答对。', 'icon': 'target', 'tone': 'violet'},
+    {'id': 'heal_expert', 'name': '抬血救场王', 'description': '同一轮答对当前题库中指定的五道双剑抬血题。', 'icon': 'heart', 'tone': 'teal'},
+    {'id': 'lamp_expert', 'name': '点灯不迷路', 'description': '同一轮答对当前题库中指定的四道超魔灵染灯题。', 'icon': 'lantern', 'tone': 'gold'},
+    {'id': 'spider_expert', 'name': '蜘蛛清道夫', 'description': '同一轮答对当前题库中指定的五道魔女蜘蛛题。', 'icon': 'spider', 'tone': 'violet'},
+    {'id': 'right_streak', 'name': '一路连对', 'description': '按本轮试卷展示顺序，连续答对 20 题。', 'icon': 'bolt', 'tone': 'gold'},
+    {'id': 'wrong_streak', 'name': '思路去散步', 'description': '按本轮试卷展示顺序，连续答错 5 题。', 'icon': 'wing', 'tone': 'violet'},
+    {'id': 'repeat_wrong', 'name': '老对手又见面', 'description': '同一题库连续上传的 3 轮中，同一道题都答错。', 'icon': 'refresh', 'tone': 'red'},
     {'id': 'comeback', 'name': '咸鱼翻身', 'description': '曾有一轮低于 60 分，之后又有一轮达到 90 分。', 'icon': 'spark', 'tone': 'gold'},
     {'id': 'zero', 'name': '反向满分', 'description': '任意一轮 0 题答对。', 'icon': 'target', 'tone': 'violet'},
     {'id': 'brave', 'name': '胆大先开怪', 'description': '任意一轮低于 60 分，开荒勇气可嘉。', 'icon': 'flame', 'tone': 'red'},
@@ -88,6 +97,13 @@ MISTAKE_RULES = {
     'edge_dancer': {'q099': {'b', 'd'}},
     'spider_tour': {'q100': {'c', 'd'}},
 }
+PRIVATE_BADGES = set(MISTAKE_RULES) | {'wrong_streak', 'repeat_wrong'}
+TOPIC_RULES = {
+    'heal_expert': {'q014', 'q015', 'q016', 'q017', 'q103'},
+    'lamp_expert': {'q045', 'q046', 'q052', 'q090'},
+    'spider_expert': {'q069', 'q070', 'q071', 'q072', 'q094'},
+}
+TOPIC_VERSION = 'peak-spiral-2026-11-18-v10'
 
 
 class ApiError(Exception):
@@ -141,6 +157,14 @@ def initialize():
                 attempt_id TEXT NOT NULL REFERENCES attempts(id) ON DELETE CASCADE,
                 badge_id TEXT NOT NULL,
                 PRIMARY KEY (attempt_id, badge_id)
+            );
+            CREATE TABLE IF NOT EXISTS attempt_analysis (
+                attempt_id TEXT PRIMARY KEY REFERENCES attempts(id) ON DELETE CASCADE
+            );
+            CREATE TABLE IF NOT EXISTS attempt_wrong_questions (
+                attempt_id TEXT NOT NULL REFERENCES attempt_analysis(attempt_id) ON DELETE CASCADE,
+                question_id TEXT NOT NULL,
+                PRIMARY KEY (attempt_id, question_id)
             );
             CREATE INDEX IF NOT EXISTS attempts_version_participant ON attempts(quiz_version, participant_id);
             CREATE INDEX IF NOT EXISTS attempts_participant_time ON attempts(participant_id, submitted_at, id);
@@ -217,6 +241,66 @@ def mistake_badges(answers, version):
             if any(set(answers.get(question_id, [])) & options for question_id, options in rules.items())}
 
 
+def analyze_attempt(answers, version, order):
+    """Only use checked answers; older clients may omit their display order."""
+    questions = BANKS[version]['questions']
+    ids = [question['id'] for question in questions]
+    if order is not None and (not isinstance(order, list) or len(order) != len(ids)
+                              or any(not isinstance(item, str) for item in order)
+                              or len(set(order)) != len(ids) or set(order) != set(ids)):
+        raise ApiError('试卷顺序无效，请刷新后重试。')
+    wrong = {question['id'] for question in questions
+             if set(answers[question['id']]) != set(question['answer'])}
+    earned = set()
+    for section, badge_id in (('twins', 'twins_expert'), ('spirit', 'spirit_expert'),
+                              ('witch', 'witch_expert')):
+        section_ids = {question['id'] for question in questions if question['section'] == section}
+        if section_ids and not (section_ids & wrong):
+            earned.add(badge_id)
+    if version == TOPIC_VERSION:
+        earned.update(badge_id for badge_id, group in TOPIC_RULES.items()
+                      if group <= set(ids) and not group & wrong)
+    if order is not None:
+        right_run = wrong_run = 0
+        for question_id in order:
+            if question_id in wrong:
+                wrong_run += 1
+                right_run = 0
+            else:
+                right_run += 1
+                wrong_run = 0
+            if right_run >= 20:
+                earned.add('right_streak')
+            if wrong_run >= 5:
+                earned.add('wrong_streak')
+    return wrong, earned
+
+
+def repeated_wrong_questions(db, participant_id):
+    """A missing analysis or different bank breaks the upload-order sequence."""
+    recent = db.execute('''SELECT a.id, a.quiz_version, x.attempt_id AS analyzed
+                           FROM attempts a LEFT JOIN attempt_analysis x ON x.attempt_id = a.id
+                           WHERE a.participant_id = ? ORDER BY a.rowid DESC LIMIT 3''',
+                        (participant_id,)).fetchall()
+    if len(recent) != 3 or any(row['quiz_version'] != recent[0]['quiz_version'] or not row['analyzed'] for row in recent):
+        return None, set()
+    wrong_sets = [{row['question_id'] for row in db.execute(
+        'SELECT question_id FROM attempt_wrong_questions WHERE attempt_id = ?', (attempt['id'],))}
+                  for attempt in recent]
+    return recent[0]['quiz_version'], set.intersection(*wrong_sets)
+
+
+def repeated_review(db, participant_id):
+    version, wrong = repeated_wrong_questions(db, participant_id)
+    bank = BANKS.get(version)
+    if not bank or not wrong:
+        return []
+    return [{'id': q['id'], 'section': q['section'], 'question': q['question'],
+             'answer': '；'.join(option['text'] for option in q['options'] if option['id'] in q['answer']),
+             'explanation': q['explanation'], 'currentVersion': version == VERSION}
+            for q in bank['questions'] if q['id'] in wrong]
+
+
 def profile(db, body):
     device, secret_hash = credentials(body)
     nickname = validate_nickname(body.get('nickname'))
@@ -246,6 +330,7 @@ def submit(db, body):
     device, secret_hash = credentials(body)
     submitted_version = body.get('version')
     result = grade(body.get('answers'), submitted_version)
+    wrong, analysis_badges = analyze_attempt(body['answers'], submitted_version, body.get('questionOrder'))
     attempt_id = body.get('attemptId')
     if not isinstance(attempt_id, str) or not re.fullmatch(r'[a-f0-9]{32}', attempt_id):
         raise ApiError('成绩编号无效。')
@@ -274,7 +359,12 @@ def submit(db, body):
                 db.execute('INSERT INTO attempt_completion_times VALUES (?, ?)', (attempt_id, completed_at))
             if elapsed is not None:
                 db.execute('INSERT INTO attempt_timings VALUES (?, ?)', (attempt_id, elapsed))
-            for badge_id in mistake_badges(body['answers'], submitted_version):
+            db.execute('INSERT INTO attempt_analysis VALUES (?)', (attempt_id,))
+            db.executemany('INSERT INTO attempt_wrong_questions VALUES (?, ?)',
+                           ((attempt_id, question_id) for question_id in wrong))
+            if repeated_wrong_questions(db, device)[1]:
+                analysis_badges.add('repeat_wrong')
+            for badge_id in mistake_badges(body['answers'], submitted_version) | analysis_badges:
                 db.execute('INSERT INTO attempt_mistake_badges VALUES (?, ?)', (attempt_id, badge_id))
         triggered = {row['badge_id'] for row in db.execute(
             'SELECT badge_id FROM attempt_mistake_badges WHERE attempt_id = ?', (attempt_id,))}
@@ -546,7 +636,7 @@ def badge_states(db, participant_ids):
                                           if isinstance(item, str) and item in earned))[:MAX_SHOWN_BADGES]
         else:
             # Wrong-answer honors are private unless their owner explicitly displays them.
-            selected = [item for item in ordered if item not in MISTAKE_RULES][:MAX_SHOWN_BADGES]
+            selected = [item for item in ordered if item not in PRIVATE_BADGES][:MAX_SHOWN_BADGES]
         states[participant_id] = {'earned': earned, 'selected': selected}
     return states, fastest
 
@@ -562,7 +652,7 @@ def badges(db, body):
     authenticated(db, device, secret_hash, '请保存昵称，或恢复原来的身份后查看勋章。')
     states, fastest = badge_states(db, [device])
     counts = badge_metrics.counts(db, BADGES, MISTAKE_RULES, badge_states, honor_boards, HONOR_CATEGORIES)
-    return badge_catalog(states[device], fastest, counts)
+    return {**badge_catalog(states[device], fastest, counts), 'repeatQuestions': repeated_review(db, device)}
 
 
 def select_badges(db, body):
@@ -588,7 +678,8 @@ def select_badges(db, body):
         raise
     states[device]['selected'] = selected
     counts = badge_metrics.counts(db, BADGES, MISTAKE_RULES, badge_states, honor_boards, HONOR_CATEGORIES)
-    return {'ok': True, **badge_catalog(states[device], fastest, counts)}
+    return {'ok': True, **badge_catalog(states[device], fastest, counts),
+            'repeatQuestions': repeated_review(db, device)}
 
 
 def ranked_leaderboard_rows(db, selected_version, limit, offset=0, participant_id=None):

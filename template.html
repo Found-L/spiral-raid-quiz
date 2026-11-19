@@ -123,6 +123,7 @@
         <p id="guide-intro" class="guide-intro"></p>
         <nav id="guide-chapters" class="guide-chapters" aria-label="切换首领"></nav>
         <nav id="guide-timeline" class="guide-timeline" aria-label="阶段索引"></nav>
+        <aside id="guard-notes" class="guard-notes" hidden></aside>
         <div id="guide-stages"></div>
         <button class="btn btn-primary" type="button" data-action="start">开始机制考核 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button>
       </section>
@@ -150,8 +151,9 @@
         <p class="badges-intro">答题会自动解锁勋章。选出你喜欢的最多 3 枚，展示在排行榜的昵称下。</p>
         <output id="badges-status" class="badges-status" aria-live="polite"></output>
         <div class="badges-actions"><button id="badges-save" class="btn btn-primary" type="button" data-action="save-badges" hidden>保存展示</button><button id="badges-reload" class="btn btn-ghost" type="button" data-action="reload-badges" hidden>刷新勋章</button><button id="badges-profile" class="btn btn-primary" type="button" data-action="badges-profile" hidden>设置昵称或恢复身份</button></div>
+        <details id="repeat-review" class="repeat-review" hidden><summary><span>✦ 最近三轮的反复错题</span><strong id="repeat-review-count"></strong></summary><p>仅你可见，按同一题库最近三次上传的答卷统计。</p><div id="repeat-review-list" class="repeat-review-list"></div></details>
         <div id="badges-grid" class="badges-grid"></div>
-        <p class="badges-note">人数按已上传且保留的身份统计。纪录勋章会随排名变化，曾获得人数根据现存答卷和纪录留档计算，已删除的资料无法还原。错题勋章只统计保存了选项的答卷；未记录用时的成绩不参与用时勋章。</p>
+        <p class="badges-note">人数按已上传且保留的身份统计。纪录勋章会随排名变化。首领、专项和连续答题勋章根据新版提交的逐题结果计算，旧成绩无法还原逐题记录；连对、连错以试卷展示顺序为准，重复错题按上传顺序计算。趣味错题勋章需自行选择才会展示。未记录用时的成绩不参与用时勋章。</p>
       </section>
 
       <section id="exam-view" class="exam-view hidden" aria-label="机制考核">

@@ -194,6 +194,8 @@ const wait = () => new Promise(resolve => setTimeout(resolve, 30));
   assert.match(timed.getElement('exam-timer').textContent, /01:1[34]/);
   timed.click('submit'); await wait();
   assert.ok(timed.submissions[0].elapsedSeconds >= 73 && timed.submissions[0].elapsedSeconds <= 74);
+  assert.deepEqual(new Set(timed.submissions[0].questionOrder), new Set(bank.questions.map(q => q.id)));
+  assert.equal(timed.submissions[0].questionOrder.length, bank.questions.length);
   assert.match(timed.getElement('result-detail').textContent, /用时 01:1[34]/);
 
   const untimed = createHarness('https://www.lysue.com', {
