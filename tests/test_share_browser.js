@@ -112,6 +112,13 @@ function shareId(url) { return new URL(url).searchParams.get('share'); }
     assert.equal(await visitorPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
     const box = await visitorPage.locator('#share-dialog').boundingBox();
     assert(box && box.x >= 0 && box.x + box.width <= 320, 'share dialog fits a narrow screen');
+    for (const width of [320, 390, 540]) {
+      await visitorPage.setViewportSize({width,height:700});
+      const frame = await visitorPage.locator('#share-artwork').boundingBox();
+      const poster = await visitorPage.locator('#share-poster').boundingBox();
+      assert(frame && poster && Math.abs(frame.width - poster.width) <= 2, `poster fills its frame at ${width}px`);
+    }
+    await visitorPage.setViewportSize({width:320,height:700});
     if (screenshotDir) await visitorPage.screenshot({path:path.join(screenshotDir, 'share-rank-mobile.png')});
     await visitorPage.goto(badgeUrl);
     await visitorPage.locator('#share-dialog[open] #share-content:not([hidden])').waitFor();

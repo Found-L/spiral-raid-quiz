@@ -4,7 +4,7 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
   const canvas = $('share-poster');
   const context = canvas.getContext('2d');
   const backgroundSource = '/*__SHARE_BACKGROUND__*/';
-  const tones = {badge:['#ffd78b','#6fe8dc'], ranking:['#ffca76','#ff8b63'], honor:['#a6f7e9','#e9c078']};
+  const tones = {badge:['#eacb91','#83d2bf'], ranking:['#eac78d','#81c8b8'], honor:['#a5e0d1','#dfc18d']};
   let current = null, requestId = 0, working = false;
   let backgroundPromise;
 
@@ -74,11 +74,15 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
   }
 
   function drawFrame(background, snapshot) {
-    if (background) context.drawImage(background, 0, 0, 1080, 1350);
+    if (background) {
+      context.save(); context.filter = 'saturate(.82)';
+      context.drawImage(background, 0, 0, 1080, 1350); context.restore();
+    }
     else { context.fillStyle = '#101c26'; context.fillRect(0, 0, 1080, 1350); }
+    context.fillStyle = 'rgba(18, 60, 55, .16)'; context.fillRect(0, 0, 1080, 1350);
     const shade = context.createLinearGradient(0, 0, 0, 1350);
-    shade.addColorStop(0, 'rgba(4,10,18,.38)'); shade.addColorStop(.34, 'rgba(4,12,22,.32)');
-    shade.addColorStop(.68, 'rgba(3,10,19,.64)'); shade.addColorStop(1, 'rgba(4,9,17,.48)');
+    shade.addColorStop(0, 'rgba(5,17,20,.38)'); shade.addColorStop(.34, 'rgba(6,19,23,.32)');
+    shade.addColorStop(.68, 'rgba(3,15,19,.64)'); shade.addColorStop(1, 'rgba(5,15,19,.48)');
     context.fillStyle = shade; context.fillRect(0, 0, 1080, 1350);
     const [primary, secondary] = tones[snapshot.kind];
     context.save();
@@ -88,16 +92,16 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     drawOrbits(primary, secondary);
     context.save();
     context.fillStyle = primary; context.shadowColor = primary; context.shadowBlur = 14;
-    for (let i = 0; i < 32; i++) {
+    for (let i = 0; i < 24; i++) {
       const x = 85 + ((i * 197 + 61) % 910), y = 200 + ((i * 331 + 41) % 950);
-      context.globalAlpha = .3 + (i % 3) * .18;
+      context.globalAlpha = .27 + (i % 3) * .14;
       context.beginPath(); context.arc(x, y, i % 5 === 0 ? 3 : 1.5, 0, Math.PI * 2); context.fill();
     }
     context.restore();
     context.textAlign = 'center'; context.shadowColor = '#02090f'; context.shadowBlur = 10;
-    context.fillStyle = '#fff0ce'; context.font = '700 28px "Microsoft YaHei", sans-serif';
+    context.fillStyle = '#fff0ce'; context.font = '700 36px "Microsoft YaHei", sans-serif';
     context.fillText('螺旋寺院  ·  团本机制考核', 540, 128);
-    context.font = '600 20px sans-serif'; context.fillStyle = '#d5c39f'; context.fillText('RAID HONORS  /  SHARE THE MOMENT', 540, 168);
+    context.font = '600 25px sans-serif'; context.fillStyle = '#e5d4b1'; context.fillText('RAID HONORS  /  SHARE THE MOMENT', 540, 170);
     context.shadowBlur = 0;
   }
 
@@ -139,15 +143,17 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     context.textAlign = 'center'; context.shadowColor = '#020910'; context.shadowBlur = 12;
     context.fillStyle = tones[snapshot.kind][0]; context.font = '700 28px "Microsoft YaHei", sans-serif'; context.fillText(label, 540, 718);
     context.fillStyle = '#fff4df'; context.font = '700 76px "Microsoft YaHei", sans-serif'; wrappedText(title, 540, 808, 850, 84, 1);
-    context.fillStyle = '#e1e7da'; context.font = '500 32px "Microsoft YaHei", sans-serif'; wrappedText(detail, 540, 879, 800, 48, 2);
+    context.fillStyle = '#e1e7da'; context.font = '500 35px "Microsoft YaHei", sans-serif'; wrappedText(detail, 540, 879, 800, 48, 2);
     context.shadowBlur = 0;
     context.strokeStyle = 'rgba(245,216,160,.55)'; context.lineWidth = 1.5;
     context.beginPath(); context.moveTo(270, 966); context.lineTo(810, 966); context.stroke();
     context.fillStyle = '#fff0d8'; context.font = '700 42px "Microsoft YaHei", sans-serif'; wrappedText(snapshot.nickname, 540, 1035, 770, 46, 1);
-    context.fillStyle = '#cad8cc'; context.font = '500 25px sans-serif'; context.fillText(formatPlayerNumber(snapshot.playerNumber), 540, 1080);
+    context.fillStyle = '#d7e1d6'; context.font = '500 29px sans-serif'; context.fillText(formatPlayerNumber(snapshot.playerNumber), 540, 1080);
     const date = new Date(snapshot.createdAt).toLocaleDateString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit'});
-    context.fillStyle = '#e3d0ab'; context.font = '500 24px "Microsoft YaHei", sans-serif'; context.fillText(`记录于 ${date}  ·  分享时的记录`, 540, 1195);
-    context.fillStyle = '#c1cbb8'; context.font = '500 21px sans-serif'; context.fillText('螺旋寺院 · 一起练习，一起进步', 540, 1237);
+    context.shadowColor = '#020910'; context.shadowBlur = 10;
+    context.fillStyle = '#f1e1c0'; context.font = '500 30px "Microsoft YaHei", sans-serif'; context.fillText(`记录于 ${date}  ·  分享时的记录`, 540, 1195);
+    context.fillStyle = '#d7e1d2'; context.font = '500 26px "Microsoft YaHei", sans-serif'; context.fillText('螺旋寺院 · 一起练习，一起进步', 540, 1242);
+    context.shadowBlur = 0;
     canvas.setAttribute('aria-label', `${snapshot.nickname}，${label}，${title}。${detail}。记录于 ${date}。`);
   }
 
