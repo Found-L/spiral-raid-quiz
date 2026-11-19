@@ -2,7 +2,8 @@
   'use strict';
   const localPreview = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('api')==='local';
   const previewPort = new URLSearchParams(location.search).get('api-port');
-  const API = localPreview ? `http://127.0.0.1:${/^\d{1,5}$/.test(previewPort || '') ? previewPort : '8787'}` : 'https://www.lysue.com/spiral-raid-quiz';
+  const localApiPort = /^\d{1,5}$/.test(previewPort || '') ? previewPort : '8787';
+  const API = localPreview ? `http://127.0.0.1:${localApiPort}` : 'https://www.lysue.com/spiral-raid-quiz';
   const bank = JSON.parse(document.getElementById('question-bank').textContent);
   const bankQuestions = bank.questions;
   let qs = bankQuestions;
@@ -93,9 +94,11 @@
   const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame','bomb','spider','laser','lantern','heart','compass','orb']);
   const badgeTones = new Set(['gold','teal','red','violet']);
   const badgeTone = badge => badgeTones.has(badge.tone) ? badge.tone : 'gold';
-  const badgeIcon = badge => badge.icon === 'bomb'
-    ? `<svg class="icon badge-bomb-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="30" cy="37" r="21" fill="#ec7358" stroke="#ffd1a0" stroke-width="2"/><path d="M39 18c1-6 4-9 10-10" fill="none" stroke="#ffda8c" stroke-width="3" stroke-linecap="round"/><path d="M50 3v5m-4-1 4 2 4-2m-2 5 3 2" fill="none" stroke="#fff2bb" stroke-width="2.3" stroke-linecap="round"/><path d="M17 30q4-4 8-1m7 0q4-4 8-1" fill="none" stroke="#4c2525" stroke-width="2.5" stroke-linecap="round"/><circle cx="21" cy="34" r="2.4" fill="#3b2222" stroke="none"/><circle cx="37" cy="34" r="2.4" fill="#3b2222" stroke="none"/><path d="M22 41q8 10 17 0Z" fill="#53242c" stroke="none"/><path d="M25 42q5 3 11 0" fill="none" stroke="#fff0c7" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="39" r="2.5" fill="#ffb192" stroke="none"/><circle cx="43" cy="39" r="2.5" fill="#ffb192" stroke="none"/></svg>`
-    : `<svg class="icon" aria-hidden="true"><use href="#badge-${badgeIcons.has(badge.icon) ? badge.icon : 'spark'}"/></svg>`;
+  function badgeIcon(badge) {
+    if (badge.icon === 'bomb') return `<svg class="icon badge-bomb-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="30" cy="37" r="21" fill="#ec7358" stroke="#ffd1a0" stroke-width="2"/><path d="M39 18c1-6 4-9 10-10" fill="none" stroke="#ffda8c" stroke-width="3" stroke-linecap="round"/><path d="M50 3v5m-4-1 4 2 4-2m-2 5 3 2" fill="none" stroke="#fff2bb" stroke-width="2.3" stroke-linecap="round"/><path d="M17 30q4-4 8-1m7 0q4-4 8-1" fill="none" stroke="#4c2525" stroke-width="2.5" stroke-linecap="round"/><circle cx="21" cy="34" r="2.4" fill="#3b2222" stroke="none"/><circle cx="37" cy="34" r="2.4" fill="#3b2222" stroke="none"/><path d="M22 41q8 10 17 0Z" fill="#53242c" stroke="none"/><path d="M25 42q5 3 11 0" fill="none" stroke="#fff0c7" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="39" r="2.5" fill="#ffb192" stroke="none"/><circle cx="43" cy="39" r="2.5" fill="#ffb192" stroke="none"/></svg>`;
+    const symbol = badgeIcons.has(badge.icon) ? badge.icon : 'spark';
+    return `<svg class="icon" aria-hidden="true"><use href="#badge-${symbol}"/></svg>`;
+  }
   const badgeChip = badge => `<span class="badge-chip tone-${badgeTone(badge)}" title="${escape(badge.description || '')}">${badgeIcon(badge)}${escape(badge.name)}</span>`;
   const sectionOf = (id) => SECTIONS.find(x=>x.id===id);
   const formatPlayerNumber = (number) => Number.isSafeInteger(number) && number > 0
@@ -274,17 +277,25 @@
     }
     return nickname;
   }
-  function finishProfile(stored, localOnly=false) {
-    const updated = {nickname:stored.nickname, playerNumber:stored.playerNumber, localOnly};
-    const switching = candidate.deviceId !== identity.deviceId;
-    if (switching) pauseTimer();
-    if (!save(':identity', candidate)) { if (switching) resumeTimer(); $('profile-error').textContent='浏览器无法保存身份，请检查存储设置。'; return; }
+  function saveCandidateProfile(updated, switching) {
+    if (!save(':identity', candidate)) {
+      if (switching) resumeTimer();
+      $('profile-error').textContent='浏览器无法保存身份，请检查存储设置。';
+      return false;
+    }
     if (!save(':profile', updated)) {
       save(':identity', identity);
       if (switching) resumeTimer();
       $('profile-error').textContent='浏览器无法保存昵称，请检查存储设置。';
-      return;
+      return false;
     }
+    return true;
+  }
+  function finishProfile(stored, localOnly=false) {
+    const updated = {nickname:stored.nickname, playerNumber:stored.playerNumber, localOnly};
+    const switching = candidate.deviceId !== identity.deviceId;
+    if (switching) pauseTimer();
+    if (!saveCandidateProfile(updated, switching)) return;
     if(switching) { remove(':pending');remove(':draft');remove(':last-result');draft={version:bank.version,index:0,answers:{}};index=0;qs=bankQuestions; }
     identity=candidate; profile=updated; updateProfileLabel();
     if (switching && view === 'exam') setView('home');
@@ -365,8 +376,7 @@
       figure.dataset.question = q.id;
       const card = $('question-card');
       card.classList.remove('question-enter');
-      void card.offsetWidth;
-      card.classList.add('question-enter');
+      requestAnimationFrame(() => card.classList.add('question-enter'));
     }
     $('answered-count').textContent=String(done); $('progress-fill').style.width=`${100*done/qs.length}%`;
     const wrap=$('question-options'); wrap.replaceChildren();
@@ -978,7 +988,17 @@
   }
   async function deleteProfile() {
     if(!profile || !confirm('确认删除你的线上资料和全部成绩？删除后无法恢复。'))return;
-    try { await request('/api/delete-profile',identity); if(view==='exam')setView('home'); remove(':profile');remove(':pending');remove(':last-result');remove(':draft');draft={version:bank.version,index:0,answers:{}};index=0;qs=bankQuestions;profile=null;identity=makeIdentity();candidate=identity;save(':identity',identity);updateProfileLabel();closeProfile();refreshRanking();if(view==='history')loadHistory();toast('线上资料与成绩已删除。'); }
+    try {
+      await request('/api/delete-profile',identity);
+      if(view==='exam') setView('home');
+      remove(':profile'); remove(':pending'); remove(':last-result'); remove(':draft');
+      draft={version:bank.version,index:0,answers:{}}; index=0; qs=bankQuestions;
+      profile=null; identity=makeIdentity(); candidate=identity; save(':identity',identity);
+      updateProfileLabel(); closeProfile();
+      await refreshRanking();
+      if(view==='history') await loadHistory();
+      toast('线上资料与成绩已删除。');
+    }
     catch(err){$('profile-error').textContent=err.message;}
   }
   const featureActions = new Map([

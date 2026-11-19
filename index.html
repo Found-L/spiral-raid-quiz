@@ -262,19 +262,19 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .badges-intro { max-width: 700px; margin: 0; color: var(--muted); }
 .badges-status { display: block; margin: 20px 0 14px; color: #e1c9a0; font-size: 13px; }
 .badges-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.badge-card { position: relative; min-width: 0; min-height: 167px; display: flex; align-items: flex-start; gap: 15px; padding: 20px 17px; text-align: left; color: var(--text); background: linear-gradient(145deg, #1c2930, #131d25 80%); border: 1px solid #43605c; border-radius: 10px; transition: border-color .18s, background .18s, transform .18s, box-shadow .18s; }
+.badge-card { position: relative; overflow: hidden; min-width: 0; min-height: 167px; display: flex; align-items: flex-start; gap: 15px; padding: 20px 17px; text-align: left; color: var(--text); background: radial-gradient(ellipse at 15% 0%, color-mix(in srgb, var(--badge-color) 14%, transparent), transparent 48%), linear-gradient(145deg, #1c2930, #111923 85%); border: 1px solid #43605c; border-radius: 10px; transition: border-color .18s, background .18s, transform .18s, box-shadow .18s; }
 .badge-card.earned:hover { border-color: var(--badge-color); transform: translateY(-2px); box-shadow: 0 8px 25px #0003; }
 .badge-card.selected { border: 2px solid #e9c77f; padding: 19px 16px; background: linear-gradient(135deg, #3b3428, #202a2b 60%, #18232a); box-shadow: inset 0 0 22px #e8c27c12, 0 0 0 3px #e7c27415; }
 .badge-card.locked { border: 1px dashed #38444a; background: #111a21; cursor: default; }
 .tone-gold { --badge-color: #e5c488; }.tone-teal { --badge-color: #93cec4; }.tone-red { --badge-color: #e7a092; }.tone-violet { --badge-color: #c9b8e6; }
-.badge-crest { width: 58px; height: 64px; flex: none; display: grid; place-items: center; color: var(--badge-color); border: 1px solid currentColor; border-radius: 20px 20px 25px 25px; background: radial-gradient(circle at 50% 22%, color-mix(in srgb, var(--badge-color) 25%, transparent), transparent 70%), #172128; box-shadow: inset 0 0 0 4px #0a1016aa, 0 5px 12px #0004; }
-.badge-crest .icon { width: 29px; height: 29px; stroke-width: 1.65; }
+.badge-crest { position: relative; isolation: isolate; width: 68px; height: 72px; flex: none; display: grid; place-items: center; color: var(--badge-color); border: 1px solid color-mix(in srgb, var(--badge-color) 80%, #fff); border-radius: 24px 24px 28px 28px; background: radial-gradient(circle at 40% 25%, color-mix(in srgb, var(--badge-color) 42%, transparent), transparent 62%), linear-gradient(145deg, #303440, #101821 78%); box-shadow: inset 0 0 0 4px #111922, inset 0 0 0 5px color-mix(in srgb, var(--badge-color) 45%, transparent), 0 7px 16px #0007; }
+.badge-crest .icon { width: 31px; height: 31px; stroke-width: 1.65; filter: drop-shadow(0 2px 5px #000b); }
 .badge-info { display: grid; align-content: start; gap: 7px; min-width: 0; }
 .badge-title { color: var(--badge-color); font-weight: 750; font-size: 16px; }
 .badge-description { color: #cbd2cc; font-size: 12px; line-height: 1.65; }
 .badge-state { justify-self: start; display: inline-flex; align-items: center; margin-top: 3px; padding: 3px 9px; border: 1px solid #668f80; border-radius: 999px; color: #bce4d3; background: #234239; font-size: 11px; font-weight: 700; line-height: 1.4; }
 .badge-card.selected .badge-state { color: #251d10; border-color: #f2d99f; background: #f1d49a; }
-.badge-card.locked .badge-crest { color: #76838a; filter: grayscale(1); background: #182127; box-shadow: inset 0 0 0 4px #0a1016aa; }
+.badge-card.locked .badge-crest { color: #76838a; filter: grayscale(.85); opacity: .7; background: #182127; box-shadow: inset 0 0 0 4px #0a1016aa; }
 .badge-card.locked .badge-title { color: #9ba7aa; }
 .badge-card.locked .badge-description { color: #9ca8a8; }
 .badge-card.locked .badge-state { color: #a8b1b3; border-color: #48565a; background: #263137; }
@@ -353,16 +353,12 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .map-rotating-danger { transform-box: view-box; transform-origin: 50% 50%; }
 .map-orb { transform-box: fill-box; transform-origin: center; }
 
-.badge-card { overflow: hidden; background: radial-gradient(ellipse at 15% 0%, color-mix(in srgb, var(--badge-color) 14%, transparent), transparent 48%), linear-gradient(145deg, #1c2930, #111923 85%); }
 .badge-card:before { content: ''; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, var(--badge-color), transparent); opacity: .65; }
 .badge-card.locked:before { opacity: .16; }
-.badge-crest { position: relative; isolation: isolate; width: 68px; height: 72px; border-radius: 24px 24px 28px 28px; border: 1px solid color-mix(in srgb, var(--badge-color) 80%, #fff); background: radial-gradient(circle at 40% 25%, color-mix(in srgb, var(--badge-color) 42%, transparent), transparent 62%), linear-gradient(145deg, #303440, #101821 78%); box-shadow: inset 0 0 0 4px #111922, inset 0 0 0 5px color-mix(in srgb, var(--badge-color) 45%, transparent), 0 7px 16px #0007; }
 .badge-crest:before { content: ''; position: absolute; z-index: -1; inset: 9px; border: 1px dashed color-mix(in srgb, var(--badge-color) 60%, transparent); border-radius: 50%; }
 .badge-crest:after { content: '✦'; position: absolute; top: -6px; right: -5px; color: var(--badge-color); font-size: 15px; text-shadow: 0 0 10px currentColor; }
-.badge-crest .icon { width: 31px; height: 31px; filter: drop-shadow(0 2px 5px #000b); }
 .badge-crest .badge-bomb-art { width: 52px; height: 52px; }
 .badge-card.locked .badge-crest:after { opacity: .35; }
-.badge-card.locked .badge-crest { filter: grayscale(.85); opacity: .7; }
 .badge-card.selected .badge-crest { box-shadow: inset 0 0 0 4px #111922, inset 0 0 0 5px var(--badge-color), 0 0 18px color-mix(in srgb, var(--badge-color) 24%, transparent); }
 .badge-card.selected:after { content: '✓'; position: absolute; top: 12px; right: 14px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; color: #261b0e; background: #f3d18d; font-size: 13px; font-weight: 800; }
 .badge-card.selected .badge-info { padding-right: 17px; }
@@ -539,7 +535,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         <div class="exam-top"><button class="back-button" type="button" data-action="leave-exam"><span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-left"/></svg></span>返回首页</button><div class="exam-meta"><span>螺旋寺院 · 机制考核</span><strong id="exam-profile"></strong><span id="exam-timer">用时 —</span></div><button class="link-button" type="button" data-action="profile">修改资料</button></div>
         <output id="draft-update-notice" class="draft-update-notice" hidden></output>
         <div class="exam-layout"><aside class="exam-sidebar"><p class="eyebrow">YOUR PROGRESS</p><h2>考核进度</h2><div class="progress-number"><strong id="answered-count">0</strong><span id="total-count"></span></div><div class="progress-track"><div id="progress-fill"></div></div><p class="muted small">答案自动保存在当前浏览器。离开答题页自动暂停计时。</p><div id="section-list" class="section-list"></div><button class="btn btn-secondary sidebar-submit" type="button" data-action="submit">交卷并查看成绩</button><button class="exam-restart" type="button" data-action="restart"><svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg>重新考核</button></aside>
-          <div class="question-area"><div class="question-bar"><span id="question-chapter">01 / 双剑</span><span id="question-number"></span></div><div id="question-card" class="question-card"><div class="question-label"><span id="question-type">单选题</span><span id="question-role">岗位</span></div><h2 id="question-text"></h2><p id="question-help" class="question-help"></p><div id="question-diagram" hidden></div><div id="question-options" class="options"></div><div class="question-controls"><button class="btn btn-ghost" type="button" data-action="previous"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"/></svg>上一题</button><button id="next-button" class="btn btn-primary" type="button" data-action="next"><span id="next-button-label">下一题</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div></div><div class="navigator-title"><span>题目导航</span><span class="muted small">选择数字可快速跳题</span></div><div id="question-nav" class="question-nav" aria-label="题目导航"></div></div>
+          <div class="question-area"><div class="question-bar"><span id="question-chapter">01 / 双剑</span><span id="question-number"></span></div><div id="question-card" class="question-card"><div class="question-label"><span id="question-type">单选题</span><span id="question-role">岗位</span></div><h2 id="question-text">准备题目…</h2><p id="question-help" class="question-help"></p><div id="question-diagram" hidden></div><div id="question-options" class="options"></div><div class="question-controls"><button class="btn btn-ghost" type="button" data-action="previous"><svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"/></svg>上一题</button><button id="next-button" class="btn btn-primary" type="button" data-action="next"><span id="next-button-label">下一题</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div></div><div class="navigator-title"><span>题目导航</span><span class="muted small">选择数字可快速跳题</span></div><div id="question-nav" class="question-nav" aria-label="题目导航"></div></div>
         </div>
       </section>
 
@@ -3931,7 +3927,8 @@ function drawRaidDiagram(key, caption, questionId = null) {
   'use strict';
   const localPreview = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('api')==='local';
   const previewPort = new URLSearchParams(location.search).get('api-port');
-  const API = localPreview ? `http://127.0.0.1:${/^\d{1,5}$/.test(previewPort || '') ? previewPort : '8787'}` : 'https://www.lysue.com/spiral-raid-quiz';
+  const localApiPort = /^\d{1,5}$/.test(previewPort || '') ? previewPort : '8787';
+  const API = localPreview ? `http://127.0.0.1:${localApiPort}` : 'https://www.lysue.com/spiral-raid-quiz';
   const bank = JSON.parse(document.getElementById('question-bank').textContent);
   const bankQuestions = bank.questions;
   let qs = bankQuestions;
@@ -4022,9 +4019,11 @@ function drawRaidDiagram(key, caption, questionId = null) {
   const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame','bomb','spider','laser','lantern','heart','compass','orb']);
   const badgeTones = new Set(['gold','teal','red','violet']);
   const badgeTone = badge => badgeTones.has(badge.tone) ? badge.tone : 'gold';
-  const badgeIcon = badge => badge.icon === 'bomb'
-    ? `<svg class="icon badge-bomb-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="30" cy="37" r="21" fill="#ec7358" stroke="#ffd1a0" stroke-width="2"/><path d="M39 18c1-6 4-9 10-10" fill="none" stroke="#ffda8c" stroke-width="3" stroke-linecap="round"/><path d="M50 3v5m-4-1 4 2 4-2m-2 5 3 2" fill="none" stroke="#fff2bb" stroke-width="2.3" stroke-linecap="round"/><path d="M17 30q4-4 8-1m7 0q4-4 8-1" fill="none" stroke="#4c2525" stroke-width="2.5" stroke-linecap="round"/><circle cx="21" cy="34" r="2.4" fill="#3b2222" stroke="none"/><circle cx="37" cy="34" r="2.4" fill="#3b2222" stroke="none"/><path d="M22 41q8 10 17 0Z" fill="#53242c" stroke="none"/><path d="M25 42q5 3 11 0" fill="none" stroke="#fff0c7" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="39" r="2.5" fill="#ffb192" stroke="none"/><circle cx="43" cy="39" r="2.5" fill="#ffb192" stroke="none"/></svg>`
-    : `<svg class="icon" aria-hidden="true"><use href="#badge-${badgeIcons.has(badge.icon) ? badge.icon : 'spark'}"/></svg>`;
+  function badgeIcon(badge) {
+    if (badge.icon === 'bomb') return `<svg class="icon badge-bomb-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="30" cy="37" r="21" fill="#ec7358" stroke="#ffd1a0" stroke-width="2"/><path d="M39 18c1-6 4-9 10-10" fill="none" stroke="#ffda8c" stroke-width="3" stroke-linecap="round"/><path d="M50 3v5m-4-1 4 2 4-2m-2 5 3 2" fill="none" stroke="#fff2bb" stroke-width="2.3" stroke-linecap="round"/><path d="M17 30q4-4 8-1m7 0q4-4 8-1" fill="none" stroke="#4c2525" stroke-width="2.5" stroke-linecap="round"/><circle cx="21" cy="34" r="2.4" fill="#3b2222" stroke="none"/><circle cx="37" cy="34" r="2.4" fill="#3b2222" stroke="none"/><path d="M22 41q8 10 17 0Z" fill="#53242c" stroke="none"/><path d="M25 42q5 3 11 0" fill="none" stroke="#fff0c7" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="39" r="2.5" fill="#ffb192" stroke="none"/><circle cx="43" cy="39" r="2.5" fill="#ffb192" stroke="none"/></svg>`;
+    const symbol = badgeIcons.has(badge.icon) ? badge.icon : 'spark';
+    return `<svg class="icon" aria-hidden="true"><use href="#badge-${symbol}"/></svg>`;
+  }
   const badgeChip = badge => `<span class="badge-chip tone-${badgeTone(badge)}" title="${escape(badge.description || '')}">${badgeIcon(badge)}${escape(badge.name)}</span>`;
   const sectionOf = (id) => SECTIONS.find(x=>x.id===id);
   const formatPlayerNumber = (number) => Number.isSafeInteger(number) && number > 0
@@ -4203,17 +4202,25 @@ function drawRaidDiagram(key, caption, questionId = null) {
     }
     return nickname;
   }
-  function finishProfile(stored, localOnly=false) {
-    const updated = {nickname:stored.nickname, playerNumber:stored.playerNumber, localOnly};
-    const switching = candidate.deviceId !== identity.deviceId;
-    if (switching) pauseTimer();
-    if (!save(':identity', candidate)) { if (switching) resumeTimer(); $('profile-error').textContent='浏览器无法保存身份，请检查存储设置。'; return; }
+  function saveCandidateProfile(updated, switching) {
+    if (!save(':identity', candidate)) {
+      if (switching) resumeTimer();
+      $('profile-error').textContent='浏览器无法保存身份，请检查存储设置。';
+      return false;
+    }
     if (!save(':profile', updated)) {
       save(':identity', identity);
       if (switching) resumeTimer();
       $('profile-error').textContent='浏览器无法保存昵称，请检查存储设置。';
-      return;
+      return false;
     }
+    return true;
+  }
+  function finishProfile(stored, localOnly=false) {
+    const updated = {nickname:stored.nickname, playerNumber:stored.playerNumber, localOnly};
+    const switching = candidate.deviceId !== identity.deviceId;
+    if (switching) pauseTimer();
+    if (!saveCandidateProfile(updated, switching)) return;
     if(switching) { remove(':pending');remove(':draft');remove(':last-result');draft={version:bank.version,index:0,answers:{}};index=0;qs=bankQuestions; }
     identity=candidate; profile=updated; updateProfileLabel();
     if (switching && view === 'exam') setView('home');
@@ -4294,8 +4301,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       figure.dataset.question = q.id;
       const card = $('question-card');
       card.classList.remove('question-enter');
-      void card.offsetWidth;
-      card.classList.add('question-enter');
+      requestAnimationFrame(() => card.classList.add('question-enter'));
     }
     $('answered-count').textContent=String(done); $('progress-fill').style.width=`${100*done/qs.length}%`;
     const wrap=$('question-options'); wrap.replaceChildren();
@@ -4907,7 +4913,17 @@ function drawRaidDiagram(key, caption, questionId = null) {
   }
   async function deleteProfile() {
     if(!profile || !confirm('确认删除你的线上资料和全部成绩？删除后无法恢复。'))return;
-    try { await request('/api/delete-profile',identity); if(view==='exam')setView('home'); remove(':profile');remove(':pending');remove(':last-result');remove(':draft');draft={version:bank.version,index:0,answers:{}};index=0;qs=bankQuestions;profile=null;identity=makeIdentity();candidate=identity;save(':identity',identity);updateProfileLabel();closeProfile();refreshRanking();if(view==='history')loadHistory();toast('线上资料与成绩已删除。'); }
+    try {
+      await request('/api/delete-profile',identity);
+      if(view==='exam') setView('home');
+      remove(':profile'); remove(':pending'); remove(':last-result'); remove(':draft');
+      draft={version:bank.version,index:0,answers:{}}; index=0; qs=bankQuestions;
+      profile=null; identity=makeIdentity(); candidate=identity; save(':identity',identity);
+      updateProfileLabel(); closeProfile();
+      await refreshRanking();
+      if(view==='history') await loadHistory();
+      toast('线上资料与成绩已删除。');
+    }
     catch(err){$('profile-error').textContent=err.message;}
   }
   const featureActions = new Map([
