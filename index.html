@@ -665,6 +665,56 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   .honor-detail-list li > small { padding: 3px 5px; }
   .honor-detail-value { font-size: 12px; }
 }
+
+.badge-people { color: #a6b9b3; font-size: 12px; line-height: 1.5; }
+.rank-social { margin-top: 9px; max-width: 540px; display: grid; gap: 5px; }
+.rank-social-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.rank-social-open { display: flex; align-items: center; gap: 12px; width: fit-content; max-width: 100%; padding: 3px 0; border: 0; background: transparent; color: #d8c497; font-size: 12px; text-align: left; }
+.rank-social-open:hover { color: #ffe3ab; }
+.rank-social-reactions { display: flex; flex-wrap: wrap; gap: 8px; color: #d7d9ce; }
+.social-preview { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; width: fit-content; max-width: 100%; padding: 0; border: 0; background: transparent; color: #aab7af; font-size: 12px; line-height: 1.5; text-align: left; }
+.social-preview b { color: #d3be91; font-size: 11px; }
+.social-preview small { color: #d7c9a8; white-space: nowrap; }
+.social-dialog { width: min(94vw, 620px); max-height: min(90vh, 900px); padding: clamp(18px, 3vw, 30px); }
+.social-dialog .eyebrow { margin-bottom: 8px; }
+.social-dialog h2 { margin-bottom: 2px; }
+.social-section-label { margin: 22px 0 8px; color: #d6c39d; font-weight: 700; }
+.social-reaction-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.social-reaction-summary { display: flex; flex-wrap: wrap; gap: 10px; color: #c1cfc3; font-size: 13px; }
+.social-reactions { display: grid; gap: 12px; margin-top: 12px; padding: 14px; border: 1px solid #485852; border-radius: 7px; background: #101a1e; }
+.social-reaction-group > span { display: block; margin-bottom: 6px; color: #b9c3b9; font-size: 12px; }
+.social-reaction-group > div { display: flex; flex-wrap: wrap; gap: 7px; }
+.social-my-reaction, .social-reaction-hint { margin: 7px 0 0; color: #a9b6ac; font-size: 12px; }
+.social-reactions button, .social-reaction-bar button, .social-sort button, .social-pages button, .social-comment-actions button { border: 1px solid #485852; border-radius: 5px; background: #192622; color: #e0e4da; padding: 5px 10px; font-size: 12px; }
+.social-reactions button { min-width: 58px; font-size: 17px; }
+.social-reactions button span { font-size: 12px; }
+.social-reactions button[aria-pressed="true"], .social-sort button[aria-pressed="true"], .social-comment-actions button[aria-pressed="true"] { color: #f4d998; border-color: #d4b778; background: #3b3425; }
+.social-dialog button:disabled { opacity: .45; cursor: default; }
+.social-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 26px 0 10px; }
+.social-sort, .social-pages, .social-comment-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.social-status { display: block; color: #e9c991; font-size: 12px; }
+.social-status:empty { display: none; }
+.social-list { list-style: none; margin: 0; padding: 0; }
+.social-comment { padding: 14px 0; border-top: 1px solid #ffffff15; }
+.social-comment.is-hidden { opacity: .7; }
+.social-comment-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.social-comment-head small { color: #97a39e; }
+.social-comment p { margin: 6px 0 9px; color: #e4e8df; overflow-wrap: anywhere; white-space: pre-wrap; }
+.social-comment-actions button { padding: 3px 8px; background: transparent; }
+.social-empty { padding: 20px 0; color: #99a9a0; }
+.social-pages { justify-content: flex-end; margin: 12px 0 20px; color: #abb8ae; font-size: 12px; }
+.social-dialog form { display: grid; gap: 8px; border-top: 1px solid #ffffff18; padding-top: 18px; }
+.social-dialog form label { font-weight: 700; color: #d9cfb8; }
+.social-dialog textarea { width: 100%; resize: vertical; min-height: 66px; padding: 10px; color: #f0eee6; background: #101920; border: 1px solid #46534e; border-radius: 4px; }
+.social-dialog form p { margin: 0; }
+.social-form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.social-dialog form .btn { min-height: 38px; }
+@media (max-width: 680px) {
+  .rank-social { max-width: 100%; }
+  .social-dialog { width: calc(100vw - 24px); max-height: 90vh; padding: 18px; }
+  .social-reaction-group > div { gap: 6px; }
+  .social-reactions button { min-width: 50px; }
+}
 </style>
 </head>
 <body>
@@ -812,7 +862,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         <output id="badges-status" class="badges-status" aria-live="polite"></output>
         <div class="badges-actions"><button id="badges-save" class="btn btn-primary" type="button" data-action="save-badges" hidden>保存展示</button><button id="badges-reload" class="btn btn-ghost" type="button" data-action="reload-badges" hidden>刷新勋章</button><button id="badges-profile" class="btn btn-primary" type="button" data-action="badges-profile" hidden>设置昵称或恢复身份</button></div>
         <div id="badges-grid" class="badges-grid"></div>
-        <p class="badges-note">成绩勋章根据已上传的记录计算；全站纪录勋章在纪录被超越后会让出。趣味错题勋章从功能上线后的交卷开始解锁，默认不会公开。未记录用时的成绩不参与用时勋章。</p>
+        <p class="badges-note">人数按已上传且保留的身份统计；纪录勋章的历史人数根据现存记录推算，纪录被超越后会让出。错题勋章人数较少时不显示具体数值，旧答卷未保存选项，无法补算。未记录用时的成绩不参与用时勋章。</p>
       </section>
 
       <section id="exam-view" class="exam-view hidden" aria-label="机制考核">
@@ -831,7 +881,16 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码是以前备份的完整代码，第一次使用只需填写上方昵称。身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><label for="identity-code">身份码</label><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><details id="saved-profiles" class="recovery" hidden><summary>切换本机保留的资料</summary><p class="muted small">切换时会保留当前本机资料和未上传成绩。</p><div id="saved-profiles-list"></div></details><details id="file-import" class="recovery" hidden><summary>导入迁移文件</summary><p class="muted small">选择从原网址下载的迁移文件。文件含有身份资料，请妥善保管。</p><label for="transfer-file">选择迁移文件</label><input id="transfer-file" type="file" accept=".json,application/json"></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="profile-history" class="link-button icon-action" type="button" data-action="open-history" hidden>我的答题记录 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><button id="profile-badges" class="link-button icon-action" type="button" data-action="open-badges" hidden>我的勋章 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><br><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
   <dialog id="transfer-dialog" aria-labelledby="transfer-title"><div class="dialog-top"><div><p class="eyebrow">TRANSFER</p><h2 id="transfer-title">转移本机资料</h2></div><button class="close-button" type="button" data-action="close-transfer" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><output id="transfer-description" class="muted" aria-live="polite">正在读取原网址的资料…</output><p id="transfer-detail" class="profile-note"></p><p id="transfer-error" class="error-text" role="alert"></p><div class="dialog-actions"><button id="transfer-confirm" class="btn btn-primary" type="button" data-action="confirm-transfer" hidden>确认转移并上传</button><button class="btn btn-ghost" type="button" data-action="close-transfer">取消</button></div></dialog>
   <dialog id="diagram-dialog" class="diagram-dialog" aria-labelledby="diagram-dialog-title"><div class="dialog-top"><div><p class="eyebrow">TACTICAL MAP</p><h2 id="diagram-dialog-title">放大查看示意图</h2></div><button class="close-button" type="button" data-action="close-diagram" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="diagram-dialog-hint">手机可左右滑动查看完整图解。</p><div id="diagram-dialog-content" class="diagram-dialog-content"></div></dialog>
-  <dialog id="honor-dialog" class="honor-dialog" aria-labelledby="honor-dialog-title"><div class="dialog-top"><div><p class="eyebrow">HALL OF HONORS</p><h2 id="honor-dialog-title">趣味榜</h2></div><button class="close-button" type="button" data-action="close-honor-detail" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p id="honor-detail-description" class="honor-dialog-description"></p><div class="honor-detail-tabs" aria-label="查看趣味榜"><button type="button" data-action="honor-mode" data-mode="history" aria-pressed="true">历史获得者</button><button type="button" data-action="honor-mode" data-mode="current" aria-pressed="false">当前排名</button></div><p class="honor-history-note">历史名单按现存答卷与当前规则推算；旧答卷没有完成时间时使用上传时间，已删除的记录无法还原。当前榜首并列者都获得勋章，纪录被超越后会让出。</p><output id="honor-detail-status" class="honor-detail-status" aria-live="polite"></output><ol id="honor-detail-list" class="honor-detail-list"></ol><div class="honor-detail-pages"><button id="honor-detail-prev" type="button" data-action="honor-prev">上一页</button><span id="honor-detail-page"></span><button id="honor-detail-next" type="button" data-action="honor-next">下一页</button></div></dialog>
+  <dialog id="honor-dialog" class="honor-dialog" aria-labelledby="honor-dialog-title"><div class="dialog-top"><div><p class="eyebrow">HALL OF HONORS</p><h2 id="honor-dialog-title">趣味榜</h2></div><button class="close-button" type="button" data-action="close-honor-detail" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p id="honor-detail-description" class="honor-dialog-description"></p><div class="honor-detail-tabs" aria-label="查看趣味榜"><button type="button" data-action="honor-mode" data-mode="history" aria-pressed="true">历史获得者</button><button type="button" data-action="honor-mode" data-mode="current" aria-pressed="false">当前排名</button></div><p class="honor-history-note">历史名单按现存答卷推算，并包含之后的纪录留档；旧答卷没有完成时间时使用上传时间，已删除的记录无法还原。并列榜首都获得勋章，纪录被超越后会让出。</p><output id="honor-detail-status" class="honor-detail-status" aria-live="polite"></output><ol id="honor-detail-list" class="honor-detail-list"></ol><div class="honor-detail-pages"><button id="honor-detail-prev" type="button" data-action="honor-prev">上一页</button><span id="honor-detail-page"></span><button id="honor-detail-next" type="button" data-action="honor-next">下一页</button></div></dialog>
+  <dialog id="social-dialog" class="social-dialog" aria-labelledby="social-title">
+    <div class="dialog-top"><div><p class="eyebrow">PLAYER NOTES <span class="slash">/</span> 榜单互动</p><h2 id="social-title">玩家互动</h2><small id="social-player-number" class="muted"></small></div><button class="close-button" type="button" data-action="social-close" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div>
+    <p class="social-section-label">收到的表情</p><div class="social-reaction-bar"><div id="social-reaction-summary" class="social-reaction-summary"></div><button id="social-add-reaction" type="button" data-action="social-toggle-picker" aria-expanded="false" aria-controls="social-reactions" hidden>＋ 添加表情</button></div>
+    <p id="social-my-reaction" class="social-my-reaction" hidden></p><div id="social-reactions" class="social-reactions" aria-label="选择表情" hidden></div><p id="social-reaction-hint" class="social-reaction-hint" hidden>再次点击已选表情可取消。</p>
+    <div class="social-list-heading"><strong id="social-count">公开评价</strong><div class="social-sort"><button id="social-sort-hot" type="button" data-action="social-sort" data-sort="hot" aria-pressed="true">最热</button><button id="social-sort-new" type="button" data-action="social-sort" data-sort="new" aria-pressed="false">最新</button></div></div>
+    <output id="social-status" class="social-status" aria-live="polite"></output><button id="social-retry" class="link-button" type="button" data-action="social-retry" hidden>重新读取</button><ol id="social-list" class="social-list"></ol>
+    <nav class="social-pages" aria-label="评价分页"><button id="social-prev" type="button" data-action="social-prev">上一页</button><span id="social-page"></span><button id="social-next" type="button" data-action="social-next">下一页</button></nav>
+    <form id="social-form"><label for="social-input">写评价</label><textarea id="social-input" rows="2" maxlength="120" placeholder="说说这位队友吧" required></textarea><p id="social-form-note" class="muted small"></p><div class="social-form-actions"><button id="social-submit" class="btn btn-primary" type="submit">发表评价</button><button id="social-delete-own" class="btn btn-ghost" type="button" data-action="social-delete-own" hidden>删除我的评价</button></div></form>
+  </dialog>
   <dialog id="restart-dialog" aria-labelledby="restart-title"><div class="dialog-top"><div><p class="eyebrow">A FRESH START</p><h2 id="restart-title">重新开始这一轮？</h2></div><button class="close-button" type="button" data-action="cancel-restart" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted restart-description">本轮未交卷的答案将清空，题目和选项会重新打乱，计时归零。已提交的成绩和勋章会保留。</p><div class="dialog-actions"><button class="btn btn-primary" type="button" data-action="confirm-restart">重新考核</button><button class="btn btn-ghost" type="button" data-action="cancel-restart">继续答题</button></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script id="question-bank" type="application/json">{
@@ -4493,6 +4552,155 @@ function drawBadgeArtwork(badge) {
   return `<svg class="icon badge-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="27" fill="#101e2b" stroke="#d8cfba" stroke-opacity=".22"/><g stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${art}</g></svg>`;
 }
 
+function createSocialUI({request, getProfile, getIdentity, activeIdentity, showProfile, refreshRanking, escape, formatPlayerNumber}) {
+  const emojis = {clap:'👏', fire:'🔥', team:'🤝', thumb:'👍', star:'🌟', joy:'😄', down:'👎', facepalm:'🤦', confused:'🤔', awkward:'😅', clown:'🤡', skull:'💀'};
+  const labels = {clap:'鼓掌', fire:'厉害', team:'配合', thumb:'点赞', star:'闪亮', joy:'开心', down:'不赞同', facepalm:'捂脸', confused:'疑惑', awkward:'尴尬', clown:'小丑', skull:'笑没了'};
+  const groups = [['鼓励', ['clap','fire','team','thumb','star','joy']], ['吐槽', ['down','facepalm','confused']], ['恶搞', ['awkward','clown','skull']]];
+  const $ = id => document.getElementById(id);
+  const dialog = $('social-dialog');
+  const form = $('social-form');
+  const input = $('social-input');
+  let number = 0, page = 1, sort = 'hot', data = null, busy = false, requestId = 0, resume = false, resumePicker = false, pickerOpen = false;
+
+  function summary(entry) {
+    const social = entry.social;
+    if (!social || !Number.isSafeInteger(entry.playerNumber)) return '';
+    const reactions = Array.isArray(social.reactions) ? social.reactions.filter(item => emojis[item.id] && Number.isSafeInteger(item.count)).slice(0, 3) : [];
+    const icons = reactions.map(item => `<span>${emojis[item.id]} ${item.count}</span>`).join('');
+    const preview = social.preview && typeof social.preview.content === 'string'
+      ? `<button type="button" class="social-preview" data-action="social-open" data-number="${entry.playerNumber}"><b>${social.preview.likes > 0 ? '热评' : '最新'}</b> ${escape(social.preview.content)} <small>👍 ${Number(social.preview.likes) || 0}</small></button>` : '';
+    return `<div class="rank-social"><div class="rank-social-actions"><button type="button" class="rank-social-open" data-action="social-open" data-number="${entry.playerNumber}" data-picker="true" aria-label="给 ${escape(entry.nickname)} 选择表情"><span class="rank-social-reactions">${icons || '＋ 添加表情'}</span></button><button type="button" class="rank-social-open" data-action="social-open" data-number="${entry.playerNumber}" data-picker="false">评价 ${Number(social.commentCount) || 0} ›</button></div>${preview}</div>`;
+  }
+
+  function authBody() {
+    const profile = getProfile();
+    return profile && !profile.localOnly && activeIdentity() ? {...getIdentity()} : {};
+  }
+  function status(message) { $('social-status').textContent = message; }
+  function showPicker(open) {
+    pickerOpen = open;
+    $('social-reactions').hidden = !open;
+    $('social-reaction-hint').hidden = !open || Boolean(data?.isTarget);
+    $('social-add-reaction').setAttribute('aria-expanded', String(open));
+  }
+  function render(resetForm) {
+    $('social-title').textContent = `${data.player.nickname} 的互动`;
+    $('social-player-number').textContent = formatPlayerNumber(data.player.number);
+    const counts = new Map(data.reactions.filter(item => Object.hasOwn(emojis, item.id)).map(item => [item.id, Number(item.count) || 0]));
+    const received = [...counts].filter(([, count]) => count > 0).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 3);
+    $('social-reaction-summary').innerHTML = received.length ? received.map(([id, count]) => `<span aria-label="${labels[id]} ${count} 次">${emojis[id]} ${count}</span>`).join('') : '<span>还没有表情</span>';
+    $('social-add-reaction').hidden = false;
+    $('social-add-reaction').textContent = data.isTarget ? '查看全部表情' : data.myReaction ? '修改表情' : '＋ 添加表情';
+    $('social-my-reaction').hidden = !data.myReaction || !emojis[data.myReaction];
+    $('social-my-reaction').textContent = data.myReaction && emojis[data.myReaction] ? `你贴了 ${emojis[data.myReaction]}` : '';
+    $('social-reactions').innerHTML = groups.map(([name, ids]) => `<div class="social-reaction-group"><span>${name}</span><div>${ids.filter(id => counts.has(id)).map(id => `<button type="button" data-action="social-reaction" data-reaction="${id}" aria-label="${labels[id]}，${counts.get(id)} 次" aria-pressed="${String(data.myReaction === id)}" ${data.isTarget ? 'disabled' : ''}>${emojis[id]} <span>${counts.get(id)}</span></button>`).join('')}</div></div>`).join('');
+    showPicker(pickerOpen);
+    $('social-count').textContent = `公开评价 ${data.commentCount} 条`;
+    $('social-sort-hot').setAttribute('aria-pressed', String(sort === 'hot'));
+    $('social-sort-new').setAttribute('aria-pressed', String(sort === 'new'));
+    $('social-list').innerHTML = data.comments.length ? data.comments.map(comment => {
+      const numberLabel = formatPlayerNumber(comment.playerNumber);
+      const like = comment.own || comment.hidden ? '' : `<button type="button" data-action="social-like" data-id="${comment.id}" data-liked="${String(comment.liked)}" aria-pressed="${String(comment.liked)}">👍 ${comment.likes}</button>`;
+      const own = comment.own ? `<button type="button" data-action="social-delete" data-id="${comment.id}">删除</button>` : '';
+      const hide = comment.canHide ? `<button type="button" data-action="social-hide" data-id="${comment.id}" data-hidden="${String(comment.hidden)}">${comment.hidden ? '恢复展示' : '隐藏'}</button>` : '';
+      const date = new Date(comment.createdAt).toLocaleDateString('zh-CN');
+      return `<li class="social-comment${comment.hidden ? ' is-hidden' : ''}"><div class="social-comment-head"><strong>${escape(comment.nickname)}</strong><small>${escape(numberLabel)} · ${escape(date)}${comment.hidden ? ' · 已隐藏' : ''}</small></div><p>${escape(comment.content)}</p><div class="social-comment-actions">${like}${own}${hide}</div></li>`;
+    }).join('') : '<li class="social-empty">还没有公开评价，来写第一条吧。</li>';
+    $('social-page').textContent = `第 ${data.page} / ${data.pages} 页`;
+    $('social-prev').disabled = data.page <= 1;
+    $('social-next').disabled = data.page >= data.pages;
+    form.hidden = data.isTarget;
+    if (resetForm) input.value = data.ownComment?.content || '';
+    $('social-submit').textContent = data.ownComment ? '保存修改' : '发表评价';
+    $('social-delete-own').hidden = !data.ownComment;
+    $('social-form-note').textContent = data.ownComment ? '每人可留一条评价；修改内容后，原有点赞会清零。' : '每人可留一条评价，最多 60 个字。';
+  }
+  async function load(resetForm = false) {
+    const current = ++requestId;
+    $('social-retry').hidden = true;
+    status('正在读取互动…');
+    try {
+      const result = await request('/api/social/view', {playerNumber:number, page, sort, ...authBody()});
+      if (current !== requestId || !dialog.open || result.player.number !== number) return;
+      data = result; page = result.page; render(resetForm); status('');
+    } catch (error) {
+      if (current === requestId && dialog.open) { status(error.message); $('social-retry').hidden = false; }
+    }
+  }
+  function open(playerNumber, expandPicker = false) {
+    if (!Number.isSafeInteger(playerNumber) || playerNumber < 1) return;
+    number = playerNumber; page = 1; sort = 'hot'; data = null;
+    input.value = ''; form.hidden = true; $('social-list').replaceChildren(); $('social-reactions').replaceChildren();
+    $('social-reaction-summary').textContent = ''; $('social-add-reaction').hidden = true; $('social-my-reaction').hidden = true; showPicker(false);
+    pickerOpen = expandPicker;
+    $('social-count').textContent = '公开评价'; $('social-page').textContent = '';
+    $('social-prev').disabled = true; $('social-next').disabled = true;
+    $('social-title').textContent = '玩家互动'; $('social-player-number').textContent = '';
+    if (!dialog.open) dialog.showModal();
+    void load(true);
+  }
+  function needIdentity(action) {
+    if (getProfile() && !getProfile().localOnly && activeIdentity()) return false;
+    if (getProfile()?.localOnly) { status('请先连接成绩服务，再参与互动。'); return true; }
+    if (getProfile() && !activeIdentity()) { status('本机身份已在其他页面切换，请刷新后继续。'); return true; }
+    resume = true; resumePicker = action === 'reaction'; dialog.close(); showProfile(); return true;
+  }
+  async function mutate(action, payload, resetForm = false) {
+    if (busy || needIdentity(action)) return;
+    busy = true;
+    const participant = {...getIdentity()};
+    const selectedNumber = number;
+    status('正在保存…');
+    try {
+      await request(`/api/social/${action}`, {...participant, ...payload});
+      if (!activeIdentity(participant)) { status('本机身份已切换，请重新打开互动。'); return; }
+      if (!dialog.open || number !== selectedNumber) { void refreshRanking(); return; }
+      if (action === 'reaction') showPicker(false);
+      await load(resetForm);
+      void refreshRanking();
+    } catch (error) { status(error.message); }
+    finally { busy = false; }
+  }
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!data || data.isTarget) return;
+    const content = input.value.trim();
+    if ([...content].length < 1 || [...content].length > 60) { status('评价请填写 1 至 60 个字。'); return; }
+    if (data.ownComment && content !== data.ownComment.content && !confirm('修改评价会清空原有点赞，确定保存吗？')) return;
+    void mutate('comment', {playerNumber:number, content}, true);
+  });
+  document.addEventListener('click', event => {
+    const target = event.target.closest('[data-action^="social-"]');
+    if (!target) return;
+    const action = target.dataset.action;
+    if (action === 'social-open') { open(Number(target.dataset.number), target.dataset.picker === 'true'); return; }
+    if (action === 'social-close') { dialog.close(); return; }
+    if (action === 'social-retry' && dialog.open) { void load(!data); return; }
+    if (!dialog.open || !data) return;
+    if (action === 'social-toggle-picker') {
+      showPicker(!pickerOpen);
+    } else if (action === 'social-reaction') {
+      void mutate('reaction', {playerNumber:number, reaction:data.myReaction === target.dataset.reaction ? null : target.dataset.reaction});
+    } else if (action === 'social-like') {
+      void mutate('like', {commentId:Number(target.dataset.id), liked:target.dataset.liked !== 'true'});
+    } else if (action === 'social-delete') {
+      if (confirm('确定删除你的这条评价吗？')) void mutate('delete', {commentId:Number(target.dataset.id)}, true);
+    } else if (action === 'social-delete-own') {
+      if (data.ownComment && confirm('确定删除你的这条评价吗？')) void mutate('delete', {commentId:data.ownComment.id}, true);
+    } else if (action === 'social-hide') {
+      void mutate('hide', {commentId:Number(target.dataset.id), hidden:target.dataset.hidden !== 'true'});
+    } else if (action === 'social-sort') {
+      sort = target.dataset.sort; page = 1; void load();
+    } else if (action === 'social-prev' && page > 1) { page--; void load(); }
+    else if (action === 'social-next' && page < data.pages) { page++; void load(); }
+  });
+  dialog.addEventListener('close', () => { if (!dialog.open) ++requestId; });
+  $('profile-dialog').addEventListener('close', () => {
+    if (resume) { resume = false; if (getProfile()) open(number, resumePicker); resumePicker = false; }
+  });
+  return {summary};
+}
+
 (() => {
   'use strict';
   const localPreview = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('api')==='local';
@@ -5017,11 +5225,13 @@ function drawBadgeArtwork(badge) {
   function rankingRow(entry) {
     const row=document.createElement('div'); row.className='ranking-row';
     row.dataset.rank = String(entry.rank);
+    row.dataset.playerKey = String(entry.playerNumber ?? `rank-${entry.rank}`);
+    row.dataset.signature = JSON.stringify(entry);
     const number = formatPlayerNumber(entry.playerNumber);
     const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
     const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
     const badgeList = shownBadges.length ? `<div class="rank-badges" aria-label="展示的勋章">${shownBadges.map(badgeChip).join('')}</div>` : '';
-    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><div class="ranking-stats"><span class="ranking-stat"><small>用时</small><b>${formatDuration(entry.elapsedSeconds)}</b></span><span class="ranking-stat"><small>最高分</small><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong></span></div>`;
+    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}${socialUI.summary(entry)}</div></div><div class="ranking-stats"><span class="ranking-stat"><small>用时</small><b>${formatDuration(entry.elapsedSeconds)}</b></span><span class="ranking-stat"><small>最高分</small><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong></span></div>`;
     return row;
   }
   async function refreshHonors() {
@@ -5031,6 +5241,9 @@ function drawBadgeArtwork(badge) {
       const data = await request('/api/honors');
       if (requestId !== honorRequest) return;
       const boards = Array.isArray(data.boards) ? data.boards : [];
+      const signature = JSON.stringify(boards);
+      if (container.dataset.signature === signature) return;
+      container.dataset.signature = signature;
       if (!boards.length) { container.innerHTML = '<p class="empty-state">暂无趣味榜数据。</p>'; return; }
       container.innerHTML = boards.map(board => {
         const badge = board.badge;
@@ -5041,7 +5254,10 @@ function drawBadgeArtwork(badge) {
         return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders"><span>${entries.length ? holders : '等待首位上榜玩家'}</span>${more}</div></article>`;
       }).join('');
     } catch (error) {
-      if (requestId === honorRequest) container.innerHTML = `<p class="empty-state">${escape(error.message)} 点击刷新榜单可重试。</p>`;
+      if (requestId === honorRequest) {
+        if (container.querySelector('.honor-card')) toast('趣味榜暂未刷新，请稍后重试。');
+        else { delete container.dataset.signature; container.innerHTML = `<p class="empty-state">${escape(error.message)} 点击刷新榜单可重试。</p>`; }
+      }
     }
   }
   async function loadHonorDetail(page = 1) {
@@ -5063,11 +5279,11 @@ function drawBadgeArtwork(badge) {
         : `共 ${data.total} 人上榜 · ${data.holderCount} 人并列榜首；同成绩按达到时间先后排列`;
       $('honor-detail-list').innerHTML = data.entries.length ? data.entries.map(entry => {
         const number = formatPlayerNumber(entry.playerNumber);
-        const value = data.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`;
+        const value = entry.recordedOnly ? '纪录已留档' : data.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`;
         const rank = mode === 'current' ? `<span class="honor-detail-rank">${entry.rank}</span>` : '';
         const status = mode === 'history' ? `<small class="${entry.current ? 'is-current' : ''}">${entry.current ? '当前持有' : '曾经获得'}</small>` : '';
-        const time = mode === 'history' ? `<span class="honor-achieved">${new Date(entry.achievedAt).toLocaleDateString('zh-CN')} 首次达成</span>` : '';
-        return `<li>${rank}<span class="honor-detail-person"><strong>${escape(entry.nickname)}</strong><small>${escape(number)}</small></span>${status}<span class="honor-detail-value"><strong>${mode === 'history' ? '当时 ' : ''}${escape(value)}</strong>${time}</span></li>`;
+        const time = mode === 'history' ? `<span class="honor-achieved">${new Date(entry.achievedAt).toLocaleDateString('zh-CN')} ${entry.recordedOnly ? '记录时间' : '首次达成'}</span>` : '';
+        return `<li>${rank}<span class="honor-detail-person"><strong>${escape(entry.nickname)}</strong><small>${escape(number)}</small></span>${status}<span class="honor-detail-value"><strong>${mode === 'history' && !entry.recordedOnly ? '当时 ' : ''}${escape(value)}</strong>${time}</span></li>`;
       }).join('') : '<li class="honor-detail-empty">暂无符合条件的记录。</li>';
       $('honor-detail-page').textContent = `第 ${honorDetailPage} / ${honorDetailPages} 页`;
       $('honor-detail-prev').disabled = honorDetailPage <= 1;
@@ -5092,13 +5308,19 @@ function drawBadgeArtwork(badge) {
   async function refreshRanking(page = rankingPage) {
     const requestId = ++rankingRequest;
     void refreshHonors();
-    $('ranking-pagination').hidden = true;
-    const list=$('ranking-list'); list.replaceChildren(); const loading=document.createElement('p'); loading.className='empty-state'; loading.textContent='正在读取榜单…'; list.append(loading);
+    const list=$('ranking-list');
+    const hadRows = Boolean(list.querySelector('.ranking-row'));
+    list.setAttribute('aria-busy', 'true');
+    if (!hadRows) list.innerHTML = '<p class="empty-state">正在读取榜单…</p>';
     try {
       const data=await request(`/api/leaderboard?view=latest&page=${page}&pageSize=20`);
       if (requestId !== rankingRequest) return;
-      list.replaceChildren();
-      if(!data.entries?.length){loading.textContent='还没有成绩，来做第一个上榜的人。';list.append(loading);return;}
+      if (!Array.isArray(data.entries)) throw new TypeError('榜单返回的数据无法识别。');
+      if (!data.entries.length) {
+        list.innerHTML = '<p class="empty-state">还没有成绩，来做第一个上榜的人。</p>';
+        $('ranking-pagination').hidden = true;
+        return;
+      }
       rankingPage = Number.isSafeInteger(data.page) ? data.page : 1;
       rankingPages = Number.isSafeInteger(data.pages) ? data.pages : 1;
       $('ranking-page-status').textContent = `共 ${data.total ?? data.entries.length} 人 · 第 ${rankingPage} / ${rankingPages} 页`;
@@ -5107,12 +5329,29 @@ function drawBadgeArtwork(badge) {
       $('ranking-page-input').value = String(rankingPage);
       $('ranking-page-input').max = String(rankingPages);
       $('ranking-pagination').hidden = rankingPages <= 1;
-      for(const entry of data.entries) list.append(rankingRow(entry));
+      const existing = new Map([...list.querySelectorAll('.ranking-row')].map(row => [row.dataset.playerKey, row]));
+      for (const [index, entry] of data.entries.entries()) {
+        const key = String(entry.playerNumber ?? `rank-${entry.rank}`);
+        let row = existing.get(key);
+        existing.delete(key);
+        if (!row) row = rankingRow(entry);
+        else if (row.dataset.signature !== JSON.stringify(entry)) {
+          const updated = rankingRow(entry);
+          row.innerHTML = updated.innerHTML;
+          row.dataset.rank = updated.dataset.rank;
+          row.dataset.signature = updated.dataset.signature;
+        }
+        if (list.children[index] !== row) list.insertBefore(row, list.children[index] || null);
+      }
+      for (const row of existing.values()) row.remove();
+      for (const placeholder of list.querySelectorAll('.empty-state')) placeholder.remove();
     } catch(err){
       if(requestId !== rankingRequest) return;
-      loading.textContent=err.message+' 可以稍后点击刷新。';
-      list.replaceChildren(loading);
+      if (list.querySelector('.ranking-row')) toast(`${err.message} 榜单保留上次内容。`);
+      else { const message=document.createElement('p'); message.className='empty-state'; message.textContent=err.message+' 可以稍后点击刷新。'; list.replaceChildren(message); }
       if(err.unavailable) setConnectionUnavailable(true);
+    } finally {
+      if (requestId === rankingRequest) list.setAttribute('aria-busy', 'false');
     }
   }
   $('ranking-page-form').addEventListener('submit', event => {
@@ -5238,7 +5477,9 @@ function drawBadgeArtwork(badge) {
         button.disabled = !badge.earned;
         button.setAttribute('aria-pressed', String(selected));
         const state = badge.earned ? (selected ? '✓ 展示中' : '＋ 已获得 · 可展示') : '未获得';
-        button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span></span>`;
+        const stats = badge.stats || {};
+        const count = stats.masked ? '少于 3 人' : Number.isSafeInteger(stats.historyCount) ? `历史推算 ${stats.historyCount} 人 · 当前 ${stats.currentCount} 人` : Number.isSafeInteger(stats.count) ? `${stats.count} 人获得` : '人数暂不可用';
+        button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span><span class="badge-people">${escape(count)}</span></span>`;
         button.dataset.signature = signature;
       }
       if (grid.children[index] !== button) grid.insertBefore(button, grid.children[index] || null);
@@ -5679,7 +5920,7 @@ function drawBadgeArtwork(badge) {
     if (candidate.deviceId !== identity.deviceId) $('profile-player-number').hidden = true;
   }
   async function deleteProfile() {
-    if(!profile || !confirm('确认删除你的线上资料和全部成绩？删除后无法恢复。'))return;
+    if(!profile || !confirm('确认删除你的线上资料、成绩和相关互动？删除后无法恢复。'))return;
     try {
       await request('/api/delete-profile',identity);
       if(view==='exam') setView('home');
@@ -5694,6 +5935,9 @@ function drawBadgeArtwork(badge) {
     }
     catch(err){$('profile-error').textContent=err.message;}
   }
+  const socialUI = typeof createSocialUI === 'function'
+    ? createSocialUI({request, getProfile:() => profile, getIdentity:() => identity, activeIdentity, showProfile, refreshRanking, escape, formatPlayerNumber})
+    : {summary:() => ''};
   const featureActions = new Map([
     ['open-badges', () => openBadges()],
     ['close-badges', () => closeBadges()],
