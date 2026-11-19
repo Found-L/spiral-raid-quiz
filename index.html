@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="剑灵巅峰服螺旋寺院团本机制练习，覆盖主 T 和各机制位。">
   <meta name="theme-color" content="#0b1019">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%23151c24' stroke='%23dfbf87' stroke-width='3'/%3E%3Cpath d='M15 39 32 21 49 39M21 42h22' fill='none' stroke='%23dfbf87' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230e1b21' stroke='%23d8b67b' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%235f9d8d' stroke-width='1'/%3E%3Cpath d='M17 31 32 20 47 31M20 35 32 27 44 35M23 37v9h18v-9M29 46v-7h6v7M18 49h28' fill='none' stroke='%23f0d19a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='15' r='2' fill='%23f0d19a'/%3E%3C/svg%3E">
   <title>螺旋寺院 · 团本机制考核</title>
   <style>:root{color-scheme:dark;--bg:#0b1017;--panel:#151c24;--panel2:#1a222b;--line:rgba(229,214,181,.14);--gold:#dfbf87;--gold-deep:#bd9762;--text:#f1ede4;--muted:#aaa99f;--teal:#91c6bd;--red:#db8d80;--serif:"Noto Serif SC","Songti SC","SimSun",serif;--sans:system-ui,-apple-system,"Microsoft YaHei",sans-serif}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);font-family:var(--sans);color:var(--text);line-height:1.6;font-size:15px}body:has(dialog[open]){overflow:hidden}button,input,textarea{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #f4cf8e;outline-offset:4px}.hidden,[hidden]{display:none!important}.site-shell{max-width:1920px;margin:auto}.topbar{height:84px;display:flex;align-items:center;gap:48px;padding:0 max(5.5vw,28px);border-bottom:1px solid var(--line);position:relative;z-index:2;background:#0d131b}.brand{display:inline-flex;align-items:center;gap:12px;white-space:nowrap}.brand-mark{width:39px;height:39px;border:1px solid #b99b68;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:19px;color:var(--gold)}.brand strong,.brand small{display:block;line-height:1.35}.brand strong{font-family:var(--serif);font-size:15px;letter-spacing:.1em}.brand small{font-size:10px;color:var(--muted);letter-spacing:.14em}.nav-links{display:flex;gap:34px;align-items:center;margin-left:auto;font-size:13px;color:#c4c2b8}.nav-links a,.nav-links button{border:0;background:transparent;color:inherit;padding:8px 0}.nav-links a:hover,.nav-links button:hover{color:var(--gold)}.profile-trigger{border:1px solid var(--line);background:#161d25;color:#e9dfcc;border-radius:3px;padding:8px 13px;display:flex;gap:11px;align-items:center;font-size:12px;white-space:nowrap}
@@ -941,6 +941,83 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
   .ambient-world span { width: 150vw; height: 150vw; }
 }
 @media (prefers-reduced-motion: reduce) { .ambient-world:before, .ambient-world span, .hero-landscape, .hero-radiance, .hero-mist, .hero-embers, .hero-embers i, .overview-danger-ray, .chapter-art *, .chapter-scene:after { animation: none; } }
+
+/* Temple seal, navigation and site selector share the page's teal-and-gold palette. */
+.topbar { height: 88px; gap: clamp(10px, 1.4vw, 24px); padding-inline: clamp(18px, 5.5vw, 100px); background: linear-gradient(110deg, #101b22f5, #0c141cf8 65%, #132525f5); box-shadow: 0 12px 32px #0003; }
+.topbar::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, #c6aa7060 24%, #76b6a14a 70%, transparent); }
+.brand { gap: 10px; flex: none; }
+.brand-mark { width: 48px; height: 48px; border: 0; border-radius: 50%; background: radial-gradient(circle at 50% 45%, #28443d, #111b20 70%); box-shadow: 0 0 18px #c5a26a24; }
+.brand-mark svg { width: 100%; height: 100%; fill: none; stroke: #e8c892; stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
+.brand-mark svg > circle:first-child { stroke: #c9a86e; stroke-width: 1; }
+.brand-mark .brand-ring { stroke: #81bba7; stroke-width: .6; stroke-dasharray: 42 4 12 5; opacity: .8; }
+.brand-mark .brand-star { fill: #f8d9a0; stroke: none; }
+.brand-copy strong { color: #f1eadb; font-size: 17px; letter-spacing: .1em; }
+.brand-copy small { margin-top: 2px; color: #a7b7ad; font-size: 10px; letter-spacing: .12em; }
+.nav-links { display: flex; gap: 3px; margin-left: auto; padding: 4px; border: 1px solid #a3c6ae1d; border-radius: 9px; background: #14242a9c; }
+.nav-links a, .nav-links button { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 12px; border: 0; border-radius: 6px; background: transparent; color: #cbd7cf; font-size: 13px; white-space: nowrap; transition: color .2s, background .2s, box-shadow .2s; }
+.nav-links .icon { width: 16px; height: 16px; color: #9cb8a9; }
+.nav-links a:hover, .nav-links button:hover, .nav-links a:focus-visible, .nav-links button:focus-visible { color: #f7e5bd; background: #36514b80; box-shadow: inset 0 0 0 1px #d8c08a35; }
+.nav-links a:hover .icon, .nav-links button:hover .icon { color: #e7c78c; }
+.site-switch { position: relative; flex: none; }
+.site-switch summary, .nav-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 0 11px; border: 1px solid #758e7c55; border-radius: 7px; color: #dbe6d9; background: #172a2d; cursor: pointer; font-size: 13px; white-space: nowrap; list-style: none; }
+.site-switch summary::-webkit-details-marker { display: none; }
+.site-switch summary:hover, .site-switch[open] summary, .nav-toggle:hover { border-color: #c6af7b; background: #253d39; color: #f5dfb6; }
+.site-switch summary:focus-visible, .nav-toggle:focus-visible { outline: 2px solid #f4cf8e; outline-offset: 3px; }
+.site-switch summary .icon { width: 17px; height: 17px; color: #a6d2c0; }
+.site-switch summary .site-chevron { width: 14px; height: 14px; transition: transform .2s; }
+.site-switch[open] .site-chevron { transform: rotate(180deg); }
+.site-switch-panel { position: absolute; top: calc(100% + 10px); right: 0; z-index: 12; width: 270px; padding: 12px; border: 1px solid #9c987068; border-radius: 9px; background: linear-gradient(150deg, #1c3332, #101b22 78%); box-shadow: 0 18px 45px #000a, 0 0 26px #5ba89b1a; }
+.site-switch-heading { margin: 2px 4px 8px; color: #d9c39b; font-size: 12px; font-weight: 700; }
+.site-switch-panel > button:not(.site-backup) { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 9px 10px; text-align: left; border: 1px solid transparent; border-radius: 6px; color: #eef1e7; background: transparent; }
+.site-switch-panel > button:not(.site-backup):hover { border-color: #99b6a961; background: #29443d8a; }
+.site-switch-panel > button:disabled { cursor: default; }
+.site-switch-panel strong, .site-switch-panel small { display: block; }
+.site-switch-panel strong { font-size: 13px; }
+.site-switch-panel small { margin-top: 2px; color: #9fb5aa; font-size: 11px; }
+.site-current-tag { padding: 3px 7px; border-radius: 20px; color: #bce8d8; background: #356b5b7a; font-size: 11px; }
+.site-switch-note { margin: 8px 4px; color: #abbeb4; font-size: 11px; line-height: 1.55; }
+.site-backup { padding: 5px 4px; border: 0; background: none; color: #e2c895; font-size: 12px; }
+.profile-trigger { min-height: 44px; border-color: #9eb7a53d; border-radius: 7px; background: #17272c; }
+.profile-trigger #header-profile { min-width: 0; max-width: clamp(64px, 11vw, 150px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-toggle { display: none; }
+@media (max-width: 1100px) {
+  .nav-toggle { display: inline-flex; }
+  .site-switch { margin-left: auto; }
+  .nav-links { display: none; position: absolute; top: calc(100% + 8px); right: clamp(18px, 5.5vw, 100px); z-index: 11; width: min(280px, calc(100vw - 36px)); padding: 8px; border-color: #9c987068; background: linear-gradient(150deg, #1c3332, #101b22 78%); box-shadow: 0 18px 45px #000a; }
+  .nav-links.is-open { display: grid; }
+  .nav-links a, .nav-links button { justify-content: flex-start; min-height: 44px; }
+}
+@media (max-width: 680px) {
+  .topbar { height: 68px; gap: 6px; padding-inline: 12px; }
+  .brand { gap: 6px; min-width: 0; }
+  .brand-mark { width: 38px; height: 38px; }
+  .brand-copy strong { font-size: 13px; letter-spacing: .04em; }
+  .brand-copy small { font-size: 9px; letter-spacing: .02em; }
+  .site-switch { position: static; }
+  .site-switch summary { min-height: 40px; padding-inline: 8px; font-size: 12px; }
+  .site-switch summary .icon { width: 15px; height: 15px; }
+  .site-switch summary .site-chevron { width: 12px; }
+  .site-switch-panel { top: calc(100% + 8px); right: 12px; left: 12px; width: auto; }
+  .profile-trigger { min-height: 40px; margin-left: 0; padding: 4px 7px; gap: 6px; }
+  .profile-trigger #header-profile { max-width: clamp(45px, 15vw, 90px); font-size: 11px; }
+  .profile-arrow { display: none; }
+  .nav-toggle { min-width: 40px; min-height: 40px; padding: 0; }
+  .nav-toggle span { display: none; }
+  .nav-links { right: 12px; width: min(280px, calc(100vw - 24px)); }
+}
+@media (max-width: 360px) {
+  .brand-copy small { display: none; }
+  .brand-mark { width: 34px; height: 34px; }
+  .site-switch summary { gap: 4px; padding-inline: 6px; }
+  .profile-trigger #header-profile { max-width: 46px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .brand-mark .brand-ring { transform-box: fill-box; transform-origin: center; animation: brand-orbit 24s linear infinite; }
+  .brand-mark .brand-star { animation: brand-glimmer 4s ease-in-out infinite; }
+}
+@keyframes brand-orbit { to { transform: rotate(360deg); } }
+@keyframes brand-glimmer { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .site-switch summary .site-chevron, .nav-links a, .nav-links button { transition: none; } }
 </style>
 </head>
 <body>
@@ -951,6 +1028,10 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
     <symbol id="icon-external" viewBox="0 0 24 24"><path d="M7 17 17 7M8.5 7H17v8.5"/></symbol>
     <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M19.5 9a7.6 7.6 0 0 0-12.9-2L4.5 9M4.5 5.5V9H8M4.5 15a7.6 7.6 0 0 0 12.9 2l2.1-2M19.5 18.5V15H16"/></symbol>
     <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5.5 19.5a6.5 6.5 0 0 1 13 0"/></symbol>
+    <symbol id="icon-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.8 12h16.4M12 3.5c2.4 2.3 3.6 5.2 3.6 8.5S14.4 18.2 12 20.5C9.6 18.2 8.4 15.3 8.4 12S9.6 5.8 12 3.5Z"/></symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m7 9 5 5 5-5"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
     <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11m0-11-11 11"/></symbol>
     <symbol id="icon-zoom" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 4.5 4.5M10.5 7.5v6m-3-3h6"/></symbol>
     <symbol id="badge-bolt" viewBox="0 0 24 24"><path d="m13.5 2.5-8 11h6L10.5 21.5l8-11h-6z"/></symbol>
@@ -976,21 +1057,17 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
   <div class="site-shell">
     <div class="ambient-world" aria-hidden="true"><span></span><span></span><span></span></div>
     <header class="topbar">
-      <a href="#home" class="brand" aria-label="螺旋寺院机制考核首页"><span class="brand-mark">旋</span><span><strong>螺旋寺院</strong><small>团队机制考核</small></span></a>
-      <nav class="nav-links" aria-label="主导航"><a href="#guide">机制图解</a><button type="button" data-action="show-leaderboard">排行榜</button><button type="button" data-action="open-history">我的记录</button><button type="button" data-action="open-badges">我的勋章</button></nav>
+      <a href="#home" class="brand" aria-label="螺旋寺院机制考核首页"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><circle class="brand-ring" cx="24" cy="24" r="17"/><path d="M13 23 24 15l11 8M15 26l9-6 9 6M17 28v8h14v-8M21 36v-6h6v6M14 39h20"/><circle class="brand-star" cx="24" cy="11" r="1.5"/></svg></span><span class="brand-copy"><strong>螺旋寺院</strong><small>团队机制考核</small></span></a>
+      <nav id="main-nav" class="nav-links" aria-label="主导航"><a href="#guide"><svg class="icon" aria-hidden="true"><use href="#badge-book"/></svg><span>机制图解</span></a><button type="button" data-action="show-leaderboard"><svg class="icon" aria-hidden="true"><use href="#badge-crown"/></svg><span>排行榜</span></button><button type="button" data-action="open-history"><svg class="icon" aria-hidden="true"><use href="#icon-clock"/></svg><span>我的记录</span></button><button type="button" data-action="open-badges"><svg class="icon" aria-hidden="true"><use href="#badge-spark"/></svg><span>我的勋章</span></button></nav>
+      <details id="site-switch" class="site-switch"><summary aria-label="切换访问站点"><svg class="icon" aria-hidden="true"><use href="#icon-globe"/></svg><span id="site-current">站点</span><svg class="icon site-chevron" aria-hidden="true"><use href="#icon-chevron"/></svg></summary><div class="site-switch-panel"><p class="site-switch-heading">选择访问站点</p><button id="site-domestic" type="button" data-action="switch-site" data-site="domestic"><span><strong>国内站</strong><small>国内访问推荐</small></span><span class="site-current-tag" hidden>当前</span></button><button id="site-overseas" type="button" data-action="switch-site" data-site="overseas"><span><strong>国外站</strong><small>国外访问推荐</small></span><span class="site-current-tag" hidden>当前</span></button><p class="site-switch-note">排行榜共用，切换时可带上本机进度。</p><button class="site-backup" type="button" data-action="download-transfer">备份本机资料</button></div></details>
       <button class="profile-trigger" type="button" data-action="profile" aria-haspopup="dialog"><span class="avatar" aria-hidden="true"><svg class="icon"><use href="#icon-user"/></svg></span><span id="header-profile">设置我的资料</span><svg class="icon profile-arrow" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button>
+      <button id="nav-toggle" class="nav-toggle" type="button" data-action="toggle-navigation" aria-label="打开导航菜单" aria-controls="main-nav" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#icon-menu"/></svg><span>菜单</span></button>
     </header>
 
     <div id="connection-notice" class="connection-notice" role="status" hidden>
       <span>成绩服务暂时连接不上，可以继续答题。成绩先保存在此浏览器，连通后再上传排行榜。</span>
       <button class="link-button" type="button" data-action="retry-connection">重新连接</button>
     </div>
-    <div id="transfer-notice" class="connection-notice transfer-notice" hidden>
-      <span>在这个浏览器的 GitHub 页面做过题？可将本机资料和待上传成绩转到国内网址。</span>
-      <button class="link-button icon-action" type="button" data-action="transfer-domestic">转移到国内网址 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button>
-      <button class="link-button" type="button" data-action="download-transfer">下载迁移文件</button>
-    </div>
-
     <main>
       <div id="home-view">
         <section class="hero" id="home">
@@ -1102,6 +1179,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
 
   <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码是以前备份的完整代码，第一次使用只需填写上方昵称。身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><label for="identity-code">身份码</label><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><details id="saved-profiles" class="recovery" hidden><summary>切换本机保留的资料</summary><p class="muted small">切换时会保留当前本机资料和未上传成绩。</p><div id="saved-profiles-list"></div></details><details id="file-import" class="recovery" hidden><summary>导入迁移文件</summary><p class="muted small">选择从原网址下载的迁移文件。文件含有身份资料，请妥善保管。</p><label for="transfer-file">选择迁移文件</label><input id="transfer-file" type="file" accept=".json,application/json"></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="profile-history" class="link-button icon-action" type="button" data-action="open-history" hidden>我的答题记录 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><button id="profile-badges" class="link-button icon-action" type="button" data-action="open-badges" hidden>我的勋章 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><br><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
   <dialog id="transfer-dialog" aria-labelledby="transfer-title"><div class="dialog-top"><div><p class="eyebrow">TRANSFER</p><h2 id="transfer-title">转移本机资料</h2></div><button class="close-button" type="button" data-action="close-transfer" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><output id="transfer-description" class="muted" aria-live="polite">正在读取原网址的资料…</output><p id="transfer-detail" class="profile-note"></p><p id="transfer-error" class="error-text" role="alert"></p><div class="dialog-actions"><button id="transfer-confirm" class="btn btn-primary" type="button" data-action="confirm-transfer" hidden>确认转移并上传</button><button class="btn btn-ghost" type="button" data-action="close-transfer">取消</button></div></dialog>
+  <dialog id="backup-dialog" class="social-confirm-dialog" aria-labelledby="backup-title"><div class="dialog-top"><h2 id="backup-title">备份本机资料</h2><button class="close-button" type="button" data-action="close-backup" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted">备份文件包含可修改资料的身份信息，请妥善保管，不要发送给他人。</p><div class="dialog-actions"><button class="btn btn-ghost" type="button" data-action="close-backup">取消</button><button class="btn btn-primary" type="button" data-action="confirm-download-transfer">下载备份</button></div></dialog>
   <dialog id="diagram-dialog" class="diagram-dialog" aria-labelledby="diagram-dialog-title"><div class="dialog-top"><div><p class="eyebrow">TACTICAL MAP</p><h2 id="diagram-dialog-title">放大查看示意图</h2></div><button class="close-button" type="button" data-action="close-diagram" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="diagram-dialog-hint">手机可左右滑动查看完整图解。</p><div id="diagram-dialog-content" class="diagram-dialog-content"></div></dialog>
   <dialog id="honor-dialog" class="honor-dialog" aria-labelledby="honor-dialog-title"><div class="dialog-top"><div><p class="eyebrow">HALL OF HONORS</p><h2 id="honor-dialog-title">趣味榜</h2></div><button class="close-button" type="button" data-action="close-honor-detail" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p id="honor-detail-description" class="honor-dialog-description"></p><div class="honor-detail-tabs" aria-label="查看趣味榜"><button type="button" data-action="honor-mode" data-mode="history" aria-pressed="true">历史获得者</button><button type="button" data-action="honor-mode" data-mode="current" aria-pressed="false">当前排名</button></div><p class="honor-history-note">历史名单按现存答卷推算，并包含之后的纪录留档；旧答卷没有完成时间时使用上传时间，已删除的记录无法还原。并列榜首都获得勋章，纪录被超越后会让出。</p><output id="honor-detail-status" class="honor-detail-status" aria-live="polite"></output><ol id="honor-detail-list" class="honor-detail-list"></ol><div class="honor-detail-pages"><button id="honor-detail-prev" type="button" data-action="honor-prev">上一页</button><span id="honor-detail-page"></span><button id="honor-detail-next" type="button" data-action="honor-next">下一页</button></div></dialog>
   <dialog id="social-dialog" class="social-dialog" aria-labelledby="social-title">
@@ -5508,7 +5586,13 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
   const localPreview = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('api')==='local';
   const previewPort = new URLSearchParams(location.search).get('api-port');
   const localApiPort = /^\d{1,5}$/.test(previewPort || '') ? previewPort : '8787';
-  const API = localPreview ? `http://127.0.0.1:${localApiPort}` : 'https://www.lysue.com/spiral-raid-quiz';
+  const GITHUB_ORIGIN = 'https://found-l.github.io';
+  const DOMESTIC_ORIGIN = 'https://www.lysue.com';
+  const DOMESTIC_URL = `${DOMESTIC_ORIGIN}/spiral-raid-quiz/`;
+  const OVERSEAS_URL = `${GITHUB_ORIGIN}/spiral-raid-quiz/`;
+  const OVERSEAS_API = 'https://spiral-raid-quiz-api.foundliny.chatgpt.site';
+  const productionApi = location.origin === GITHUB_ORIGIN ? OVERSEAS_API : `${DOMESTIC_ORIGIN}/spiral-raid-quiz`;
+  const API = localPreview ? `http://127.0.0.1:${localApiPort}` : productionApi;
   const bank = JSON.parse(document.getElementById('question-bank').textContent);
   const bankQuestions = bank.questions;
   let qs = bankQuestions;
@@ -5521,9 +5605,6 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
   const KEY = 'spiral-temple-quiz-v1';
   const transferStorageKeys = [':identity', ':profile', ':pending', ':draft', ':last-result', ':local-profiles'];
   const transferTransactionKey = KEY + ':transfer-transaction';
-  const GITHUB_ORIGIN = 'https://found-l.github.io';
-  const DOMESTIC_ORIGIN = 'https://www.lysue.com';
-  const DOMESTIC_URL = `${DOMESTIC_ORIGIN}/spiral-raid-quiz/`;
   const $ = (id) => document.getElementById(id);
   function recoverTransferTransaction() {
     try {
@@ -6505,6 +6586,7 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
   let transferWindow = null;
   let incomingTransfer = null;
   let transferSender = null;
+  let transferSenderOrigin = null;
   const transferHash = '#import-github';
   const transferPrefix = 'spiral-quiz-transfer-v1';
   const transferLimit = 5 * 1024 * 1024;
@@ -6517,12 +6599,12 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     if (!value || typeof value !== 'object' || value.schema !== 1 || !value.identity ||
         !/^[a-f0-9]{32}$/.test(value.identity.deviceId || '') ||
         !/^[a-f0-9]{64}$/.test(value.identity.secret || '') ||
-        !value.profile || typeof value.profile.nickname !== 'string' ||
+        (value.profile !== null && (!value.profile || typeof value.profile.nickname !== 'string')) ||
         !Array.isArray(value.pending) || !value.draft || typeof value.draft !== 'object' ||
         !value.draft.answers || typeof value.draft.answers !== 'object' || Array.isArray(value.draft.answers)) {
       throw new Error('迁移资料格式不正确，请在原网址重新发起转移。');
     }
-    validNickname(value.profile.nickname);
+    if (value.profile) validNickname(value.profile.nickname);
     for (const item of value.pending) {
       if (!item || !/^[a-f0-9]{32}$/.test(item.attemptId || '') ||
           typeof item.version !== 'string' || !item.answers || typeof item.answers !== 'object' || Array.isArray(item.answers)) {
@@ -6609,31 +6691,34 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     return {next:{...imported, pending, draft:incomingHasDraft ? imported.draft : current.draft,
       lastResult:imported.lastResult || current.lastResult}, archives};
   }
-  function presentTransfer(value, sender = null) {
+  function presentTransfer(value, sender = null, senderOrigin = null) {
     try {
       const data = validateSnapshot(value);
-      incomingTransfer = data; transferSender = sender;
+      incomingTransfer = data; transferSender = sender; transferSenderOrigin = senderOrigin;
       const differs = hasLocalWork(currentSnapshot()) && !sameIdentity(identity, data.identity);
-      $('transfer-description').textContent = `即将转移“${data.profile.nickname}”的资料和 ${data.pending.length} 条待上传成绩。`;
+      $('transfer-description').textContent = `即将转移“${data.profile?.nickname || '未设置昵称'}”的资料和 ${data.pending.length} 条待上传成绩。`;
       $('transfer-detail').textContent = differs
-        ? '此网址已有其他本机资料，将先保留；可在修改资料中切换。请先关闭国内网址的其他标签页。原网址的数据会保留。'
-        : '原网址的数据会保留。若两处都有不同的未交卷进度，会保留另一份供切换。请先关闭国内网址的其他标签页。';
+        ? '此网址已有其他本机资料，将先保留；可在修改资料中切换。请先关闭此网址的其他标签页。原网址的数据会保留。'
+        : '原网址的数据会保留。若两处都有不同的未交卷进度，会保留另一份供切换。请先关闭此网址的其他标签页。';
       $('transfer-error').textContent = ''; $('transfer-confirm').hidden = false;
+      $('transfer-confirm').textContent = data.profile ? '确认转移并同步' : '确认转移';
       if ($('profile-dialog').open) closeProfile();
       if (!$('transfer-dialog').open) $('transfer-dialog').showModal();
     } catch (error) {
-      incomingTransfer = null; $('transfer-confirm').hidden = true;
+      incomingTransfer = null; transferSender = null; transferSenderOrigin = null; $('transfer-confirm').hidden = true;
       $('transfer-error').textContent = error.message;
       if ($('profile-dialog').open) closeProfile();
       if (!$('transfer-dialog').open) $('transfer-dialog').showModal();
     }
   }
   function closeTransfer() {
-    $('transfer-dialog').close(); incomingTransfer = null; transferSender = null;
+    $('transfer-dialog').close(); incomingTransfer = null; transferSender = null; transferSenderOrigin = null;
     if (location.hash === transferHash) window.history.replaceState(null, '', location.pathname + location.search);
   }
   function syncTransferredProfile() {
-    setView('home'); openHistory();
+    setView('home');
+    if (!profile) return;
+    openHistory();
     void retryConnection().then(() => { if (view === 'history') void loadHistory(); })
       .catch(error => toast(error.message));
   }
@@ -6643,9 +6728,9 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     try {
       const {next, archives} = mergeForTransfer(incomingTransfer);
       persistSnapshot(next, archives);
-      if (transferSender) transferSender.postMessage({type:transferPrefix + ':done'}, GITHUB_ORIGIN);
+      if (transferSender && transferSenderOrigin) transferSender.postMessage({type:transferPrefix + ':done'}, transferSenderOrigin);
       closeTransfer(); syncTransferredProfile();
-      toast('资料已转移，正在同步成绩。');
+      toast(profile ? '资料已转移，正在同步成绩。' : '本机进度已转移，设置昵称后可同步成绩。');
     } catch (error) { resumeTimer(); $('transfer-error').textContent = error.message; }
   }
   function restoreLocalProfile(id) {
@@ -6665,19 +6750,32 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
       if (profile) syncTransferredProfile(); else { setView('home'); toast('已切换到未设置昵称的本机资料。'); }
     } catch (error) { resumeTimer(); $('profile-error').textContent = error.message; }
   }
-  function startTransfer() {
-    if (!profile) { toast('请先在此网址设置昵称。'); return; }
-    transferWindow = window.open(DOMESTIC_URL + transferHash, '_blank');
+  function otherOrigin() {
+    if (location.origin === GITHUB_ORIGIN) return DOMESTIC_ORIGIN;
+    if (location.origin === DOMESTIC_ORIGIN) return GITHUB_ORIGIN;
+    return null;
+  }
+  function startTransfer(site = 'domestic') {
+    if (!['domestic', 'overseas'].includes(site)) return;
+    const url = site === 'domestic' ? DOMESTIC_URL : OVERSEAS_URL;
+    if (location.origin === new URL(url).origin) return;
+    $('site-switch').open = false;
+    if (!otherOrigin() || !hasLocalWork(currentSnapshot())) { location.assign(url); return; }
+    transferWindow = window.open(url + transferHash, '_blank');
     if (!transferWindow) toast('浏览器阻止了新页面，请允许弹窗或下载迁移文件。');
   }
   function downloadTransfer() {
-    if (!profile) { toast('请先在此网址设置昵称。'); return; }
-    if (!confirm('迁移文件包含可修改资料的身份信息，请妥善保管，不要发送给他人。继续下载？')) return;
+    $('site-switch').open = false;
+    if (!hasLocalWork(currentSnapshot())) { toast('当前没有需要备份的本机资料。'); return; }
+    $('backup-dialog').showModal();
+  }
+  function confirmDownloadTransfer() {
     try {
       const data = validateSnapshot(currentSnapshot());
       const url = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:'application/json'}));
       const link = document.createElement('a'); link.href = url; link.download = '螺旋寺院-迁移资料.json'; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
+      $('backup-dialog').close();
     } catch (error) { toast(error.message); }
   }
   async function readTransferFile(event) {
@@ -6692,32 +6790,44 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     }
   }
   window.addEventListener('message', event => {
-    if (location.origin === GITHUB_ORIGIN && event.origin === DOMESTIC_ORIGIN &&
-        transferWindow && event.source === transferWindow && event.data?.type === transferPrefix + ':ready') {
-      try { transferWindow.postMessage({type:transferPrefix + ':data', snapshot:validateSnapshot(currentSnapshot())}, DOMESTIC_ORIGIN); }
+    const peer = otherOrigin();
+    if (!peer || event.origin !== peer) return;
+    if (transferWindow && event.source === transferWindow && event.data?.type === transferPrefix + ':ready') {
+      try { transferWindow.postMessage({type:transferPrefix + ':data', snapshot:validateSnapshot(currentSnapshot())}, peer); }
       catch (error) { toast(error.message); }
-    } else if (location.origin === DOMESTIC_ORIGIN && location.hash === transferHash &&
-               event.origin === GITHUB_ORIGIN && window.opener && event.source === window.opener &&
+    } else if (location.hash === transferHash && window.opener && event.source === window.opener &&
                event.data?.type === transferPrefix + ':data') {
-      presentTransfer(event.data.snapshot, event.source);
-    } else if (location.origin === GITHUB_ORIGIN && event.origin === DOMESTIC_ORIGIN &&
-               transferWindow && event.source === transferWindow && event.data?.type === transferPrefix + ':done') {
-      toast('资料已转移，请在国内网址查看同步结果。');
+      presentTransfer(event.data.snapshot, event.source, event.origin);
+    } else if (transferWindow && event.source === transferWindow && event.data?.type === transferPrefix + ':done') {
+      toast('资料已转移，请在新网址查看同步结果。');
     }
   });
   function initializeTransfer() {
-    $('transfer-notice').hidden = location.origin !== GITHUB_ORIGIN;
-    $('file-import').hidden = location.origin !== DOMESTIC_ORIGIN;
+    const peer = otherOrigin();
+    let current = '';
+    if (location.origin === DOMESTIC_ORIGIN) current = 'domestic';
+    if (location.origin === GITHUB_ORIGIN) current = 'overseas';
+    const label = {domestic:'国内站', overseas:'国外站'}[current] || '站点';
+    $('site-current').textContent = label;
+    const summary = $('site-switch').querySelector('summary');
+    if (summary) summary.setAttribute('aria-label', current ? `当前${label}，切换访问站点` : '选择访问站点');
+    for (const name of ['domestic', 'overseas']) {
+      const button = $('site-' + name);
+      button.disabled = current === name;
+      const tag = button.querySelector('.site-current-tag');
+      if (tag) tag.hidden = current !== name;
+    }
+    $('file-import').hidden = !peer;
     $('transfer-file').addEventListener('change', readTransferFile);
-    if (location.origin !== DOMESTIC_ORIGIN || location.hash !== transferHash) return;
+    if (!peer || location.hash !== transferHash) return;
     $('transfer-description').textContent = '正在读取原网址的资料…';
     $('transfer-confirm').hidden = true;
     $('transfer-dialog').showModal();
     if (!window.opener) {
-      $('transfer-error').textContent = '请回到原 GitHub 页面，点击“转移到国内网址”；也可使用迁移文件导入。';
+      $('transfer-error').textContent = '请回到原网址，在站点菜单中重新切换；也可使用备份文件导入。';
       return;
     }
-    window.opener.postMessage({type:transferPrefix + ':ready'}, GITHUB_ORIGIN);
+    window.opener.postMessage({type:transferPrefix + ':ready'}, peer);
     setTimeout(() => {
       if (!incomingTransfer && $('transfer-dialog').open) $('transfer-error').textContent = '暂未收到资料，请回到原页面重试，或下载迁移文件后导入。';
     }, 10000);
@@ -6785,7 +6895,16 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     ['sequence-next', target => stepSequence(target, 1)],
     ['close-diagram', () => $('diagram-dialog').close()],
   ]);
+  let navigationOpen = false;
+  function setNavigation(open) {
+    navigationOpen = open;
+    $('main-nav').classList.toggle('is-open', open);
+    $('nav-toggle').setAttribute('aria-expanded', String(open));
+    $('nav-toggle').setAttribute('aria-label', open ? '关闭导航菜单' : '打开导航菜单');
+  }
   document.addEventListener('click',(e)=>{
+    if (!e.target.closest('#site-switch')) $('site-switch').open = false;
+    if (e.target.closest('#main-nav') || (navigationOpen && !e.target.closest('#nav-toggle'))) setNavigation(false);
     if (view !== 'home' && e.target.closest('a[href="#guide"], a[href="#home"]')) setView('home');
     const target=e.target.closest('[data-action]'); if(!target)return;
     const featureAction = featureActions.get(target.dataset.action);
@@ -6796,8 +6915,12 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
       case 'close-profile': closeProfile();break;
       case 'copy-identity': copyIdentity();break;
       case 'import-identity': importIdentity();break;
-      case 'transfer-domestic': startTransfer();break;
+      case 'transfer-domestic': startTransfer('domestic');break;
+      case 'switch-site': startTransfer(target.dataset.site);break;
+      case 'toggle-navigation': $('site-switch').open = false; setNavigation(!navigationOpen);break;
       case 'download-transfer': downloadTransfer();break;
+      case 'confirm-download-transfer': confirmDownloadTransfer();break;
+      case 'close-backup': $('backup-dialog').close();break;
       case 'confirm-transfer': confirmTransfer();break;
       case 'close-transfer': closeTransfer();break;
       case 'restore-local-profile': restoreLocalProfile(target.dataset.archiveId);break;
@@ -6830,6 +6953,10 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
         break;
       }
     }
+  });
+  $('site-switch').addEventListener('toggle', () => { if ($('site-switch').open) setNavigation(false); });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { $('site-switch').open = false; setNavigation(false); }
   });
   $('profile-dialog').addEventListener('cancel',()=>{afterProfile=null;candidate=identity;});
   $('transfer-dialog').addEventListener('cancel', e=>{e.preventDefault();closeTransfer();});

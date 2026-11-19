@@ -34,7 +34,8 @@ function createHarness(origin, initial, hash = '') {
   getElement('question-bank').textContent = JSON.stringify(bank);
   const opener = {messages:[], postMessage(data, target){this.messages.push({data,target});}};
   const child = {messages:[], postMessage(data, target){this.messages.push({data,target});}};
-  global.location = {origin, hostname:new URL(origin).hostname, search:'', hash, pathname:'/spiral-raid-quiz/'};
+  let assigned = null;
+  global.location = {origin, hostname:new URL(origin).hostname, search:'', hash, pathname:'/spiral-raid-quiz/', assign:url=>{assigned=url;}};
   global.localStorage = {getItem:k=>storage.get(k) ?? null, setItem(k,v){
     if (failOnce && k.endsWith(failOnce)) { failOnce=''; throw new Error('quota'); }
     storage.set(k,v);
@@ -60,6 +61,7 @@ function createHarness(origin, initial, hash = '') {
   };
   delete require.cache[require.resolve('../app.js')]; require('../app.js');
   return {storage, opener, child, submissions, getElement, windowListeners, documentListeners,
+    assigned:()=>assigned,
     online:()=>{online=true;}, failOn:suffix=>{failOnce=suffix;},
     click:(action,extra={})=>documentListeners.click({target:{closest:selector=>selector==='[data-action]' ? {dataset:{action,...extra}} : null}})};
 }
@@ -117,12 +119,50 @@ const wait = () => new Promise(resolve => setTimeout(resolve, 30));
   assert.deepEqual(archived[0].snapshot.identity, destinationIdentity);
   assert.deepEqual(archived[0].snapshot.pending, [destinationAttempt]);
   assert.equal(destination.opener.messages.at(-1).target, 'https://found-l.github.io');
-
   destination.click('restore-local-profile', {archiveId:archived[0].id}); await wait();
   assert.deepEqual(read(destination, ':identity'), destinationIdentity);
   assert.equal(destination.submissions.length, 2);
   assert.equal(destination.submissions[1].attemptId, destinationAttempt.attemptId);
   assert.equal(read(destination, ':local-profiles')[0].snapshot.profile.nickname, '旧玩家');
+
+  const reverseSource = createHarness('https://www.lysue.com', {
+    ':identity':sourceIdentity, ':profile':{nickname:'国内玩家'}, ':pending':[oldAttempt],
+    ':draft':{version:bank.version,index:0,answers:{q001:['a']}}
+  });
+  reverseSource.click('switch-site', {site:'overseas'});
+  assert.equal(reverseSource.child.url, 'https://found-l.github.io/spiral-raid-quiz/#import-github');
+  reverseSource.windowListeners.message({origin:'https://evil.example',source:reverseSource.child,data:ready});
+  assert.equal(reverseSource.child.messages.length, 0);
+  reverseSource.windowListeners.message({origin:'https://found-l.github.io',source:reverseSource.child,data:ready});
+  assert.equal(reverseSource.child.messages[0].target, 'https://found-l.github.io');
+  const reverseData = reverseSource.child.messages[0].data;
+  const reverseDestination = createHarness('https://found-l.github.io', {
+    ':identity':destinationIdentity, ':profile':{nickname:'国外原资料'}, ':pending':[destinationAttempt],
+    ':draft':{version:bank.version,index:0,answers:{q002:['a']}}
+  }, '#import-github');
+  assert.equal(reverseDestination.opener.messages[0].target, 'https://www.lysue.com');
+  reverseDestination.windowListeners.message({origin:'https://www.lysue.com',source:reverseDestination.opener,data:reverseData});
+  assert.match(reverseDestination.getElement('transfer-description').textContent, /国内玩家.*1 条/);
+  reverseDestination.click('confirm-transfer');
+  assert.deepEqual(read(reverseDestination, ':identity'), sourceIdentity);
+  assert.equal(read(reverseDestination, ':local-profiles')[0].snapshot.profile.nickname, '国外原资料');
+  assert.equal(reverseDestination.opener.messages.at(-1).target, 'https://www.lysue.com');
+
+  const draftSource = createHarness('https://found-l.github.io', {
+    ':identity':sourceIdentity, ':draft':{version:bank.version,index:0,answers:{q001:['a']}}
+  });
+  draftSource.click('switch-site', {site:'domestic'});
+  draftSource.windowListeners.message({origin:'https://www.lysue.com',source:draftSource.child,data:ready});
+  const draftDestination = createHarness('https://www.lysue.com', {':identity':destinationIdentity}, '#import-github');
+  draftDestination.windowListeners.message({origin:'https://found-l.github.io',source:draftDestination.opener,data:draftSource.child.messages[0].data});
+  assert.match(draftDestination.getElement('transfer-description').textContent, /未设置昵称/);
+  draftDestination.click('confirm-transfer');
+  assert.deepEqual(read(draftDestination, ':draft').answers.q001, ['a']);
+  assert.equal(draftDestination.storage.has(key + ':profile'), false);
+
+  const emptySource = createHarness('https://www.lysue.com', {':identity':sourceIdentity});
+  emptySource.click('switch-site', {site:'overseas'});
+  assert.equal(emptySource.assigned(), 'https://found-l.github.io/spiral-raid-quiz/');
 
   const previous = Object.fromEntries([':identity', ':profile', ':pending', ':draft', ':last-result', ':local-profiles']
     .map(suffix=>[suffix, null]));

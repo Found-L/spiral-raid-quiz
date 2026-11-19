@@ -1,18 +1,12 @@
 import handler from "vinext/server/fetch-handler";
 import { runWithConnectorBinding } from "../lib/connector-context";
 import type { ConnectorBinding } from "../lib/connector-contract.mjs";
+import { quizProxyRequest } from "./quiz-proxy.mjs";
 
 const worker = {
   fetch(request: Request, env: Cloudflare.Env, ctx: ExecutionContext<{ CONNECTORS?: ConnectorBinding }>) {
-    const target = new URL(request.url);
-    if (['/api/profile', '/api/submit', '/api/history', '/api/delete-profile', '/api/leaderboard'].includes(target.pathname)) {
-      target.protocol = 'https:';
-      target.host = 'www.lysue.com';
-      target.pathname = '/spiral-raid-quiz' + target.pathname;
-      const forwarded = new Request(target, request);
-      forwarded.headers.delete('host');
-      return fetch(forwarded);
-    }
+    const forwarded = quizProxyRequest(request);
+    if (forwarded) return fetch(forwarded);
     let binding = ctx.props?.CONNECTORS;
     // Local preview emulates the same request-scoped capability. This branch and
     // the auxiliary service binding are absent from production builds.

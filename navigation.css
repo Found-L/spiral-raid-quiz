@@ -1,0 +1,76 @@
+/* Temple seal, navigation and site selector share the page's teal-and-gold palette. */
+.topbar { height: 88px; gap: clamp(10px, 1.4vw, 24px); padding-inline: clamp(18px, 5.5vw, 100px); background: linear-gradient(110deg, #101b22f5, #0c141cf8 65%, #132525f5); box-shadow: 0 12px 32px #0003; }
+.topbar::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, #c6aa7060 24%, #76b6a14a 70%, transparent); }
+.brand { gap: 10px; flex: none; }
+.brand-mark { width: 48px; height: 48px; border: 0; border-radius: 50%; background: radial-gradient(circle at 50% 45%, #28443d, #111b20 70%); box-shadow: 0 0 18px #c5a26a24; }
+.brand-mark svg { width: 100%; height: 100%; fill: none; stroke: #e8c892; stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
+.brand-mark svg > circle:first-child { stroke: #c9a86e; stroke-width: 1; }
+.brand-mark .brand-ring { stroke: #81bba7; stroke-width: .6; stroke-dasharray: 42 4 12 5; opacity: .8; }
+.brand-mark .brand-star { fill: #f8d9a0; stroke: none; }
+.brand-copy strong { color: #f1eadb; font-size: 17px; letter-spacing: .1em; }
+.brand-copy small { margin-top: 2px; color: #a7b7ad; font-size: 10px; letter-spacing: .12em; }
+.nav-links { display: flex; gap: 3px; margin-left: auto; padding: 4px; border: 1px solid #a3c6ae1d; border-radius: 9px; background: #14242a9c; }
+.nav-links a, .nav-links button { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 12px; border: 0; border-radius: 6px; background: transparent; color: #cbd7cf; font-size: 13px; white-space: nowrap; transition: color .2s, background .2s, box-shadow .2s; }
+.nav-links .icon { width: 16px; height: 16px; color: #9cb8a9; }
+.nav-links a:hover, .nav-links button:hover, .nav-links a:focus-visible, .nav-links button:focus-visible { color: #f7e5bd; background: #36514b80; box-shadow: inset 0 0 0 1px #d8c08a35; }
+.nav-links a:hover .icon, .nav-links button:hover .icon { color: #e7c78c; }
+.site-switch { position: relative; flex: none; }
+.site-switch summary, .nav-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 0 11px; border: 1px solid #758e7c55; border-radius: 7px; color: #dbe6d9; background: #172a2d; cursor: pointer; font-size: 13px; white-space: nowrap; list-style: none; }
+.site-switch summary::-webkit-details-marker { display: none; }
+.site-switch summary:hover, .site-switch[open] summary, .nav-toggle:hover { border-color: #c6af7b; background: #253d39; color: #f5dfb6; }
+.site-switch summary:focus-visible, .nav-toggle:focus-visible { outline: 2px solid #f4cf8e; outline-offset: 3px; }
+.site-switch summary .icon { width: 17px; height: 17px; color: #a6d2c0; }
+.site-switch summary .site-chevron { width: 14px; height: 14px; transition: transform .2s; }
+.site-switch[open] .site-chevron { transform: rotate(180deg); }
+.site-switch-panel { position: absolute; top: calc(100% + 10px); right: 0; z-index: 12; width: 270px; padding: 12px; border: 1px solid #9c987068; border-radius: 9px; background: linear-gradient(150deg, #1c3332, #101b22 78%); box-shadow: 0 18px 45px #000a, 0 0 26px #5ba89b1a; }
+.site-switch-heading { margin: 2px 4px 8px; color: #d9c39b; font-size: 12px; font-weight: 700; }
+.site-switch-panel > button:not(.site-backup) { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 9px 10px; text-align: left; border: 1px solid transparent; border-radius: 6px; color: #eef1e7; background: transparent; }
+.site-switch-panel > button:not(.site-backup):hover { border-color: #99b6a961; background: #29443d8a; }
+.site-switch-panel > button:disabled { cursor: default; }
+.site-switch-panel strong, .site-switch-panel small { display: block; }
+.site-switch-panel strong { font-size: 13px; }
+.site-switch-panel small { margin-top: 2px; color: #9fb5aa; font-size: 11px; }
+.site-current-tag { padding: 3px 7px; border-radius: 20px; color: #bce8d8; background: #356b5b7a; font-size: 11px; }
+.site-switch-note { margin: 8px 4px; color: #abbeb4; font-size: 11px; line-height: 1.55; }
+.site-backup { padding: 5px 4px; border: 0; background: none; color: #e2c895; font-size: 12px; }
+.profile-trigger { min-height: 44px; border-color: #9eb7a53d; border-radius: 7px; background: #17272c; }
+.profile-trigger #header-profile { min-width: 0; max-width: clamp(64px, 11vw, 150px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-toggle { display: none; }
+@media (max-width: 1100px) {
+  .nav-toggle { display: inline-flex; }
+  .site-switch { margin-left: auto; }
+  .nav-links { display: none; position: absolute; top: calc(100% + 8px); right: clamp(18px, 5.5vw, 100px); z-index: 11; width: min(280px, calc(100vw - 36px)); padding: 8px; border-color: #9c987068; background: linear-gradient(150deg, #1c3332, #101b22 78%); box-shadow: 0 18px 45px #000a; }
+  .nav-links.is-open { display: grid; }
+  .nav-links a, .nav-links button { justify-content: flex-start; min-height: 44px; }
+}
+@media (max-width: 680px) {
+  .topbar { height: 68px; gap: 6px; padding-inline: 12px; }
+  .brand { gap: 6px; min-width: 0; }
+  .brand-mark { width: 38px; height: 38px; }
+  .brand-copy strong { font-size: 13px; letter-spacing: .04em; }
+  .brand-copy small { font-size: 9px; letter-spacing: .02em; }
+  .site-switch { position: static; }
+  .site-switch summary { min-height: 40px; padding-inline: 8px; font-size: 12px; }
+  .site-switch summary .icon { width: 15px; height: 15px; }
+  .site-switch summary .site-chevron { width: 12px; }
+  .site-switch-panel { top: calc(100% + 8px); right: 12px; left: 12px; width: auto; }
+  .profile-trigger { min-height: 40px; margin-left: 0; padding: 4px 7px; gap: 6px; }
+  .profile-trigger #header-profile { max-width: clamp(45px, 15vw, 90px); font-size: 11px; }
+  .profile-arrow { display: none; }
+  .nav-toggle { min-width: 40px; min-height: 40px; padding: 0; }
+  .nav-toggle span { display: none; }
+  .nav-links { right: 12px; width: min(280px, calc(100vw - 24px)); }
+}
+@media (max-width: 360px) {
+  .brand-copy small { display: none; }
+  .brand-mark { width: 34px; height: 34px; }
+  .site-switch summary { gap: 4px; padding-inline: 6px; }
+  .profile-trigger #header-profile { max-width: 46px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .brand-mark .brand-ring { transform-box: fill-box; transform-origin: center; animation: brand-orbit 24s linear infinite; }
+  .brand-mark .brand-star { animation: brand-glimmer 4s ease-in-out infinite; }
+}
+@keyframes brand-orbit { to { transform: rotate(360deg); } }
+@keyframes brand-glimmer { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .site-switch summary .site-chevron, .nav-links a, .nav-links button { transition: none; } }

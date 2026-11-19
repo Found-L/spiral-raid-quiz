@@ -2,7 +2,7 @@ import base64
 from pathlib import Path
 root=Path(__file__).resolve().parent
 template=(root/'template.html').read_text(encoding='utf-8')
-css='\n'.join((root/name).read_text(encoding='utf-8') for name in ('style.css','detail.css','social.css','share.css','cinematic.css'))
+css='\n'.join((root/name).read_text(encoding='utf-8') for name in ('style.css','detail.css','social.css','share.css','cinematic.css','navigation.css'))
 js='\n'.join((root/name).read_text(encoding='utf-8') for name in ('badge-art.js','social-ui.js','share-ui.js','app.js'))
 background='data:image/webp;base64,' + base64.b64encode((root/'assets'/'share-temple-v1.webp').read_bytes()).decode('ascii')
 assert js.count('/*__SHARE_BACKGROUND__*/') == 1
