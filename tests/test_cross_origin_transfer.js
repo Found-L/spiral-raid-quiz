@@ -241,7 +241,7 @@ const wait = () => new Promise(resolve => setTimeout(resolve, 30));
   extended.online(); extended.click('start');
   const extendedDraft = read(extended, ':draft');
   assert.deepEqual(extendedDraft.order.slice(0,oldOrder.length),oldOrder);
-  assert.deepEqual(new Set(extendedDraft.order.slice(oldOrder.length)),new Set(['q101','q102']));
+  assert.deepEqual(new Set(extendedDraft.order.slice(oldOrder.length)),new Set(['q101','q102','q103']));
   assert.deepEqual(extendedDraft.optionOrder[oldOrder[0]],oldOptions[oldOrder[0]]);
   assert.equal(extendedDraft.index,4);
   assert.deepEqual(extendedDraft.answers[oldOrder[0]],[oldOptions[oldOrder[0]][0]]);

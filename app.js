@@ -878,7 +878,10 @@
     for (const actor of scene.actors) {
       const node = container.querySelector(`[data-actor="${actor.id}"]`);
       const [x, y] = step.positions?.[actor.id] || [actor.x, actor.y];
-      if (node) node.style.transform = `translate(${x}px, ${y}px)`;
+      if (node) {
+        node.style.transform = `translate(${x}px, ${y}px)`;
+        node.classList.toggle('scene-hidden', (step.hidden || []).includes(actor.id));
+      }
     }
     container.querySelectorAll('[data-cue]').forEach(node => {
       node.classList.toggle('active', (step.cues || []).includes(node.dataset.cue));
@@ -913,7 +916,7 @@
       const rect = container.getBoundingClientRect();
       if (rect.width && rect.bottom > 0 && rect.top < innerHeight) applySequence(container, Number(container.dataset.step) + 1);
     });
-  }, 3500);
+  }, 5000);
   function openDiagram(target) {
     const figure = target.closest('.raid-diagram');
     if (!figure) return;
