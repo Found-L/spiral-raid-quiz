@@ -81,6 +81,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   background: #151d25;
   color: #d5d4c9;
   font-size: 13px;
+  transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
 }
 .guide-chapters a[aria-current],
 .guide-chapters a:hover,
@@ -93,6 +94,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   border-top-color: #7b684d;
   background: #121a23;
   scroll-margin-top: 16px;
+  transition: border-color .22s ease, box-shadow .22s ease;
 }
 .guide-stage > .eyebrow { margin-bottom: 9px; letter-spacing: .06em; }
 .guide-stage h2 { margin: 0 0 16px; font: 600 clamp(20px, 2.9vw, 30px)/1.38 var(--serif); }
@@ -192,7 +194,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .close-button:hover { color: var(--gold); border-color: var(--line); background: #222a30; }
 .close-button .icon { width: 19px; height: 19px; }
 
-.guide-card { border-radius: 3px; }
+.guide-card { border-radius: 3px; transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
 .guide-card .diagram {
   border: 1px solid rgba(229,214,181,.07);
   border-radius: 3px;
@@ -279,7 +281,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .badges-actions { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 15px; padding: 8px 0; background: rgba(11,16,23,.96); }
 .badges-note { margin: 18px 0 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
 .rank-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-.badge-chip { display: inline-flex; align-items: center; gap: 3px; max-width: 100%; padding: 2px 6px; border: 1px solid color-mix(in srgb, var(--badge-color) 45%, transparent); border-radius: 3px; color: var(--badge-color); background: rgba(224,196,151,.04); font-size: 10px; line-height: 1.4; white-space: nowrap; }
+.badge-chip { display: inline-flex; align-items: center; gap: 3px; max-width: 100%; padding: 2px 6px; border: 1px solid color-mix(in srgb, var(--badge-color) 45%, transparent); border-radius: 3px; color: var(--badge-color); background: rgba(224,196,151,.04); font-size: 10px; line-height: 1.4; white-space: nowrap; transition: background .2s ease, border-color .2s ease; }
 .badge-chip .icon { width: 12px; height: 12px; stroke-width: 1.8; }
 .result-honors { display: inline-grid; gap: 7px; margin-top: 15px; padding: 13px 18px; border: 1px solid #826b4b; border-radius: 8px; background: #271f1a; text-align: left; }
 .result-honors > span { color: #f0d19d; font-size: 13px; font-weight: 700; }
@@ -294,6 +296,53 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   .badge-card { min-height: 0; }
   .badge-chip { font-size: 10px; }
   .diagram-dialog { max-height: 90vh; }
+}
+
+/* Movement keeps the original route and markers visible, including when animation is off. */
+.map-route-glow { fill: none; stroke: #fff5d5; stroke-width: 1.8; stroke-linecap: round; stroke-dasharray: 4 18; opacity: .85; pointer-events: none; }
+.guide-card:focus-within { border-color: var(--accent); }
+.guide-stage:focus-within { border-color: #ad9167; box-shadow: 0 0 0 2px #d3aa7017; }
+.ranking-list .ranking-row { transition: background .2s ease, border-color .2s ease; }
+.ranking-row:first-child { background: linear-gradient(90deg, #d9b8780d, transparent 65%); }
+.ranking-list .rank-number { width: 30px; min-width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #6b604c; border-radius: 50%; background: #211f1b; font-size: 14px; }
+.ranking-row:nth-child(2) .rank-number { color: #c5d1d2; border-color: #647a7d; background: #1b282b; }
+.ranking-row:nth-child(3) .rank-number { color: #ddb39b; border-color: #86675a; background: #2b211e; }
+.badge-card .badge-crest { transition: transform .24s ease, box-shadow .24s ease; }
+
+@media (hover: hover) and (pointer: fine) {
+  .guide-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 12px 28px #0004; }
+  .guide-timeline button:hover, .guide-chapters a:hover { transform: translateY(-2px); background: #202a2d; }
+  .ranking-row:hover { background: #22302e; }
+  .badge-card.earned:hover .badge-crest { transform: rotate(-5deg) scale(1.05); box-shadow: inset 0 0 0 4px #0a1016aa, 0 0 18px #e8c27c30; }
+  .badge-chip:hover { background: #d9c49b1c; border-color: var(--badge-color); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-copy > * { animation: motion-arrive .65s backwards; }
+  .hero-copy h1 { animation-delay: .07s; }
+  .hero-description { animation-delay: .13s; }
+  .hero-actions, .hero-note { animation-delay: .2s; }
+  .hero-art svg { animation: hero-float 8s ease-in-out infinite; }
+  .map-route-glow { animation: route-flow 2.8s linear infinite; }
+  .ranking-row { animation: motion-arrive .45s backwards; }
+  .ranking-row:nth-child(2) { animation-delay: .045s; }
+  .ranking-row:nth-child(3) { animation-delay: .09s; }
+  .badge-card.badge-enter { animation: motion-arrive .42s backwards; }
+  .badge-card.badge-enter:nth-child(3n + 2) { animation-delay: .04s; }
+  .badge-card.badge-enter:nth-child(3n) { animation-delay: .08s; }
+  .badge-card.badge-change { animation: badge-select .42s ease-out; }
+  .result-honors:not([hidden]) { animation: motion-arrive .5s both; }
+}
+@keyframes motion-arrive { from { opacity: .65; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes hero-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+@keyframes route-flow { to { stroke-dashoffset: -22; } }
+@keyframes badge-select { 0% { transform: scale(.98); } 55% { transform: scale(1.015); } 100% { transform: scale(1); } }
+
+@media (max-width: 680px) {
+  .ranking-list .rank-number { width: 24px; min-width: 24px; height: 24px; font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-route-glow { display: none; }
 }
 </style>
 </head>
@@ -3475,11 +3524,14 @@ function drawRaidDiagram(key, caption, questionId = null) {
   const circle = (x, y, radius, style) => `<circle cx="${x}" cy="${y}" r="${radius}" class="${style}"/>`;
   const line = (path, style = 'map-rule') => `<path d="${path}" class="${style}"/>`;
   const label = (x, y, text, style = '') => `<text x="${x}" y="${y}" class="${style}">${text}</text>`;
-  const arrow = (x1, y1, x2, y2, style = 'map-gold-line') => {
+  const arrow = (x1, y1, x2, y2, style = 'map-gold-line', animate = true) => {
     const angle = Math.atan2(y2 - y1, x2 - x1);
     const base = [x2 - 10 * Math.cos(angle), y2 - 10 * Math.sin(angle)];
     const dx = 4 * Math.sin(angle), dy = 4 * Math.cos(angle);
-    return line(`M${x1} ${y1}L${x2} ${y2}M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`, style);
+    const shaft = `M${x1} ${y1}L${x2} ${y2}`;
+    const arrowhead = `M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`;
+    // Only the teaching guide adds a moving highlight; the underlying arrow stays visible.
+    return line(shaft + arrowhead, style) + (!test && animate ? line(shaft, 'map-route-glow') : '');
   };
   const token = (x, y, text, style = 'map-ally', radius = 12) =>
     circle(x, y, radius, style) + circle(x, y, Math.max(radius - 3, 1), 'map-token-ring') + label(x, y + 4.5, text, 'map-token');
@@ -3544,7 +3596,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       break;
     case 'spirit-facing':
       art = [boss(), token(128, 135, '火', 'map-hazard', 18), token(431, 135, '外', 'map-ally', 18),
-        arrow(157, 135, 244, 135, 'map-red-line'), arrow(458, 135, 516, 135, 'map-ally-line'),
+        arrow(157, 135, 244, 135, 'map-red-line', false), arrow(458, 135, 516, 135, 'map-ally-line', false),
         label(128, 182, '带业火 · 进隔离'), label(431, 182, '留外场 · 背对'), label(280, 222, '击倒切换时')].join('');
       break;
     case 'spirit-lamps': {
@@ -3564,10 +3616,11 @@ function drawRaidDiagram(key, caption, questionId = null) {
     case 'witch-line':
       art = [arena(), boss(305, 154, '首领'), line('M280 135L184 90 M280 135L323 38', 'map-red-line'),
         token(340, 156, 'T'), token(293, 192, '近'), token(234, 164, '队'), label(113, 72, '不祥气息'), line('M155 76l25 12')].join('');
-      if (!test) art += line('M348 168q6 37-35 50', 'map-ally-line') + arrow(334, 207, 313, 218, 'map-ally-line') + label(448, 208, '沿内侧带位');
+      if (!test) art += line('M348 168q6 37-35 50', 'map-ally-line') + line('M348 168q6 37-35 50', 'map-route-glow')
+        + arrow(334, 207, 313, 218, 'map-ally-line', false) + label(448, 208, '沿内侧带位');
       break;
     case 'witch-charge':
-      art = [arena(280, 135, 108), boss(), arrow(308, 135, 348, 135), label(360, 162, '面向'),
+      art = [arena(280, 135, 108), boss(), arrow(308, 135, 348, 135, 'map-gold-line', false), label(360, 162, '面向'),
         token(216, 197, '队'), token(241, 217, '队'), label(117, 214, '队友区')].join('');
       if (!test) art += arrow(252, 135, 188, 135, 'map-ally-line') + label(110, 138, '后冲方向') + label(449, 137, '前冲方向')
         + line('M304 126L372 74A112 112 0 0 1 386 121Z', 'map-scan') + label(458, 65, '扇面朝空处');
@@ -3588,7 +3641,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       art = [arena(), boss(280, 125, '首领'), spider(364, 178), swarm(399, 191),
         spider(195, 150), swarm(160, 172), spider(279, 49), swarm(312, 51),
         label(417, 162, '小蜘蛛'), label(379, 231, '处理区 A'), label(176, 222, '处理区 B'), label(223, 40, '处理区 C')].join('');
-      if (!test) art += arrow(412, 204, 385, 186, 'map-ally-line') + arrow(349, 166, 306, 140, 'map-red-line') + label(440, 86, '大蜘蛛转向首领');
+      if (!test) art += arrow(412, 204, 385, 186, 'map-ally-line') + arrow(349, 166, 306, 140, 'map-red-line', false) + label(440, 86, '大蜘蛛转向首领');
       if (questionId === 'q071') art += arrow(349, 166, 306, 140, 'map-red-line');
       break;
     default:
@@ -3715,6 +3768,10 @@ function drawRaidDiagram(key, caption, questionId = null) {
     return seconds <= 365 * 24 * 3600 ? seconds : null;
   }
   function updateExamTimer() { $('exam-timer').textContent = `用时 ${formatDuration(elapsedTime())}`; }
+  function scrollToLeaderboard() {
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    requestAnimationFrame(() => $('leaderboard').scrollIntoView({behavior:reduceMotion ? 'auto' : 'smooth'}));
+  }
   const attemptDate = new Intl.DateTimeFormat('zh-CN', {
     timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit',
     hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
@@ -4135,7 +4192,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
     setView(badgesReturn);
     if (badgesReturn === 'home') { void refreshRanking(); $('leaderboard').scrollIntoView(); }
   }
-  function renderBadges() {
+  function renderBadges(enter = false) {
     const grid = $('badges-grid');
     grid.replaceChildren();
     const earned = badgeData.badges.filter(badge => badge.earned).length;
@@ -4147,6 +4204,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = `badge-card tone-${badgeTone(badge)}${badge.earned ? ' earned' : ' locked'}${selected ? ' selected' : ''}`;
+      if (enter) button.classList.add('badge-enter');
       button.dataset.action = 'toggle-badge';
       button.dataset.badge = badge.id;
       button.disabled = !badge.earned;
@@ -4178,7 +4236,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       badgesDirty = false;
       $('badges-save').hidden = false;
       $('badges-save').disabled = false;
-      renderBadges();
+      renderBadges(true);
     } catch (error) {
       if (requestId !== badgesRequest || view !== 'badges') return;
       $('badges-status').textContent = profile.localOnly && error.status === 403
@@ -4195,7 +4253,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
     renderBadges();
     $('badges-status').textContent += ' · 更改后请保存';
     const button = [...$('badges-grid').children].find(item => item.dataset.badge === id);
-    if (button) button.focus({preventScroll:true});
+    if (button) { button.classList.add('badge-change'); button.focus({preventScroll:true}); }
   }
   async function saveBadges() {
     if (!badgeData || !activeIdentity()) return;
@@ -4524,12 +4582,12 @@ function drawRaidDiagram(key, caption, questionId = null) {
       case 'next': if(index===qs.length-1)submitExam();else goto(index+1);break;
       case 'submit': submitExam();break;
       case 'leave-exam': setView('home');refreshRanking();break;
-      case 'show-leaderboard': setView('home');refreshRanking();requestAnimationFrame(()=>$('leaderboard').scrollIntoView({behavior:'smooth'}));break;
+      case 'show-leaderboard': setView('home');void refreshRanking();scrollToLeaderboard();break;
       case 'refresh-ranking': refreshRanking();break;
       case 'retry-upload': uploadPending();break;
       case 'retry-connection': retryConnection();break;
       case 'restart': draft={version:bank.version,index:0,answers:{}};index=0;save(':draft',draft);beginExam();break;
-      case 'results-home': setView('home');refreshRanking();requestAnimationFrame(()=>$('leaderboard').scrollIntoView({behavior:'smooth'}));break;
+      case 'results-home': setView('home');void refreshRanking();scrollToLeaderboard();break;
       case 'toggle-review': onlyWrong=!onlyWrong;renderResult();break;
       case 'open-history': openHistory();break;
       case 'close-history': closeHistory();break;
