@@ -138,6 +138,8 @@ const b = {deviceId:'b'.repeat(32),secret:'2'.repeat(64)};
       assert.equal(await switchButton.locator('svg').count(),1);
       assert.equal(await page.locator('#site-current').isVisible(),false);
       assert.match(await switchButton.getAttribute('aria-label'),/当前国内站/);
+      assert.equal(await page.locator('#header-profile').isVisible(),true,`profile name hidden at ${width}px`);
+      assert.match(await page.locator('#header-profile-button').getAttribute('aria-label'),/打开个人资料/);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth),true,`page overflows at ${width}px`);
       const boxes=[];
       for (const selector of ['.brand','#main-nav','#site-switch summary','.profile-trigger','#nav-toggle']) {

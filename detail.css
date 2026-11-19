@@ -138,7 +138,6 @@
 .avatar .icon { width: 19px; height: 19px; stroke-width: 1.5; }
 .profile-trigger { transition: border-color .18s, background .18s; }
 .profile-trigger:hover { border-color: #9b8562; background: #1d252c; }
-.profile-arrow { width: 15px; height: 15px; color: #c6b595; }
 .btn .icon { width: 17px; height: 17px; }
 .icon-action { display: inline-flex; align-items: center; gap: 7px; }
 .icon-action .icon { width: 16px; height: 16px; }
@@ -187,7 +186,6 @@
 .back-button:hover .icon-ring { transform: translateX(-3px); }
 
 @media (max-width: 680px) {
-  .profile-arrow { display: none; }
   .card-footer { gap: 8px; }
   .card-footer .card-cta { gap: 7px; }
 }

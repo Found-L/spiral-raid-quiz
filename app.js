@@ -226,6 +226,7 @@
   }
   function updateProfileLabel() {
     $('header-profile').textContent = profile ? profile.nickname : '设置我的资料';
+    $('header-profile-button').setAttribute('aria-label', profile ? `${profile.nickname}，打开个人资料` : '设置我的资料');
     $('exam-profile').textContent = profile ? profile.nickname : '';
     $('delete-profile').classList.toggle('hidden',!profile);
     $('profile-history').hidden = !profile;
