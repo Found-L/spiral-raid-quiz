@@ -1,6 +1,6 @@
 /* Temple seal, navigation and site selector share the page's teal-and-gold palette. */
 :root { --navigation-height: 88px; }
-.topbar { position: sticky; top: 0; z-index: 50; height: var(--navigation-height); gap: clamp(10px, 1.4vw, 24px); padding-inline: clamp(18px, 5.5vw, 100px); background: linear-gradient(110deg, #101b22f5, #0c141cf8 65%, #132525f5); box-shadow: 0 12px 32px #0003; }
+.topbar { position: sticky; top: 0; z-index: 50; height: var(--navigation-height); gap: clamp(10px, 1.4vw, 24px); padding-inline: clamp(18px, 5.5vw, 100px); background: linear-gradient(110deg, #101b22, #0c141c 65%, #132525); box-shadow: 0 12px 32px #0003; }
 #home, #guide, #leaderboard, #honor-board, .guide-stage { scroll-margin-top: calc(var(--navigation-height) + 16px); }
 .badges-actions { top: var(--navigation-height); }
 .topbar::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; pointer-events: none; background: linear-gradient(90deg, transparent, #c6aa7060 24%, #76b6a14a 70%, transparent); }
@@ -12,20 +12,22 @@
 .brand-mark .brand-star { fill: #f8d9a0; stroke: none; }
 .brand-copy strong { color: #f1eadb; font-size: 17px; letter-spacing: .1em; }
 .brand-copy small { margin-top: 2px; color: #a7b7ad; font-size: 10px; letter-spacing: .12em; }
-.nav-links { display: flex; gap: 3px; margin-left: auto; padding: 4px; border: 1px solid #a3c6ae1d; border-radius: 9px; background: #14242a9c; }
-.nav-links a, .nav-links button { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 12px; border: 0; border-radius: 6px; background: transparent; color: #cbd7cf; font-size: 13px; white-space: nowrap; transition: color .2s, background .2s, box-shadow .2s; }
+.header-dock { display: flex; align-items: center; margin-left: auto; padding: 4px; border: 1px solid #96b5a636; border-radius: 11px; background: linear-gradient(110deg, #192b2d, #122126); box-shadow: inset 0 1px #d9e9d60a, 0 8px 22px #0002; }
+.nav-links { display: flex; gap: 2px; margin: 0; padding: 0; border: 0; background: transparent; }
+.nav-links a, .nav-links button { display: inline-flex; align-items: center; gap: 7px; min-height: 40px; padding: 8px 11px; border: 0; border-radius: 7px; background: transparent; color: #cbd7cf; font-size: 13px; white-space: nowrap; transition: color .2s, background .2s, box-shadow .2s; }
 .nav-links .icon { width: 16px; height: 16px; color: #9cb8a9; }
 .nav-links a:hover, .nav-links button:hover, .nav-links a:focus-visible, .nav-links button:focus-visible { color: #f7e5bd; background: #36514b80; box-shadow: inset 0 0 0 1px #d8c08a35; }
 .nav-links a:hover .icon, .nav-links button:hover .icon { color: #e7c78c; }
+.header-actions { display: flex; align-items: center; gap: 3px; margin-left: 6px; padding-left: 8px; border-left: 1px solid #9fb7a842; }
 .site-switch { position: relative; flex: none; }
-.site-switch summary, .nav-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 0 11px; border: 1px solid #758e7c55; border-radius: 7px; color: #dbe6d9; background: #172a2d; cursor: pointer; font-size: 13px; white-space: nowrap; list-style: none; }
-.site-switch summary { width: 44px; padding: 0; border-color: transparent; background: transparent; }
+.site-switch summary, .nav-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 0 10px; border: 0; border-radius: 7px; color: #dbe6d9; background: transparent; cursor: pointer; font-size: 13px; white-space: nowrap; list-style: none; }
+.site-switch summary { width: 40px; padding: 0; }
 .site-switch summary::-webkit-details-marker { display: none; }
-.site-switch summary:hover, .site-switch[open] summary, .nav-toggle:hover { border-color: #c6af7b; background: #253d39; color: #f5dfb6; }
+.site-switch summary:hover, .site-switch[open] summary, .nav-toggle:hover { background: #34524980; color: #f5dfb6; }
 .site-switch summary:focus-visible, .nav-toggle:focus-visible { outline: 2px solid #f4cf8e; outline-offset: 3px; }
 .site-switch summary .icon { width: 19px; height: 19px; color: #a6d2c0; }
 .site-switch summary:hover .icon, .site-switch[open] summary .icon { color: #f5dfb6; }
-.site-switch-panel { position: absolute; top: calc(100% + 30px); right: 0; z-index: 12; width: 270px; padding: 12px; border: 1px solid #9c987068; border-radius: 9px; background: linear-gradient(150deg, #1c3332, #101b22 78%); box-shadow: 0 18px 45px #000a, 0 0 26px #5ba89b1a; }
+.site-switch-panel { position: absolute; top: calc(100% + 32px); right: 0; z-index: 12; width: 270px; padding: 12px; border: 1px solid #9c987068; border-radius: 9px; background: linear-gradient(150deg, #1c3332, #101b22 78%); box-shadow: 0 18px 45px #000a, 0 0 26px #5ba89b1a; }
 .site-switch-heading { margin: 2px 4px 8px; color: #d9c39b; font-size: 12px; font-weight: 700; }
 .site-switch-panel > button:not(.site-backup) { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 9px 10px; text-align: left; border: 1px solid transparent; border-radius: 6px; color: #eef1e7; background: transparent; }
 .site-switch-panel > button:not(.site-backup):hover { border-color: #99b6a961; background: #29443d8a; }
@@ -36,15 +38,15 @@
 .site-current-tag { padding: 3px 7px; border-radius: 20px; color: #bce8d8; background: #356b5b7a; font-size: 11px; }
 .site-switch-note { margin: 8px 4px; color: #abbeb4; font-size: 11px; line-height: 1.55; }
 .site-backup { padding: 5px 4px; border: 0; background: none; color: #e2c895; font-size: 12px; }
-.profile-trigger { min-height: 44px; padding: 5px 12px 5px 6px; gap: 9px; border-color: #9eb7a54d; border-radius: 9px; background: linear-gradient(115deg, #1d3531, #14252a); }
-.profile-trigger .avatar { flex-basis: 30px; height: 30px; border: 1px solid #d6bb806e; background: radial-gradient(circle at 40% 30%, #385348, #1a2a29 75%); color: #eed4a3; box-shadow: inset 0 0 0 2px #142323; }
+.profile-trigger { min-height: 40px; padding: 4px 10px 4px 5px; gap: 8px; border: 0; border-radius: 7px; background: transparent; }
+.profile-trigger .avatar { flex-basis: 28px; height: 28px; border: 0; border-radius: 8px; background: #30483d; color: #efd4a0; box-shadow: none; }
 .profile-trigger .avatar .icon { width: 18px; height: 18px; stroke-width: 1.7; }
-.profile-trigger #header-profile { display: block; min-width: 0; max-width: clamp(64px, 11vw, 150px); overflow: hidden; color: #e7eade; font-size: 13px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.profile-trigger #header-profile { display: block; min-width: 0; max-width: clamp(64px, 11vw, 150px); overflow: hidden; color: #e7eade; font-size: 13px; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
 .nav-toggle { display: none; }
 @media (max-width: 1100px) {
   .nav-toggle { display: inline-flex; }
-  .site-switch { margin-left: auto; }
-  .nav-links { display: none; position: absolute; top: calc(100% + 8px); right: clamp(18px, 5.5vw, 100px); z-index: 11; width: min(280px, calc(100vw - 36px)); padding: 8px; border-color: #9c987068; background: linear-gradient(150deg, #1c3332, #101b22 78%); box-shadow: 0 18px 45px #000a; }
+  .header-actions { margin-left: 0; padding-left: 0; border-left: 0; }
+  .nav-links { display: none; position: absolute; top: calc(100% + 8px); right: clamp(18px, 5.5vw, 100px); z-index: 11; width: min(280px, calc(100vw - 36px)); padding: 8px; border: 1px solid #9c987068; border-radius: 9px; background: linear-gradient(150deg, #1c3332, #101b22 78%); box-shadow: 0 18px 45px #000a; }
   .nav-links.is-open { display: grid; }
   .nav-links a, .nav-links button { justify-content: flex-start; min-height: 44px; }
 }
@@ -59,7 +61,9 @@
   .site-switch summary { width: 40px; min-height: 40px; }
   .site-switch summary .icon { width: 18px; height: 18px; }
   .site-switch-panel { top: calc(100% + 8px); right: 12px; left: 12px; width: auto; }
-  .profile-trigger { min-height: 40px; margin-left: 0; padding: 4px 8px 4px 5px; gap: 6px; }
+  .header-dock { padding: 3px; }
+  .header-actions { gap: 1px; }
+  .profile-trigger { min-height: 40px; margin-left: 0; padding: 4px 7px 4px 4px; gap: 6px; }
   .profile-trigger .avatar { flex-basis: 28px; height: 28px; }
   .profile-trigger #header-profile { max-width: clamp(45px, 15vw, 90px); font-size: 11px; }
   .nav-toggle { min-width: 40px; min-height: 40px; padding: 0; }
