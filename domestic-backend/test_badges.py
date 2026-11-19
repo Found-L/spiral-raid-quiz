@@ -69,8 +69,8 @@ class BadgeTest(unittest.TestCase):
         self.attempt(player, 87, elapsed=500)
         self.attempt(player, 87, elapsed=700)
         earned = self.earned(player)
-        self.assertTrue({'first', 'three_rounds', 'steady', 'comeback', 'brave', 'almost',
-                         'knowledge', 'slow_careful', 'perfect', 'perfect_fast'} <= earned)
+        self.assertLessEqual({'first', 'three_rounds', 'steady', 'comeback', 'brave', 'almost',
+                              'knowledge', 'slow_careful', 'perfect', 'perfect_fast'}, earned)
         self.assertNotIn('five_minutes', earned)
         self.assertNotIn('five_rounds', earned)
         before = self.db.execute('SELECT COUNT(*) FROM attempts').fetchone()[0]

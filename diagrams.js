@@ -123,7 +123,10 @@ function drawRaidDiagram(key, caption, questionId = null) {
       throw new Error(`Unknown raid diagram: ${key}`);
   }
 
-  const grid = `<path class="map-underlay" d="${[40,80,120,160,200,240,280,320,360,400,440,480,520].map(x => `M${x} 0v270`).join(' ')} ${[45,90,135,180,225].map(y => `M0 ${y}h560`).join(' ')}"/>`;
+  const vertical = [40,80,120,160,200,240,280,320,360,400,440,480,520].map(x => `M${x} 0v270`).join(' ');
+  const horizontal = [45,90,135,180,225].map(y => `M0 ${y}h560`).join(' ');
+  const grid = `<path class="map-underlay" d="${vertical} ${horizontal}"/>`;
   const legend = (legends[key] || []).map(([tone, text]) => `<span><i class="legend-mark legend-${tone}" aria-hidden="true"></i>${text}</span>`).join('');
-  return `<figure class="raid-diagram"><div class="diagram-top"><span>站位与路线示意</span><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${grid}${art}</svg><figcaption><span>${caption}</span>${legend ? `<span class="diagram-legend">${legend}</span>` : ''}</figcaption></figure>`;
+  const legendMarkup = legend ? `<span class="diagram-legend">${legend}</span>` : '';
+  return `<figure class="raid-diagram"><div class="diagram-top"><span>站位与路线示意</span><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${grid}${art}</svg><figcaption><span>${caption}</span>${legendMarkup}</figcaption></figure>`;
 }

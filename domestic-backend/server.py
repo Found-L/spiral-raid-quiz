@@ -219,6 +219,60 @@ def version_order(version):
     return (match.group(1), int(match.group(2))) if match else ('', 0)
 
 
+def saved_badge_selections(db, participant_ids, placeholders):
+    selections = db.execute('SELECT participant_id, selections FROM badge_selections WHERE participant_id IN ('
+                            + placeholders + ')', participant_ids).fetchall()
+    saved = {}
+    for row in selections:
+        try:
+            value = json.loads(row['selections'])
+            saved[row['participant_id']] = value if isinstance(value, list) else []
+        except (TypeError, ValueError):
+            saved[row['participant_id']] = []
+    return saved
+
+
+def attempt_badges(row, fastest):
+    correct, total, elapsed = row['correct_count'], row['total_count'], row['elapsed_seconds']
+    high = correct * 100 >= 90 * total
+    timed = elapsed is not None
+    conditions = {
+        'perfect': correct == total,
+        'perfect_fast': correct == total and timed and elapsed <= 600,
+        'almost': total - correct == 1,
+        'knowledge': high,
+        'slow_careful': high and timed and elapsed >= 1800,
+        'brave': correct * 100 < 60 * total,
+        'zero': correct == 0,
+        'five_minutes': timed and elapsed <= 300,
+        'quickest': timed and fastest is not None and elapsed == fastest,
+    }
+    return {badge_id for badge_id, matches in conditions.items() if matches}
+
+
+def has_comeback(rows):
+    had_low = False
+    for row in rows:
+        correct, total = row['correct_count'], row['total_count']
+        if had_low and correct * 100 >= 90 * total:
+            return True
+        if correct * 100 < 60 * total:
+            had_low = True
+    return False
+
+
+def earned_badges(rows, fastest):
+    thresholds = {'first': 1, 'three_rounds': 3, 'five_rounds': 5, 'ten_rounds': 10}
+    earned = {badge_id for badge_id, count in thresholds.items() if len(rows) >= count}
+    if sum(row['correct_count'] * 100 >= 90 * row['total_count'] for row in rows) >= 3:
+        earned.add('steady')
+    if has_comeback(rows):
+        earned.add('comeback')
+    for row in rows:
+        earned.update(attempt_badges(row, fastest))
+    return earned
+
+
 def badge_states(db, participant_ids):
     """Derive achievements from saved attempts and keep only eligible displayed badges."""
     participant_ids = list(dict.fromkeys(participant_ids))
@@ -232,57 +286,13 @@ def badge_states(db, participant_ids):
                              FROM attempts a LEFT JOIN attempt_timings t ON t.attempt_id = a.id
                              WHERE a.participant_id IN (''' + placeholders + ''')
                              ORDER BY a.submitted_at, a.id''', participant_ids).fetchall()
-    selections = db.execute('SELECT participant_id, selections FROM badge_selections WHERE participant_id IN ('
-                            + placeholders + ')', participant_ids).fetchall()
     by_player = {participant_id: [] for participant_id in participant_ids}
     for attempt in attempts:
         by_player[attempt['participant_id']].append(attempt)
-    saved = {}
-    for row in selections:
-        try:
-            value = json.loads(row['selections'])
-            saved[row['participant_id']] = value if isinstance(value, list) else []
-        except (TypeError, ValueError):
-            saved[row['participant_id']] = []
+    saved = saved_badge_selections(db, participant_ids, placeholders)
     states = {}
     for participant_id, rows in by_player.items():
-        earned = set()
-        if rows:
-            earned.add('first')
-        if len(rows) >= 3:
-            earned.add('three_rounds')
-        if len(rows) >= 5:
-            earned.add('five_rounds')
-        if len(rows) >= 10:
-            earned.add('ten_rounds')
-        if sum(row['correct_count'] * 100 >= 90 * row['total_count'] for row in rows) >= 3:
-            earned.add('steady')
-        had_low = False
-        for row in rows:
-            correct, total, elapsed = row['correct_count'], row['total_count'], row['elapsed_seconds']
-            high = correct * 100 >= 90 * total
-            if correct == total:
-                earned.add('perfect')
-                if elapsed is not None and elapsed <= 600:
-                    earned.add('perfect_fast')
-            if total - correct == 1:
-                earned.add('almost')
-            if high:
-                earned.add('knowledge')
-                if had_low:
-                    earned.add('comeback')
-                if elapsed is not None and elapsed >= 1800:
-                    earned.add('slow_careful')
-            if correct * 100 < 60 * total:
-                earned.add('brave')
-                had_low = True
-            if correct == 0:
-                earned.add('zero')
-            if elapsed is not None:
-                if elapsed <= 300:
-                    earned.add('five_minutes')
-                if fastest is not None and elapsed == fastest:
-                    earned.add('quickest')
+        earned = earned_badges(rows, fastest)
         ordered = [badge['id'] for badge in BADGES if badge['id'] in earned]
         if participant_id in saved:
             selected = list(dict.fromkeys(item for item in saved[participant_id]

@@ -397,6 +397,15 @@
     });
     if(!list.children.length){const p=document.createElement('p');p.className='empty-state';p.textContent='这一轮没有错题。';list.append(p);}
   }
+  function rankingRow(entry) {
+    const row=document.createElement('div'); row.className='ranking-row';
+    const number = formatPlayerNumber(entry.playerNumber);
+    const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
+    const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
+    const badgeList = shownBadges.length ? `<div class="rank-badges" aria-label="展示的勋章">${shownBadges.map(badgeChip).join('')}</div>` : '';
+    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`;
+    return row;
+  }
   async function refreshRanking() {
     const requestId = ++rankingRequest;
     const list=$('ranking-list'); list.replaceChildren(); const loading=document.createElement('p'); loading.className='empty-state'; loading.textContent='正在读取榜单…'; list.append(loading);
@@ -405,14 +414,7 @@
       if (requestId !== rankingRequest) return;
       list.replaceChildren();
       if(!data.entries?.length){loading.textContent='还没有成绩，来做第一个上榜的人。';list.append(loading);return;}
-      for(const entry of data.entries){
-        const row=document.createElement('div');row.className='ranking-row';
-        const number = formatPlayerNumber(entry.playerNumber);
-        const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
-        const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
-        const badgeList = shownBadges.length ? `<div class="rank-badges" aria-label="展示的勋章">${shownBadges.map(badgeChip).join('')}</div>` : '';
-        row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
-      }
+      for(const entry of data.entries) list.append(rankingRow(entry));
     } catch(err){
       if(requestId !== rankingRequest) return;
       loading.textContent=err.message+' 可以稍后点击刷新。';
@@ -532,7 +534,9 @@
       button.dataset.badge = badge.id;
       button.disabled = !badge.earned;
       button.setAttribute('aria-pressed', String(selected));
-      button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${!badge.earned ? '未获得' : selected ? '已选择展示' : '已获得'}</span></span>`;
+      let state = '未获得';
+      if (badge.earned) state = selected ? '已选择展示' : '已获得';
+      button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span></span>`;
       grid.append(button);
     }
   }
@@ -550,7 +554,7 @@
       const data = await request('/api/badges', who);
       if (requestId !== badgesRequest || view !== 'badges' || !activeIdentity(who)) return;
       if (!Array.isArray(data.badges) || !Array.isArray(data.selected) || !Number.isSafeInteger(data.maxShown)) {
-        throw new Error('暂时无法读取勋章，请稍后刷新。');
+        throw new TypeError('暂时无法读取勋章，请稍后刷新。');
       }
       badgeData = data;
       selectedBadges = data.selected.slice();
@@ -566,7 +570,7 @@
     }
   }
   function toggleBadge(id) {
-    if (!badgeData || !badgeData.badges.some(badge => badge.id === id && badge.earned)) return;
+    if (!badgeData?.badges.some(badge => badge.id === id && badge.earned)) return;
     if (selectedBadges.includes(id)) selectedBadges = selectedBadges.filter(item => item !== id);
     else if (selectedBadges.length < badgeData.maxShown) selectedBadges.push(id);
     else { toast(`最多展示 ${badgeData.maxShown} 枚勋章。`); return; }
@@ -872,9 +876,21 @@
     try { await request('/api/delete-profile',identity); remove(':profile');remove(':pending');remove(':last-result');remove(':draft');draft={version:bank.version,index:0,answers:{}};index=0;profile=null;identity=makeIdentity();candidate=identity;save(':identity',identity);updateProfileLabel();closeProfile();refreshRanking();if(view==='history')loadHistory();toast('线上资料与成绩已删除。'); }
     catch(err){$('profile-error').textContent=err.message;}
   }
+  const featureActions = new Map([
+    ['open-badges', () => openBadges()],
+    ['close-badges', () => closeBadges()],
+    ['badges-profile', () => showProfile('badges')],
+    ['reload-badges', () => { void loadBadges(); }],
+    ['toggle-badge', target => toggleBadge(target.dataset.badge)],
+    ['save-badges', () => { void saveBadges(); }],
+    ['zoom-diagram', target => openDiagram(target)],
+    ['close-diagram', () => $('diagram-dialog').close()],
+  ]);
   document.addEventListener('click',(e)=>{
     if (view !== 'home' && e.target.closest('a[href="#guide"], a[href="#home"]')) setView('home');
     const target=e.target.closest('[data-action]'); if(!target)return;
+    const featureAction = featureActions.get(target.dataset.action);
+    if (featureAction) { featureAction(target); return; }
     switch(target.dataset.action){
       case 'start': start();break;
       case 'profile': showProfile();break;
@@ -903,14 +919,6 @@
       case 'refresh-history': loadHistory();uploadPending();break;
       case 'history-more': loadHistory(true);break;
       case 'history-profile': showProfile();break;
-      case 'open-badges': openBadges();break;
-      case 'close-badges': closeBadges();break;
-      case 'badges-profile': showProfile('badges');break;
-      case 'reload-badges': loadBadges();break;
-      case 'toggle-badge': toggleBadge(target.dataset.badge);break;
-      case 'save-badges': saveBadges();break;
-      case 'zoom-diagram': openDiagram(target);break;
-      case 'close-diagram': $('diagram-dialog').close();break;
       case 'guide-stage': {
         const stage = $('guide-stage-' + target.dataset.stage);
         stage.scrollIntoView({block:'start'});
