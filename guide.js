@@ -149,4 +149,8 @@ const QUESTION_DIAGRAMS = {
   q070: ['witch-spiders', '图中标出了本处理区的大蜘蛛和分散的小蜘蛛。'],
   q071: ['witch-spiders', '大蜘蛛转头面对场地中央的首领。'],
   q076: ['witch-line', '近战站在首领附近，附近有不祥气息。'],
+  q089: ['spirit-select', '图中标出了波动炸弹和队友的位置。'],
+  q092: ['witch-spiders', '图中标出了大蜘蛛和分散的小蜘蛛。'],
+  q093: ['witch-line', '红线是不祥气息，移动方向以场内为准。'],
+  q094: ['witch-spiders', '大蜘蛛转头面对场地中央的首领。'],
 };

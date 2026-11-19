@@ -76,12 +76,22 @@
   let historyReturn = 'home';
   let historyCursor = null;
   let historyRequest = 0;
+  let badgesReturn = 'home';
+  let badgesRequest = 0;
+  let badgeData = null;
+  let selectedBadges = [];
+  let badgesDirty = false;
   let uploading = false;
   let connecting = false;
   let rankingRequest = 0;
   let lastUploadError = '';
   let examTimer = null;
   const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame','bomb','spider','laser','lantern','heart','compass']);
+  const badgeTones = new Set(['gold','teal','red','violet']);
+  const badgeTone = badge => badgeTones.has(badge.tone) ? badge.tone : 'gold';
+  const badgeIcon = badge => `<svg class="icon" aria-hidden="true"><use href="#badge-${badgeIcons.has(badge.icon) ? badge.icon : 'spark'}"/></svg>`;
+  const badgeChip = badge => `<span class="badge-chip tone-${badgeTone(badge)}" title="${escape(badge.description || '')}">${badgeIcon(badge)}${escape(badge.name)}</span>`;
   const sectionOf = (id) => SECTIONS.find(x=>x.id===id);
   const formatPlayerNumber = (number) => Number.isSafeInteger(number) && number > 0
     ? `#${String(number).padStart(6, '0')}` : '';
@@ -126,7 +136,7 @@
     if (examTimer !== null) { clearInterval(examTimer); examTimer = null; }
     if (which === 'exam') { updateExamTimer(); examTimer = setInterval(updateExamTimer, 1000); }
     if (which === 'home' && location.hash.startsWith('#guide-')) window.history.replaceState(null, '', '#guide');
-    for (const section of ['home', 'exam', 'result', 'guide', 'history']) {
+    for (const section of ['home', 'exam', 'result', 'guide', 'history', 'badges']) {
       $(section + '-view').classList.toggle('hidden', section !== which);
     }
     window.scrollTo({top:0,behavior:'instant'});
@@ -136,6 +146,7 @@
     $('exam-profile').textContent = profile ? profile.nickname : '';
     $('delete-profile').classList.toggle('hidden',!profile);
     $('profile-history').hidden = !profile;
+    $('profile-badges').hidden = false;
   }
   async function request(path, body) {
     const controller = new AbortController(); const timer=setTimeout(()=>controller.abort(),12000);
@@ -213,6 +224,7 @@
     const number = formatPlayerNumber(profile.playerNumber);
     toast(localOnly ? '昵称已保存在本机，可以开始答题。' : number ? `资料已保存 · 榜单编号 ${number}` : '资料已保存');
     if(next==='start') beginExam();
+    else if (next==='badges') openBadges();
     else if (view === 'history') loadHistory();
     else refreshRanking();
     if (!localOnly && nextPendingAttempt()) uploadPending();
@@ -325,6 +337,11 @@
         if (result?.attemptId === attempt.attemptId && (data.correctCount !== result.correctCount || data.totalCount !== result.totalCount)) {
           throw new Error('成绩核对失败，请刷新后联系团长。');
         }
+        if (result?.attemptId === attempt.attemptId && Array.isArray(data.triggeredBadges)) {
+          result.triggeredBadges = data.triggeredBadges;
+          save(':last-result', result);
+          renderResultBadges();
+        }
         const remaining = pendingAttempts().filter(item => item.attemptId !== attempt.attemptId);
         if (remaining.length && !save(':pending', remaining)) throw new Error('浏览器无法保存上传进度，请检查存储设置。');
         if (!remaining.length) remove(':pending');
@@ -335,6 +352,7 @@
       $('sync-status').textContent=lastUploadError || '成绩已上传，排行榜保留你的最高分。';
       void refreshRanking();
       if (view === 'history') void loadHistory();
+      if (view === 'badges' && !badgesDirty) void loadBadges();
     } catch(err) {
       if (identity === participant) {
         lastUploadError = err.message;
@@ -373,6 +391,7 @@
     $('result-name').textContent=profile?profile.nickname:'';
     $('result-score').textContent=formatScore(result.score);
     $('result-detail').textContent=`答对 ${result.correctCount} / ${result.totalCount} 题 · 用时 ${formatDuration(result.elapsedSeconds)} · 多选题全部选对才计分`;
+    renderResultBadges();
     $('review-toggle').textContent=onlyWrong?'查看全部题目':'只看错题';
     const list=$('review-list'); list.replaceChildren();
     qs.forEach((q,i)=>{
@@ -384,6 +403,21 @@
     });
     if(!list.children.length){const p=document.createElement('p');p.className='empty-state';p.textContent='这一轮没有错题。';list.append(p);}
   }
+  function renderResultBadges() {
+    const items = (result?.triggeredBadges || []).filter(badge => badge && typeof badge.name === 'string');
+    const container = $('result-honors');
+    container.hidden = !items.length;
+    container.innerHTML = items.length ? `<span>本轮触发的趣味勋章</span><div>${items.map(badgeChip).join('')}</div><small>可以在“我的勋章”中选择是否展示。</small>` : '';
+  }
+  function rankingRow(entry) {
+    const row=document.createElement('div'); row.className='ranking-row';
+    const number = formatPlayerNumber(entry.playerNumber);
+    const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
+    const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
+    const badgeList = shownBadges.length ? `<div class="rank-badges" aria-label="展示的勋章">${shownBadges.map(badgeChip).join('')}</div>` : '';
+    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`;
+    return row;
+  }
   async function refreshRanking() {
     const requestId = ++rankingRequest;
     const list=$('ranking-list'); list.replaceChildren(); const loading=document.createElement('p'); loading.className='empty-state'; loading.textContent='正在读取榜单…'; list.append(loading);
@@ -392,12 +426,7 @@
       if (requestId !== rankingRequest) return;
       list.replaceChildren();
       if(!data.entries?.length){loading.textContent='还没有成绩，来做第一个上榜的人。';list.append(loading);return;}
-      for(const entry of data.entries){
-        const row=document.createElement('div');row.className='ranking-row';
-        const number = formatPlayerNumber(entry.playerNumber);
-        const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
-        row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`; list.append(row);
-      }
+      for(const entry of data.entries) list.append(rankingRow(entry));
     } catch(err){
       if(requestId !== rankingRequest) return;
       loading.textContent=err.message+' 可以稍后点击刷新。';
@@ -488,6 +517,110 @@
     } finally {
       if (requestId === historyRequest) more.disabled = false;
     }
+  }
+  function openBadges() {
+    if ($('profile-dialog').open) closeProfile();
+    if (view !== 'badges') badgesReturn = view;
+    setView('badges');
+    $('badges-title').focus({preventScroll:true});
+    void loadBadges();
+  }
+  function closeBadges() {
+    ++badgesRequest;
+    setView(badgesReturn);
+    if (badgesReturn === 'home') { void refreshRanking(); $('leaderboard').scrollIntoView(); }
+  }
+  function renderBadges() {
+    const grid = $('badges-grid');
+    grid.replaceChildren();
+    const earned = badgeData.badges.filter(badge => badge.earned).length;
+    const fastest = Number.isSafeInteger(badgeData.fastestSeconds) ? formatDuration(badgeData.fastestSeconds) : '暂无';
+    $('badges-status').textContent = `已获得 ${earned} / ${badgeData.badges.length} 枚 · 已选 ${selectedBadges.length} / ${badgeData.maxShown} 枚 · 全站最快 ${fastest}`;
+    $('badges-save').textContent = `保存展示（${selectedBadges.length}/${badgeData.maxShown}）`;
+    for (const badge of badgeData.badges) {
+      const selected = selectedBadges.includes(badge.id);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `badge-card tone-${badgeTone(badge)}${badge.earned ? ' earned' : ' locked'}${selected ? ' selected' : ''}`;
+      button.dataset.action = 'toggle-badge';
+      button.dataset.badge = badge.id;
+      button.disabled = !badge.earned;
+      button.setAttribute('aria-pressed', String(selected));
+      let state = '未获得';
+      if (badge.earned) state = selected ? '✓ 展示中' : '＋ 已获得 · 可展示';
+      button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span></span>`;
+      grid.append(button);
+    }
+  }
+  async function loadBadges() {
+    const requestId = ++badgesRequest;
+    badgeData = null;
+    $('badges-grid').replaceChildren();
+    $('badges-save').hidden = true;
+    $('badges-reload').hidden = !profile;
+    $('badges-profile').hidden = Boolean(profile);
+    if (!profile) { $('badges-status').textContent = '设置昵称或恢复原来的身份后，即可查看和展示勋章。'; return; }
+    $('badges-status').textContent = '正在读取勋章…';
+    const who = {...identity};
+    try {
+      const data = await request('/api/badges', who);
+      if (requestId !== badgesRequest || view !== 'badges' || !activeIdentity(who)) return;
+      if (!Array.isArray(data.badges) || !Array.isArray(data.selected) || !Number.isSafeInteger(data.maxShown)) {
+        throw new TypeError('暂时无法读取勋章，请稍后刷新。');
+      }
+      badgeData = data;
+      selectedBadges = data.selected.slice();
+      badgesDirty = false;
+      $('badges-save').hidden = false;
+      $('badges-save').disabled = false;
+      renderBadges();
+    } catch (error) {
+      if (requestId !== badgesRequest || view !== 'badges') return;
+      $('badges-status').textContent = profile.localOnly && error.status === 403
+        ? '资料和成绩还没有上传，连接成功后即可查看勋章。' : error.message;
+      if (error.unavailable) setConnectionUnavailable(true);
+    }
+  }
+  function toggleBadge(id) {
+    if (!badgeData?.badges.some(badge => badge.id === id && badge.earned)) return;
+    if (selectedBadges.includes(id)) selectedBadges = selectedBadges.filter(item => item !== id);
+    else if (selectedBadges.length < badgeData.maxShown) selectedBadges.push(id);
+    else { toast(`最多展示 ${badgeData.maxShown} 枚勋章。`); return; }
+    badgesDirty = true;
+    renderBadges();
+    $('badges-status').textContent += ' · 更改后请保存';
+    const button = [...$('badges-grid').children].find(item => item.dataset.badge === id);
+    if (button) button.focus({preventScroll:true});
+  }
+  async function saveBadges() {
+    if (!badgeData || !activeIdentity()) return;
+    const requestId = ++badgesRequest;
+    const who = {...identity};
+    $('badges-save').disabled = true;
+    try {
+      const data = await request('/api/badges/select', {...who, selected:selectedBadges});
+      if (requestId !== badgesRequest || view !== 'badges' || !activeIdentity(who)) return;
+      badgeData = data;
+      selectedBadges = data.selected.slice();
+      badgesDirty = false;
+      renderBadges();
+      void refreshRanking();
+      toast('勋章展示已保存。');
+    } catch (error) {
+      if (requestId !== badgesRequest || view !== 'badges') return;
+      $('badges-status').textContent = error.message;
+      if (error.unavailable) setConnectionUnavailable(true);
+    } finally {
+      if (requestId === badgesRequest) $('badges-save').disabled = false;
+    }
+  }
+  function openDiagram(target) {
+    const figure = target.closest('.raid-diagram');
+    if (!figure) return;
+    const copy = figure.cloneNode(true);
+    copy.querySelector('[data-action="zoom-diagram"]')?.remove();
+    $('diagram-dialog-content').replaceChildren(copy);
+    $('diagram-dialog').showModal();
   }
   function renderGuide(chapterId) {
     const guide = RAID_GUIDE[chapterId];
@@ -755,9 +888,21 @@
     try { await request('/api/delete-profile',identity); remove(':profile');remove(':pending');remove(':last-result');remove(':draft');draft={version:bank.version,index:0,answers:{}};index=0;profile=null;identity=makeIdentity();candidate=identity;save(':identity',identity);updateProfileLabel();closeProfile();refreshRanking();if(view==='history')loadHistory();toast('线上资料与成绩已删除。'); }
     catch(err){$('profile-error').textContent=err.message;}
   }
+  const featureActions = new Map([
+    ['open-badges', () => openBadges()],
+    ['close-badges', () => closeBadges()],
+    ['badges-profile', () => showProfile('badges')],
+    ['reload-badges', () => { void loadBadges(); }],
+    ['toggle-badge', target => toggleBadge(target.dataset.badge)],
+    ['save-badges', () => { void saveBadges(); }],
+    ['zoom-diagram', target => openDiagram(target)],
+    ['close-diagram', () => $('diagram-dialog').close()],
+  ]);
   document.addEventListener('click',(e)=>{
     if (view !== 'home' && e.target.closest('a[href="#guide"], a[href="#home"]')) setView('home');
     const target=e.target.closest('[data-action]'); if(!target)return;
+    const featureAction = featureActions.get(target.dataset.action);
+    if (featureAction) { featureAction(target); return; }
     switch(target.dataset.action){
       case 'start': start();break;
       case 'profile': showProfile();break;
