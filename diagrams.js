@@ -1,5 +1,6 @@
 function drawRaidDiagram(key, caption, questionId = null) {
   const test = Boolean(questionId);
+  if (!test && RAID_SEQUENCES[key]) return drawSequenceDiagram(key, caption);
   const circle = (x, y, radius, style) => `<circle cx="${x}" cy="${y}" r="${radius}" class="${style}"/>`;
   const line = (path, style = 'map-rule') => `<path d="${path}" class="${style}"/>`;
   const label = (x, y, text, style = '') => `<text x="${x}" y="${y}" class="${style}">${text}</text>`;
@@ -9,13 +10,11 @@ function drawRaidDiagram(key, caption, questionId = null) {
     const dx = 4 * Math.sin(angle), dy = 4 * Math.cos(angle);
     const shaft = `M${x1} ${y1}L${x2} ${y2}`;
     const arrowhead = `M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`;
-    // Animate only existing route arrows; facing indicators remain static.
-    const traveler = `<circle class="map-flow-dot map-flow-trail" r="3"><animateMotion path="${shaft}" dur="3s" begin="-.18s" repeatCount="indefinite"/></circle><circle class="map-flow-dot" r="4"><animateMotion path="${shaft}" dur="3s" repeatCount="indefinite"/></circle>`;
-    return line(shaft + arrowhead, style) + (animate ? line(shaft, 'map-route-glow') + traveler : '');
+    return line(shaft + arrowhead, style);
   };
   const token = (x, y, text, style = 'map-ally', radius = 12) =>
-    circle(x, y, radius + 4, 'map-token-aura') + circle(x, y, radius, style) + circle(x, y, Math.max(radius - 3, 1), 'map-token-ring') + label(x, y + 4.5, text, 'map-token');
-  const arena = (x = 280, y = 135, radius = 106) => circle(x, y, radius + 5, 'map-field-halo') + circle(x, y, radius, 'map-field') + circle(x, y, radius - 12, 'map-grid');
+    circle(x, y, radius, style) + label(x, y + 4.5, text, 'map-token');
+  const arena = (x = 280, y = 135, radius = 106) => circle(x, y, radius, 'map-field');
   const boss = (x = 280, y = 135, text = '首领', style = 'map-boss') => token(x, y, text, style, 24);
   const spider = (x, y) => token(x, y, '大', 'map-boss', 17);
   const swarm = (x, y) => [[-16, -4], [9, -16], [12, 9], [-6, 15]].map(([dx,dy]) => circle(x+dx, y+dy, 5, 'map-hazard map-spiderling')).join('');
@@ -136,11 +135,8 @@ function drawRaidDiagram(key, caption, questionId = null) {
       throw new Error(`Unknown raid diagram: ${key}`);
   }
 
-  const vertical = [40,80,120,160,200,240,280,320,360,400,440,480,520].map(x => `M${x} 0v270`).join(' ');
-  const horizontal = [45,90,135,180,225].map(y => `M0 ${y}h560`).join(' ');
-  const grid = `<path class="map-underlay" d="${vertical} ${horizontal}"/>`;
   const legend = (legends[key] || []).map(([tone, text]) => `<span><i class="legend-mark legend-${tone}" aria-hidden="true"></i>${text}</span>`).join('');
   const legendMarkup = legend ? `<span class="diagram-legend">${legend}</span>` : '';
-  const motionNote = key === 'witch-line' ? '<span class="diagram-motion-note">旋转动画仅作示意，实际方向与速度以场内为准。</span>' : '';
-  return `<figure class="raid-diagram" data-diagram="${key}"><div class="diagram-top"><span>站位与路线示意</span><div class="diagram-controls"><button type="button" class="diagram-pause" data-action="toggle-diagram-motion" aria-pressed="false">暂停</button><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${grid}${art}</svg><figcaption><span>${caption}</span>${motionNote}${legendMarkup}</figcaption></figure>`;
+  const motionNote = key === 'witch-line' ? '<span class="diagram-motion-note">不祥气息的位置与方向以场内为准。</span>' : '';
+  return `<figure class="raid-diagram question-map" data-diagram="${key}"><div class="diagram-top"><span>站位示意</span><div class="diagram-controls"><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${art}</svg><figcaption><span>${caption}</span>${motionNote}${legendMarkup}</figcaption></figure>`;
 }

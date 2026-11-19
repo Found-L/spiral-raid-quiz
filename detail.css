@@ -511,3 +511,119 @@
 @keyframes map-orb-float { 0%,100% { transform: translateY(-2px); filter: brightness(.9) drop-shadow(0 0 2px currentColor); } 50% { transform: translateY(2px); filter: brightness(1.4) drop-shadow(0 0 7px currentColor); } }
 @keyframes crest-breathe { 0%,100% { filter: brightness(.93); } 50% { filter: brightness(1.18); } }
 @media (prefers-reduced-motion: reduce) { .diagram-pause { display: none; } }
+
+/* A restrained backdrop leaves the mechanism marks as the focus. */
+.hero:before, .hero:after { display: none; }
+.overview-sequence { margin: 14px 0 0; overflow: hidden; border-radius: 8px; background: radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--accent) 14%, #14232b), #101922 82%); }
+.overview-sequence svg { display: block; width: 100%; height: auto; }
+.overview-readout { min-height: 53px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; color: #e1e7df; font-size: 12px; line-height: 1.5; background: #0c151cb8; }
+.overview-readout [data-step-count] { flex: none; color: var(--gold); font: 12px Georgia, serif; letter-spacing: .08em; }
+.sequence-svg { background: radial-gradient(ellipse at center, #1b3439, #101a21 78%); }
+.sequence-svg .scene-zone { fill: #1b3036; fill-opacity: .42; stroke: #739692; stroke-opacity: .5; stroke-width: 1.5; }
+.sequence-svg .scene-zone.boundary { fill: none; stroke: #9bc5be; stroke-opacity: .75; stroke-dasharray: 5 6; }
+.sequence-svg .scene-zone.fire-boundary { fill: none; stroke: #f4a28f; stroke-opacity: .8; stroke-dasharray: 5 6; }
+.sequence-svg .scene-zone.inside { fill: #634538; fill-opacity: .3; stroke: #c99777; }
+.sequence-svg .scene-label { fill: #c5d4ce; stroke: #102027; stroke-width: 3px; paint-order: stroke; font: 15px var(--sans); text-anchor: middle; }
+.sequence-svg .scene-label.gold { fill: #f4d19a; }
+.sequence-svg .scene-label.hazard { fill: #ffaca0; }
+.sequence-svg .scene-piece { fill: #2c6263; stroke: #a0dfd2; stroke-width: 2; filter: drop-shadow(0 2px 5px #0008); }
+.sequence-svg .scene-piece.hazard { fill: #854943; stroke: #ffb2a0; }
+.sequence-svg .scene-piece.boss { fill: #735638; stroke: #f5d39a; }
+.sequence-svg .scene-piece.lamp { fill: #7a653b; stroke: #f8d893; }
+.sequence-svg .scene-piece-text { fill: #fff4e0; stroke: #152229; stroke-width: 3px; paint-order: stroke; font: 700 15px var(--sans); text-anchor: middle; }
+.sequence-svg .scene-path { fill: none; stroke: #96e0d3; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.sequence-svg .scene-path.hazard { stroke: #ff9487; }
+.sequence-svg .scene-path.gold { stroke: #f3d08f; }
+.sequence-svg .scene-scan { fill: #e9ad72; fill-opacity: .22; stroke: #e7bb85; stroke-width: 2; }
+.sequence-svg .scene-wave { fill: none; stroke: #f3d197; stroke-width: 4; stroke-linecap: round; }
+.sequence-svg .scene-cue { opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+.sequence-svg .scene-cue.active { opacity: 1; }
+.sequence-svg .scene-actor { transition: transform .85s cubic-bezier(.2,.7,.2,1); }
+.motion-paused .scene-actor, .motion-paused .scene-cue, .sequence-resetting .scene-actor, .sequence-resetting .scene-cue { transition: none; }
+.sequence-readout { min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 11px 13px; background: #182c2e; color: #edf2e8; line-height: 1.55; font-size: 13px; }
+.sequence-count { flex: none; color: #ebc98e; font: 13px Georgia, serif; letter-spacing: .06em; }
+.sequence-readout [data-step-text] { min-width: 0; flex: 1; }
+.sequence-controls { display: flex; flex: none; gap: 5px; }
+.sequence-controls button { width: 34px; height: 34px; border: 1px solid #597370; border-radius: 50%; background: #132426; color: #d9e5db; font-size: 17px; }
+.sequence-controls button:hover, .sequence-controls button:focus-visible { border-color: #e6c993; color: #ffdfaa; }
+.sequence-diagram figcaption { border-top: 0; }
+.question-map .map-rotating-danger { animation: none !important; }
+
+/* Equal board slots keep cards aligned even when a record has many co-holders. */
+.leaderboard-header { grid-template-columns: minmax(0, 1fr) 115px 100px; }
+.ranking-row { grid-template-columns: minmax(0, 1fr) 230px; }
+.ranking-stats { grid-template-columns: 115px 100px; }
+.honor-boards { align-items: stretch; grid-auto-rows: 1fr; }
+.honor-card-head { min-height: 108px; }
+.honor-list { min-height: 240px; display: flex; flex-direction: column; }
+.honor-list .honor-empty { flex: 1; }
+.honor-holders { min-height: 34px; }
+
+/* Boss tabs and phase index are navigational, with clear current states. */
+.guide-chapters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; padding: 0; border: 0; }
+.guide-chapters a { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 68px; padding: 12px 15px; border: 1px solid #394746; border-radius: 8px; background: #151f25; }
+.guide-chapters a[aria-current] { border-color: #d0ad78; background: linear-gradient(110deg, #403a2c, #1a292a); color: #f1d29a; box-shadow: inset 0 -2px #ddbf86; }
+.chapter-number { color: #bba27b; font: 15px Georgia, serif; }
+.chapter-copy { min-width: 0; display: grid; gap: 3px; }
+.chapter-copy strong { color: inherit; font-size: 14px; }
+.chapter-copy small { color: #9dafaa; font-size: 11px; }
+.guide-timeline { display: flex; flex-wrap: nowrap; gap: 7px; overflow-x: auto; overscroll-behavior-x: contain; padding: 5px 0 10px; margin: 17px 0 20px; scrollbar-width: none; }
+.guide-timeline::-webkit-scrollbar { display: none; }
+.guide-timeline button { flex: 0 0 auto; gap: 8px; min-height: 40px; padding: 8px 12px; border-color: transparent; border-radius: 7px; background: #18232a; color: #b8c5bf; }
+.guide-timeline button[aria-current] { border-color: #b59d72; background: #302f27; color: #f6d49b; }
+.timeline-number { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #29383a; color: #b6c5be; font: 12px Georgia, serif; }
+.guide-timeline button[aria-current] .timeline-number { background: #dfc28d; color: #24251e; }
+.guide-chapters a:focus-visible, .guide-timeline button:focus-visible { outline: 2px solid #f1d29a; outline-offset: 3px; }
+
+@media (max-width: 800px) {
+  .ranking-row { grid-template-columns: minmax(0, 1fr); }
+  .ranking-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .honor-card-head { min-height: 90px; }
+}
+@media (max-width: 560px) {
+  .guide-chapters { gap: 6px; }
+  .guide-chapters a { min-height: 58px; gap: 6px; padding: 9px 7px; }
+  .chapter-number { font-size: 12px; }
+  .chapter-copy strong { font-size: 12px; }
+  .chapter-copy small { display: none; }
+  .overview-readout { min-height: 54px; }
+  .sequence-svg .scene-label { font-size: 18px; }
+  .sequence-svg .scene-piece-text { font-size: 18px; }
+  .honor-card-head { min-height: 0; }
+  .honor-list { min-height: 180px; }
+  .sequence-readout { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sequence-svg .scene-actor, .sequence-svg .scene-cue { transition: none; }
+}
+
+.honor-holders { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; }
+.honor-holders button { border: 0; padding: 3px 0; color: #ead2a4; background: none; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.honor-holders button:hover { color: #fff0cc; text-decoration: underline; }
+.honor-dialog { width: min(650px, calc(100vw - 28px)); max-height: min(90vh, 850px); }
+.honor-dialog-description, .honor-history-note { margin: 10px 0; color: #b7c3bd; font-size: 13px; line-height: 1.65; }
+.honor-history-note { color: #9eada6; font-size: 12px; }
+.honor-detail-tabs { display: flex; gap: 6px; padding: 4px; margin: 16px 0 10px; border-radius: 8px; background: #101b21; }
+.honor-detail-tabs button { flex: 1; min-height: 38px; border: 0; border-radius: 6px; color: #aebdb6; background: transparent; font-weight: 650; }
+.honor-detail-tabs button[aria-pressed="true"] { color: #f2d29b; background: #394035; box-shadow: inset 0 0 0 1px #b89e71; }
+.honor-detail-status { display: block; min-height: 25px; color: #e4c995; font-size: 12px; }
+.honor-detail-list { max-height: min(44vh, 430px); min-height: 100px; overflow-y: auto; overscroll-behavior: contain; list-style: none; margin: 4px 0 14px; padding: 0; border-top: 1px solid #ffffff16; }
+.honor-detail-list li { display: flex; align-items: center; gap: 12px; min-height: 62px; padding: 10px 4px; border-bottom: 1px solid #ffffff12; }
+.honor-detail-rank { width: 28px; flex: none; text-align: center; color: #e8c78e; font: 16px Georgia, serif; }
+.honor-detail-person { min-width: 0; flex: 1; }
+.honor-detail-person strong, .honor-detail-person small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.honor-detail-person small { color: #96a8a1; font-size: 11px; }
+.honor-detail-list li > small { flex: none; padding: 3px 7px; border-radius: 20px; color: #aebcb6; background: #293638; font-size: 11px; white-space: nowrap; }
+.honor-detail-list li > small.is-current { color: #e9d29f; background: #51462f; }
+.honor-detail-value { display: grid; flex: none; gap: 2px; text-align: right; color: #f0debf; font-size: 13px; }
+.honor-achieved { color: #91a49d; font-size: 11px; }
+.honor-detail-list .honor-detail-empty { justify-content: center; color: #a8b6af; }
+.honor-detail-pages { display: flex; align-items: center; justify-content: center; gap: 16px; color: #b9c8c0; font-size: 12px; }
+.honor-detail-pages button { min-height: 38px; padding: 6px 14px; border: 1px solid #53635f; border-radius: 6px; color: #eed6aa; background: #14252a; }
+.honor-detail-pages button:disabled { opacity: .4; }
+@media (max-width: 560px) {
+  .honor-dialog { padding: 18px; }
+  .honor-detail-list li { gap: 7px; }
+  .honor-detail-list li > small { padding: 3px 5px; }
+  .honor-detail-value { font-size: 12px; }
+}

@@ -549,6 +549,122 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 @keyframes map-orb-float { 0%,100% { transform: translateY(-2px); filter: brightness(.9) drop-shadow(0 0 2px currentColor); } 50% { transform: translateY(2px); filter: brightness(1.4) drop-shadow(0 0 7px currentColor); } }
 @keyframes crest-breathe { 0%,100% { filter: brightness(.93); } 50% { filter: brightness(1.18); } }
 @media (prefers-reduced-motion: reduce) { .diagram-pause { display: none; } }
+
+/* A restrained backdrop leaves the mechanism marks as the focus. */
+.hero:before, .hero:after { display: none; }
+.overview-sequence { margin: 14px 0 0; overflow: hidden; border-radius: 8px; background: radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--accent) 14%, #14232b), #101922 82%); }
+.overview-sequence svg { display: block; width: 100%; height: auto; }
+.overview-readout { min-height: 53px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; color: #e1e7df; font-size: 12px; line-height: 1.5; background: #0c151cb8; }
+.overview-readout [data-step-count] { flex: none; color: var(--gold); font: 12px Georgia, serif; letter-spacing: .08em; }
+.sequence-svg { background: radial-gradient(ellipse at center, #1b3439, #101a21 78%); }
+.sequence-svg .scene-zone { fill: #1b3036; fill-opacity: .42; stroke: #739692; stroke-opacity: .5; stroke-width: 1.5; }
+.sequence-svg .scene-zone.boundary { fill: none; stroke: #9bc5be; stroke-opacity: .75; stroke-dasharray: 5 6; }
+.sequence-svg .scene-zone.fire-boundary { fill: none; stroke: #f4a28f; stroke-opacity: .8; stroke-dasharray: 5 6; }
+.sequence-svg .scene-zone.inside { fill: #634538; fill-opacity: .3; stroke: #c99777; }
+.sequence-svg .scene-label { fill: #c5d4ce; stroke: #102027; stroke-width: 3px; paint-order: stroke; font: 15px var(--sans); text-anchor: middle; }
+.sequence-svg .scene-label.gold { fill: #f4d19a; }
+.sequence-svg .scene-label.hazard { fill: #ffaca0; }
+.sequence-svg .scene-piece { fill: #2c6263; stroke: #a0dfd2; stroke-width: 2; filter: drop-shadow(0 2px 5px #0008); }
+.sequence-svg .scene-piece.hazard { fill: #854943; stroke: #ffb2a0; }
+.sequence-svg .scene-piece.boss { fill: #735638; stroke: #f5d39a; }
+.sequence-svg .scene-piece.lamp { fill: #7a653b; stroke: #f8d893; }
+.sequence-svg .scene-piece-text { fill: #fff4e0; stroke: #152229; stroke-width: 3px; paint-order: stroke; font: 700 15px var(--sans); text-anchor: middle; }
+.sequence-svg .scene-path { fill: none; stroke: #96e0d3; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.sequence-svg .scene-path.hazard { stroke: #ff9487; }
+.sequence-svg .scene-path.gold { stroke: #f3d08f; }
+.sequence-svg .scene-scan { fill: #e9ad72; fill-opacity: .22; stroke: #e7bb85; stroke-width: 2; }
+.sequence-svg .scene-wave { fill: none; stroke: #f3d197; stroke-width: 4; stroke-linecap: round; }
+.sequence-svg .scene-cue { opacity: 0; pointer-events: none; transition: opacity .35s ease; }
+.sequence-svg .scene-cue.active { opacity: 1; }
+.sequence-svg .scene-actor { transition: transform .85s cubic-bezier(.2,.7,.2,1); }
+.motion-paused .scene-actor, .motion-paused .scene-cue, .sequence-resetting .scene-actor, .sequence-resetting .scene-cue { transition: none; }
+.sequence-readout { min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 11px 13px; background: #182c2e; color: #edf2e8; line-height: 1.55; font-size: 13px; }
+.sequence-count { flex: none; color: #ebc98e; font: 13px Georgia, serif; letter-spacing: .06em; }
+.sequence-readout [data-step-text] { min-width: 0; flex: 1; }
+.sequence-controls { display: flex; flex: none; gap: 5px; }
+.sequence-controls button { width: 34px; height: 34px; border: 1px solid #597370; border-radius: 50%; background: #132426; color: #d9e5db; font-size: 17px; }
+.sequence-controls button:hover, .sequence-controls button:focus-visible { border-color: #e6c993; color: #ffdfaa; }
+.sequence-diagram figcaption { border-top: 0; }
+.question-map .map-rotating-danger { animation: none !important; }
+
+/* Equal board slots keep cards aligned even when a record has many co-holders. */
+.leaderboard-header { grid-template-columns: minmax(0, 1fr) 115px 100px; }
+.ranking-row { grid-template-columns: minmax(0, 1fr) 230px; }
+.ranking-stats { grid-template-columns: 115px 100px; }
+.honor-boards { align-items: stretch; grid-auto-rows: 1fr; }
+.honor-card-head { min-height: 108px; }
+.honor-list { min-height: 240px; display: flex; flex-direction: column; }
+.honor-list .honor-empty { flex: 1; }
+.honor-holders { min-height: 34px; }
+
+/* Boss tabs and phase index are navigational, with clear current states. */
+.guide-chapters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; padding: 0; border: 0; }
+.guide-chapters a { display: flex; align-items: center; gap: 12px; min-width: 0; min-height: 68px; padding: 12px 15px; border: 1px solid #394746; border-radius: 8px; background: #151f25; }
+.guide-chapters a[aria-current] { border-color: #d0ad78; background: linear-gradient(110deg, #403a2c, #1a292a); color: #f1d29a; box-shadow: inset 0 -2px #ddbf86; }
+.chapter-number { color: #bba27b; font: 15px Georgia, serif; }
+.chapter-copy { min-width: 0; display: grid; gap: 3px; }
+.chapter-copy strong { color: inherit; font-size: 14px; }
+.chapter-copy small { color: #9dafaa; font-size: 11px; }
+.guide-timeline { display: flex; flex-wrap: nowrap; gap: 7px; overflow-x: auto; overscroll-behavior-x: contain; padding: 5px 0 10px; margin: 17px 0 20px; scrollbar-width: none; }
+.guide-timeline::-webkit-scrollbar { display: none; }
+.guide-timeline button { flex: 0 0 auto; gap: 8px; min-height: 40px; padding: 8px 12px; border-color: transparent; border-radius: 7px; background: #18232a; color: #b8c5bf; }
+.guide-timeline button[aria-current] { border-color: #b59d72; background: #302f27; color: #f6d49b; }
+.timeline-number { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #29383a; color: #b6c5be; font: 12px Georgia, serif; }
+.guide-timeline button[aria-current] .timeline-number { background: #dfc28d; color: #24251e; }
+.guide-chapters a:focus-visible, .guide-timeline button:focus-visible { outline: 2px solid #f1d29a; outline-offset: 3px; }
+
+@media (max-width: 800px) {
+  .ranking-row { grid-template-columns: minmax(0, 1fr); }
+  .ranking-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .honor-card-head { min-height: 90px; }
+}
+@media (max-width: 560px) {
+  .guide-chapters { gap: 6px; }
+  .guide-chapters a { min-height: 58px; gap: 6px; padding: 9px 7px; }
+  .chapter-number { font-size: 12px; }
+  .chapter-copy strong { font-size: 12px; }
+  .chapter-copy small { display: none; }
+  .overview-readout { min-height: 54px; }
+  .sequence-svg .scene-label { font-size: 18px; }
+  .sequence-svg .scene-piece-text { font-size: 18px; }
+  .honor-card-head { min-height: 0; }
+  .honor-list { min-height: 180px; }
+  .sequence-readout { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sequence-svg .scene-actor, .sequence-svg .scene-cue { transition: none; }
+}
+
+.honor-holders { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; }
+.honor-holders button { border: 0; padding: 3px 0; color: #ead2a4; background: none; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.honor-holders button:hover { color: #fff0cc; text-decoration: underline; }
+.honor-dialog { width: min(650px, calc(100vw - 28px)); max-height: min(90vh, 850px); }
+.honor-dialog-description, .honor-history-note { margin: 10px 0; color: #b7c3bd; font-size: 13px; line-height: 1.65; }
+.honor-history-note { color: #9eada6; font-size: 12px; }
+.honor-detail-tabs { display: flex; gap: 6px; padding: 4px; margin: 16px 0 10px; border-radius: 8px; background: #101b21; }
+.honor-detail-tabs button { flex: 1; min-height: 38px; border: 0; border-radius: 6px; color: #aebdb6; background: transparent; font-weight: 650; }
+.honor-detail-tabs button[aria-pressed="true"] { color: #f2d29b; background: #394035; box-shadow: inset 0 0 0 1px #b89e71; }
+.honor-detail-status { display: block; min-height: 25px; color: #e4c995; font-size: 12px; }
+.honor-detail-list { max-height: min(44vh, 430px); min-height: 100px; overflow-y: auto; overscroll-behavior: contain; list-style: none; margin: 4px 0 14px; padding: 0; border-top: 1px solid #ffffff16; }
+.honor-detail-list li { display: flex; align-items: center; gap: 12px; min-height: 62px; padding: 10px 4px; border-bottom: 1px solid #ffffff12; }
+.honor-detail-rank { width: 28px; flex: none; text-align: center; color: #e8c78e; font: 16px Georgia, serif; }
+.honor-detail-person { min-width: 0; flex: 1; }
+.honor-detail-person strong, .honor-detail-person small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.honor-detail-person small { color: #96a8a1; font-size: 11px; }
+.honor-detail-list li > small { flex: none; padding: 3px 7px; border-radius: 20px; color: #aebcb6; background: #293638; font-size: 11px; white-space: nowrap; }
+.honor-detail-list li > small.is-current { color: #e9d29f; background: #51462f; }
+.honor-detail-value { display: grid; flex: none; gap: 2px; text-align: right; color: #f0debf; font-size: 13px; }
+.honor-achieved { color: #91a49d; font-size: 11px; }
+.honor-detail-list .honor-detail-empty { justify-content: center; color: #a8b6af; }
+.honor-detail-pages { display: flex; align-items: center; justify-content: center; gap: 16px; color: #b9c8c0; font-size: 12px; }
+.honor-detail-pages button { min-height: 38px; padding: 6px 14px; border: 1px solid #53635f; border-radius: 6px; color: #eed6aa; background: #14252a; }
+.honor-detail-pages button:disabled { opacity: .4; }
+@media (max-width: 560px) {
+  .honor-dialog { padding: 18px; }
+  .honor-detail-list li { gap: 7px; }
+  .honor-detail-list li > small { padding: 3px 5px; }
+  .honor-detail-value { font-size: 12px; }
+}
 </style>
 </head>
 <body>
@@ -611,17 +727,14 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
           <div class="hero-art" aria-hidden="true">
             <svg viewBox="0 0 540 460" fill="none" xmlns="http://www.w3.org/2000/svg">
               <defs><radialGradient id="halo"><stop stop-color="#e6b96d" stop-opacity=".33"/><stop offset="1" stop-color="#1b2630" stop-opacity="0"/></radialGradient><linearGradient id="roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d4ac6c"/><stop offset="1" stop-color="#6f573d"/></linearGradient></defs>
-              <circle class="hero-aura" cx="285" cy="220" r="210" fill="url(#halo)"/><circle class="hero-ring" cx="285" cy="218" r="149" stroke="#e4c990" stroke-opacity=".4"/><circle class="hero-orbit" cx="285" cy="218" r="177" stroke="#d5bd8c" stroke-opacity=".3" stroke-dasharray="3 9"/>
-              <g class="hero-satellite"><circle cx="285" cy="41" r="5" fill="#f3d89d"/><circle cx="132" cy="307" r="3" fill="#f2aa8c"/><circle cx="438" cy="307" r="3" fill="#a2ddd8"/></g>
-              <path class="hero-arc" d="M116 192a171 171 0 0 1 226-137 M444 282a171 171 0 0 1-234 98" stroke="#e7c38a" stroke-opacity=".65" stroke-width="1.3" stroke-dasharray="5 10"/>
-              <path d="M110 335h350M147 357h276M172 381h226" stroke="#bfa578" stroke-opacity=".35"/>
+              <circle class="hero-aura" cx="285" cy="220" r="210" fill="url(#halo)"/>
+              <path d="M135 338h300" stroke="#bfa578" stroke-opacity=".35"/>
               <path d="M187 321h194l-8-106h-179l-7 106Z" fill="#0f1820" stroke="#9b805a" stroke-width="2"/>
               <path d="m167 224 118-68 118 68-26 8-92-47-92 47-26-8Z" fill="#181d20" stroke="url(#roof)" stroke-width="2"/>
               <path d="m197 178 88-54 88 54-21 7-67-34-67 34-21-7Z" fill="#191d20" stroke="url(#roof)" stroke-width="2"/>
               <path d="m227 133 58-38 58 38-17 6-41-21-41 21-17-6Z" fill="#1b1e20" stroke="url(#roof)" stroke-width="2"/>
               <path class="hero-door-glow" d="M269 315v-60c0-12 7-20 16-20s16 8 16 20v60M220 252v55m130-55v55" stroke="#f1d19a" stroke-opacity=".9" stroke-width="2"/>
-              <path d="M285 94V68m-14 17h28M143 119l11 11m-11 0 11-11M420 155l9 9m-9 0 9-9" stroke="#d3b681" stroke-opacity=".75"/>
-              <circle class="hero-spark" cx="115" cy="237" r="5" fill="#e08d6c"/><circle class="hero-spark" cx="445" cy="263" r="5" fill="#84c4ce"/><circle class="hero-spark" cx="285" cy="43" r="3" fill="#e6c990"/>
+              <path d="M285 94V68m-14 17h28" stroke="#d3b681" stroke-opacity=".75"/>
             </svg>
             <span class="art-caption">THE SPIRAL TEMPLE <i></i> TEAM STUDY</span>
           </div>
@@ -636,13 +749,16 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
           <div class="section-heading"><div><p class="eyebrow">ENCOUNTER GUIDE <span class="slash">/</span> 机制速览</p><h2>先认清，你的位置</h2></div><p>三个区间，各司其职。图中为分工示意，<br>具体站位和流程以团队实战为准。</p></div>
           <div class="guide-grid">
             <article class="guide-card twins"><div class="card-top"><span>01 / 双首领</span><span>球 · 花 · 治疗</span></div><h3>灼热剑 &amp; 酷寒剑</h3><p>分清同色与异色，让接球、踩花和治疗有序衔接。</p>
-              <svg class="diagram" viewBox="0 0 360 160" role="img" aria-label="双剑分工示意：火与冰、球花、治疗"><g class="overview-rings" stroke="#e2b595"><circle cx="95" cy="75" r="56"/><circle cx="265" cy="75" r="56"/></g><g class="overview-twins-glint"><circle class="overview-glint-dot" cx="180" cy="18" r="2" fill="#f5dca7"/><circle class="overview-glint-dot" cx="180" cy="142" r="2" fill="#9bd5d1"/></g><circle cx="95" cy="75" r="49" fill="#b64c3b" fill-opacity=".12" stroke="#d67960" stroke-opacity=".7"/><circle cx="265" cy="75" r="49" fill="#4e9fa8" fill-opacity=".12" stroke="#78b9c4" stroke-opacity=".7"/><circle cx="95" cy="75" r="18" fill="#bf6550" fill-opacity=".25"/><circle cx="265" cy="75" r="18" fill="#6ab2be" fill-opacity=".25"/><path d="M147 75h65" stroke="#cdb68a" stroke-opacity=".65" stroke-dasharray="4 5"/><circle class="guide-orb" cx="61" cy="42" r="5" fill="#dc9873"/><circle class="guide-orb" cx="130" cy="108" r="5" fill="#7ec2cd"/><circle class="guide-orb" cx="232" cy="42" r="5" fill="#dc9873"/><circle class="guide-orb" cx="297" cy="107" r="5" fill="#7ec2cd"/><text x="95" y="81" text-anchor="middle" fill="#eecab2" font-size="14">火</text><text x="265" y="81" text-anchor="middle" fill="#b9e4e8" font-size="14">冰</text><text x="180" y="142" text-anchor="middle" fill="#b8a98d" font-size="11">同色踩花 · 异色治疗</text></svg>
+
+              <div class="overview-placeholder" data-overview="twins-orbs"></div>
               <a class="card-footer" href="#guide-twins" aria-label="查看双剑详细图解"><span class="card-roles">主 T / 吃球 / 踩花 / 治疗</span><span class="card-cta">查看图解 <span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-right"/></svg></span></span></a></article>
             <article class="guide-card spirit"><div class="card-top"><span>02 / 超魔灵</span><span>隔离 · 染灯</span></div><h3>超魔灵</h3><p>看清业火与隔离时间，分开确认仇恨和追踪。</p>
-              <svg class="diagram" viewBox="0 0 360 160" fill="none" role="img" aria-label="超魔灵染灯示意：中心首领及周围核心"><g class="overview-rings" stroke="#e8cc91"><circle cx="180" cy="78" r="67"/><circle cx="180" cy="78" r="31"/></g><g class="overview-spirit-glint"><circle class="overview-glint-dot" cx="180" cy="12" r="2.5" fill="#fff0b5"/></g><circle cx="180" cy="78" r="55" stroke="#c3a97a" stroke-opacity=".45" stroke-dasharray="4 5"/><circle cx="180" cy="78" r="25" fill="#c8ac79" fill-opacity=".15" stroke="#c8ac79"/><g class="guide-lights" fill="#e1c38c"><circle cx="180" cy="17" r="5"/><circle cx="233" cy="47" r="5"/><circle cx="233" cy="109" r="5"/><circle cx="180" cy="139" r="5"/><circle cx="127" cy="109" r="5"/><circle cx="127" cy="47" r="5"/></g><path class="guide-direction" d="M205 39c28 12 43 36 37 61" stroke="#79b7b5" stroke-width="2"/><path d="m235 96 7 7 3-10" stroke="#79b7b5" stroke-width="2"/><text x="180" y="83" text-anchor="middle" fill="#e6d3ae" font-size="12">引导</text></svg>
+
+              <div class="overview-placeholder" data-overview="spirit-select"></div>
               <a class="card-footer" href="#guide-spirit" aria-label="查看超魔灵详细图解"><span class="card-roles">主 T / 业火 / 隔离 / 染灯</span><span class="card-cta">查看图解 <span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-right"/></svg></span></span></a></article>
             <article class="guide-card witch"><div class="card-top"><span>03 / 黑风魔女</span><span>冲锋 · 蜘蛛</span></div><h3>黑风魔女</h3><p>观察正反冲与危险线，炸弹和蜘蛛各自分点处理。</p>
-              <svg class="diagram" viewBox="0 0 360 160" fill="none" role="img" aria-label="魔女机制示意：旋转危险线及蜘蛛分点"><g class="overview-rings" stroke="#e5b4a0"><circle cx="180" cy="80" r="68"/><circle cx="180" cy="80" r="32"/></g><g class="overview-witch-glint"><circle class="overview-glint-dot" cx="180" cy="13" r="2.5" fill="#f7d599"/></g><circle cx="180" cy="80" r="59" stroke="#bfa67a" stroke-opacity=".4"/><circle cx="180" cy="80" r="25" stroke="#bfa67a" stroke-opacity=".25"/><g class="guide-witch-ray"><path d="M180 80 232 51" stroke="#e17372" stroke-width="3"/></g><path d="M120 47a70 70 0 0 1 95-25" stroke="#d78778" stroke-opacity=".8"/><path d="m210 17 7 7-10 2" stroke="#d78778" stroke-opacity=".8"/><g fill="#87beb4"><circle cx="126" cy="112" r="6"/><circle cx="231" cy="112" r="6"/><circle cx="180" cy="19" r="6"/></g><text x="180" y="84" text-anchor="middle" fill="#e6d3ae" font-size="11">BOSS</text></svg>
+
+              <div class="overview-placeholder" data-overview="witch-bomb"></div>
               <a class="card-footer" href="#guide-witch" aria-label="查看黑风魔女详细图解"><span class="card-roles">主 T / 控制 / 炸弹 / 蜘蛛</span><span class="card-cta">查看图解 <span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-right"/></svg></span></span></a></article>
           </div>
         </section>
@@ -650,10 +766,10 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         <section class="section how-section"><div class="how-copy"><p class="eyebrow">HOW IT WORKS <span class="slash">/</span> 考核方式</p><h2>练的是判断，<br>也是配合。</h2><p>单选、多选、判断和选择式填空。每题等权，多选需要全部选对。完成后立即查看分数与每题解析。</p><button class="text-action icon-action" type="button" data-action="start">进入考核 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div>
           <div class="steps"><div><span>01</span><div><strong>填写昵称</strong><p>输入你的昵称，无需注册。</p></div></div><div><span>02</span><div><strong>完成考题</strong><p>可分段答题，进度保存在当前浏览器。</p></div></div><div><span>03</span><div><strong>查看解析与排名</strong><p>排行榜保留每位玩家的最高成绩。</p></div></div></div>
         </section>
-        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><a class="link-button" href="#honor-board">趣味榜</a><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button icon-action" type="button" data-action="refresh-ranking"><svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg>刷新榜单</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>正确题数</span><span>用时</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div>
+        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><a class="link-button" href="#honor-board">趣味榜</a><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button icon-action" type="button" data-action="refresh-ranking"><svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg>刷新榜单</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>用时</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div>
           <nav class="ranking-pagination" id="ranking-pagination" aria-label="榜单分页" hidden><span id="ranking-page-status" aria-live="polite"></span><div class="ranking-page-controls"><button type="button" id="ranking-previous" data-action="ranking-previous">上一页</button><button type="button" id="ranking-next" data-action="ranking-next">下一页</button><form id="ranking-page-form"><label for="ranking-page-input">跳至</label><input id="ranking-page-input" type="number" min="1" inputmode="numeric" required><span>页</span><button type="submit">前往</button></form></div></nav>
           <p class="muted ranking-foot">每位玩家显示一条成绩，最多展示 3 枚勋章。同分按用时由短到长排列，未记录用时排在同分已计时成绩之后。新答卷仅计算答题页在前台的时间；旧成绩可能包含离开时间。用时由浏览器记录，仅供学习参考。</p>
-          <div class="honor-heading" id="honor-board"><div><p class="eyebrow">HALL OF HONORS <span class="slash">/</span> 全站趣味榜</p><h3>各有各的拿手好戏</h3></div><p>每榜展示前 5 人，并列第一都能获得对应勋章。</p></div>
+          <div class="honor-heading" id="honor-board"><div><p class="eyebrow">HALL OF HONORS <span class="slash">/</span> 全站趣味榜</p><h3>各有各的拿手好戏</h3></div><p>首页每榜展示 5 人，同成绩按达到时间先后排列；点击查看全部。</p></div>
           <div id="honor-boards" class="honor-boards" aria-live="polite"><p class="empty-state">正在读取趣味榜…</p></div>
           <p class="muted honor-foot">统计所有已上传答卷，包含新旧题库；没有记录用时的答卷不参加计时榜。榜首纪录变化时勋章会易主。用时由浏览器记录，趣味榜仅供娱乐。</p>
         </section>
@@ -715,6 +831,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   <dialog id="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div><p class="eyebrow">PLAYER PROFILE</p><h2 id="profile-title">设置你的昵称</h2></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted">只填昵称即可。榜单编号会自动分配，改名时保留。</p><label>昵称<input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"></label><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">身份保存在当前浏览器。更换设备或清除浏览器数据前，可备份身份码以恢复成绩。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码是以前备份的完整代码，第一次使用只需填写上方昵称。身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><label for="identity-code">身份码</label><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><details id="saved-profiles" class="recovery" hidden><summary>切换本机保留的资料</summary><p class="muted small">切换时会保留当前本机资料和未上传成绩。</p><div id="saved-profiles-list"></div></details><details id="file-import" class="recovery" hidden><summary>导入迁移文件</summary><p class="muted small">选择从原网址下载的迁移文件。文件含有身份资料，请妥善保管。</p><label for="transfer-file">选择迁移文件</label><input id="transfer-file" type="file" accept=".json,application/json"></details><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">稍后再说</button></div><button id="profile-history" class="link-button icon-action" type="button" data-action="open-history" hidden>我的答题记录 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><button id="profile-badges" class="link-button icon-action" type="button" data-action="open-badges" hidden>我的勋章 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><br><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
   <dialog id="transfer-dialog" aria-labelledby="transfer-title"><div class="dialog-top"><div><p class="eyebrow">TRANSFER</p><h2 id="transfer-title">转移本机资料</h2></div><button class="close-button" type="button" data-action="close-transfer" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><output id="transfer-description" class="muted" aria-live="polite">正在读取原网址的资料…</output><p id="transfer-detail" class="profile-note"></p><p id="transfer-error" class="error-text" role="alert"></p><div class="dialog-actions"><button id="transfer-confirm" class="btn btn-primary" type="button" data-action="confirm-transfer" hidden>确认转移并上传</button><button class="btn btn-ghost" type="button" data-action="close-transfer">取消</button></div></dialog>
   <dialog id="diagram-dialog" class="diagram-dialog" aria-labelledby="diagram-dialog-title"><div class="dialog-top"><div><p class="eyebrow">TACTICAL MAP</p><h2 id="diagram-dialog-title">放大查看示意图</h2></div><button class="close-button" type="button" data-action="close-diagram" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="diagram-dialog-hint">手机可左右滑动查看完整图解。</p><div id="diagram-dialog-content" class="diagram-dialog-content"></div></dialog>
+  <dialog id="honor-dialog" class="honor-dialog" aria-labelledby="honor-dialog-title"><div class="dialog-top"><div><p class="eyebrow">HALL OF HONORS</p><h2 id="honor-dialog-title">趣味榜</h2></div><button class="close-button" type="button" data-action="close-honor-detail" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p id="honor-detail-description" class="honor-dialog-description"></p><div class="honor-detail-tabs" aria-label="查看趣味榜"><button type="button" data-action="honor-mode" data-mode="history" aria-pressed="true">历史获得者</button><button type="button" data-action="honor-mode" data-mode="current" aria-pressed="false">当前排名</button></div><p class="honor-history-note">历史名单按现存答卷与当前规则推算；旧答卷没有完成时间时使用上传时间，已删除的记录无法还原。当前榜首并列者都获得勋章，纪录被超越后会让出。</p><output id="honor-detail-status" class="honor-detail-status" aria-live="polite"></output><ol id="honor-detail-list" class="honor-detail-list"></ol><div class="honor-detail-pages"><button id="honor-detail-prev" type="button" data-action="honor-prev">上一页</button><span id="honor-detail-page"></span><button id="honor-detail-next" type="button" data-action="honor-next">下一页</button></div></dialog>
   <dialog id="restart-dialog" aria-labelledby="restart-title"><div class="dialog-top"><div><p class="eyebrow">A FRESH START</p><h2 id="restart-title">重新开始这一轮？</h2></div><button class="close-button" type="button" data-action="cancel-restart" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted restart-description">本轮未交卷的答案将清空，题目和选项会重新打乱，计时归零。已提交的成绩和勋章会保留。</p><div class="dialog-actions"><button class="btn btn-primary" type="button" data-action="confirm-restart">重新考核</button><button class="btn btn-ghost" type="button" data-action="cancel-restart">继续答题</button></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script id="question-bank" type="application/json">{
@@ -3987,7 +4104,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       },
       {
         timing: '约 71% 与 41% 飞天，第二次落地后持续处理', title: '先分点，聚小蜘蛛并打断大蜘蛛回血', diagram: 'witch-spiders',
-        caption: 'A、B、C 表示团队分配的处理区。实际出生点以场内标记为准，第二次落地后还要留出首领带位区域。',
+        caption: '图示一个蜘蛛处理区。实际出生点和分组以场内标记为准，第二次落地后还要留出首领带位区域。',
         roles: [
           ['蜘蛛组', '飞天时到各自分点。先接住大蜘蛛，小蜘蛛出现后聚到大蜘蛛附近，用范围输出同时处理。分配好聚怪、控制、输出，避免多人追同一只小怪。'],
           ['蜘蛛控制位', '注意大蜘蛛抬头转向首领，及时用约定的眩晕或击倒打断回血。按当场小怪状态安排输出和下一轮控制。'],
@@ -4036,8 +4153,166 @@ const QUESTION_DIAGRAMS = {
   q100: ['witch-spiders', '小蜘蛛分散在大蜘蛛附近。'],
 };
 
+// The positions below are illustrative snapshots, not fixed in-game coordinates.
+// Moving a complete labelled role makes the order of each mechanic visible.
+const sceneLabel = (x, y, text, tone = '') => `<text x="${x}" y="${y}" class="scene-label ${tone}">${text}</text>`;
+const sceneLine = (path, tone = 'ally') => `<path d="${path}" class="scene-path ${tone}"/>`;
+const sceneCue = (name, content) => `<g class="scene-cue" data-cue="${name}">${content}</g>`;
+const sceneCircle = (x, y, r, tone = '') => `<circle cx="${x}" cy="${y}" r="${r}" class="scene-zone ${tone}"/>`;
+const sceneActor = (actor) => {
+  const {id, x, y, text, tone = 'ally', r = 17, mark = ''} = actor;
+  return `<g class="scene-actor" data-actor="${id}" style="transform:translate(${x}px,${y}px)"><circle r="${r}" class="scene-piece ${tone}"/><text class="scene-piece-text" y="5">${text}</text>${mark}</g>`;
+};
+const point = (id, x, y, text, tone = 'ally', r = 17, mark = '') => ({id, x, y, text, tone, r, mark});
+const RAID_SEQUENCES = {
+  'twins-distance': {
+    background: sceneCircle(145,125,65,'fire-boundary') + sceneCircle(414,125,65,'boundary') + sceneLabel(145,234,'灼热剑侧') + sceneLabel(414,234,'酷寒剑侧'),
+    actors: [point('fire',145,125,'火','hazard',25),point('ice',414,125,'冰','ally',25),point('ft',52,125,'T','hazard'),point('it',455,125,'T')],
+    cues: sceneCue('knock', sceneLine('M455 125 L512 125 M502 118 L512 125 L502 132','hazard') + sceneLabel(507,171,'击退')) + sceneCue('return', sceneLine('M500 125 L461 125 M471 118 L461 125 L471 132','ally')),
+    steps: [
+      {text:'火 T 在约 8 米外，冰 T 靠近冰首领。'},
+      {text:'冰 T 被击退后，先确认身边的安全方向。', positions:{it:[510,125]}, cues:['knock']},
+      {text:'冰 T 尽快回到首领附近；火 T 保持距离。', cues:['return']},
+    ],
+  },
+  'twins-orbs': {
+    background: sceneLabel(142,32,'灼热剑侧','gold') + sceneLabel(420,32,'酷寒剑侧','gold') + sceneCircle(142,132,82) + sceneCircle(420,132,82) + sceneLabel(91,69,'火球') + sceneLabel(191,210,'冰球') + sceneLabel(370,69,'火球') + sceneLabel(470,210,'冰球'),
+    actors: [point('fire',142,132,'火','hazard',23),point('ice',420,132,'冰','ally',23),point('fball',91,85,'','hazard',9),point('iball',191,180,'','ally',9),point('fball2',370,85,'','hazard',9),point('iball2',470,180,'','ally',9),point('block',69,150,'挡','hazard'),point('heal',222,148,'疗')],
+    cues: sceneCue('block', sceneLine('M75 138 L87 101 M80 108 L87 101 L91 111','hazard')) + sceneCue('heal', sceneLine('M217 159 L204 171 M214 170 L204 171 L207 160','ally')),
+    steps: [
+      {text:'先认本侧首领颜色，再确认谁负责挡球和治疗。'},
+      {text:'同色挡球位处理同色球；示例为火侧挡火球。',positions:{block:[91,108]},cues:['block']},
+      {text:'治疗位按分工准备异色状态；示例为火侧接冰球。',positions:{block:[91,108],heal:[191,157]},cues:['heal']},
+    ],
+  },
+  'twins-heal': {
+    background: sceneLabel(92,55,'同色花点','gold') + sceneLabel(276,55,'治疗珠','gold') + sceneLabel(461,55,'本侧主 T','gold'),
+    actors:[point('flower',92,116,'花','ally',24),point('pearl',276,116,'珠','ally',20),point('tank',461,116,'T','boss',24),point('flowerRole',54,178,'踩','ally'),point('heal',238,178,'疗')],
+    cues:sceneCue('flower',sceneLine('M64 164 L80 136 M77 145 L80 136 L69 141','ally')) + sceneCue('pearl',sceneLine('M247 164 L264 137 M253 143 L264 137 L263 149','ally')) + sceneCue('aim',sceneLine('M303 116 L426 116 M416 108 L426 116 L416 124','ally')),
+    steps:[
+      {text:'三层同色位处理分配到的同色花点。',positions:{flowerRole:[92,151]},cues:['flower']},
+      {text:'治疗位拾取出现的治疗珠。',positions:{flowerRole:[92,151],heal:[276,151]},cues:['pearl']},
+      {text:'绿色治疗指示对准本侧主 T，按刀数接续治疗。',positions:{flowerRole:[92,151],heal:[276,151]},cues:['aim']},
+    ],
+  },
+  'twins-swap': {
+    background:sceneLabel(145,35,'一侧') + sceneLabel(416,35,'另一侧') + sceneLabel(280,236,'河道 · 左右仅为相对位置'),
+    actors:[point('fire',135,91,'火','hazard',23),point('ice',425,91,'冰','ally',23),point('ft',90,139,'T','hazard'),point('it',470,139,'T'),point('heal',92,191,'疗')],
+    cues:sceneCue('swap',sceneLine('M171 76 L390 76 M380 69 L390 76 L380 83','hazard')+sceneLine('M389 108 L171 108 M181 101 L171 108 L181 115','ally')) + sceneCue('heal',sceneLine('M115 192 L431 192 M421 184 L431 192 L421 200','ally')),
+    steps:[
+      {text:'一轮结束，先观察首领的换边与吸引动作。'},
+      {text:'首领互换，同色位留意被吸后的落点。',positions:{fire:[425,91],ice:[135,91],ft:[470,139],it:[90,139]},cues:['swap']},
+      {text:'吸人结束后，异色治疗位再自行过河。',positions:{fire:[425,91],ice:[135,91],ft:[470,139],it:[90,139],heal:[460,191]},cues:['heal']},
+    ],
+  },
+  'spirit-select': {
+    background:sceneCircle(280,128,66,'boundary') + sceneLabel(105,225,'远点业火组') + sceneLabel(445,218,'空处示例'),
+    actors:[point('boss',280,128,'首领','boss',25),point('tank',239,166,'T'),point('a',100,84,'A'),point('b',77,129,'B'),point('c',102,173,'C'),point('bomb',321,98,'弹','hazard')],
+    cues:sceneCue('bomb',sceneLine('M342 102 L454 159 M443 148 L454 159 L438 159','hazard')),
+    steps:[
+      {text:'业火组占远点，炸弹候选位靠近首领。'},
+      {text:'近点被波动炸弹点名，先看清周围队员。'},
+      {text:'被点名者撤向空处，避开队友与隔离内队员。',positions:{bomb:[454,159]},cues:['bomb']},
+    ],
+  },
+  'spirit-facing': {
+    background:sceneLabel(123,61,'带业火 · 进隔离','gold') + sceneLabel(438,61,'无业火 · 留外场','gold'),
+    actors:[point('boss',280,133,'首领','boss',25),point('fire',124,133,'火','hazard',20),point('outside',434,133,'外','ally',20)],
+    cues:sceneCue('face',sceneLine('M153 133 L240 133 M230 125 L240 133 L230 141','hazard')+sceneLine('M463 133 L519 133 M509 125 L519 133 L509 141','ally')),
+    steps:[
+      {text:'击倒前确认身上有没有业火，报清谁进谁留。'},
+      {text:'要进隔离的业火位，在击倒切换时面向首领。',cues:['face']},
+      {text:'留外场的无业火队员背对首领，切换后再调整。',cues:['face']},
+    ],
+  },
+  'spirit-lamps': {
+    background:sceneCircle(280,130,98) + sceneLabel(280,255,'灯位与引导次序按团队安排'),
+    actors:[point('boss',280,130,'首领','boss',24),point('tank',322,130,'T'),point('team',226,166,'队'),point('l1',280,32,'灯','lamp',14),point('l2',365,81,'灯','lamp',14),point('l3',365,179,'灯','lamp',14),point('l4',280,228,'灯','lamp',14),point('l5',195,179,'灯','lamp',14),point('l6',195,81,'灯','lamp',14)],
+    cues:sceneCue('first',sceneLine('M301 107 L343 82 M332 84 L343 82 L337 92','gold')) + sceneCue('second',sceneLine('M302 150 L343 177 M337 167 L343 177 L331 175','gold')),
+    steps:[
+      {text:'染灯阶段，主 T 先认清待染的灯位。'},
+      {text:'引导首领攻击覆盖灯位；这里仅示范一个方向。',positions:{tank:[317,105]},cues:['first']},
+      {text:'继续按团队路线处理其他灯位，外场让开引导方向。',positions:{tank:[317,155]},cues:['second']},
+    ],
+  },
+  'spirit-rotation': {
+    background:sceneCircle(142,135,79,'inside') + sceneCircle(419,135,79) + sceneLabel(142,45,'隔离内','gold') + sceneLabel(419,45,'外场','gold'),
+    actors:[point('a',142,135,'A','hazard',22),point('b',419,135,'B','ally',22)],
+    cues:sceneCue('leave',sceneLine('M170 109 L386 109 M376 101 L386 109 L376 117','hazard')) + sceneCue('enter',sceneLine('M389 160 L171 160 M181 152 L171 160 L181 168','ally')),
+    steps:[
+      {text:'A 组在隔离内，B 组在外场准备。'},
+      {text:'切换时 A 组出场，留意约 30 秒后遗症。',positions:{a:[419,112],b:[419,158]},cues:['leave']},
+      {text:'下一组按业火和击倒口令接替，别让后遗症位抢进。',positions:{a:[419,112],b:[142,135]},cues:['enter']},
+    ],
+  },
+  'witch-line': {
+    background:sceneCircle(280,130,104) + sceneLabel(116,60,'不祥气息','hazard') + sceneLabel(443,224,'内侧安全带位'),
+    actors:[point('boss',305,155,'首领','boss',24),point('tank',342,158,'T'),point('team',267,189,'队')],
+    cues:sceneCue('line1',sceneLine('M280 130 L189 83','hazard')+sceneLine('M280 130 L321 34','hazard')) + sceneCue('line2',sceneLine('M280 130 L180 113','hazard')+sceneLine('M280 130 L347 50','hazard')) + sceneCue('move',sceneLine('M346 180 Q343 206 321 216 M332 215 L321 216 L326 206','ally')),
+    steps:[
+      {text:'先看不祥气息位置，主 T 与队伍保持安全间隔。',cues:['line1']},
+      {text:'危险线移动时，主 T 沿内侧调整，别让首领碰线。',positions:{boss:[301,181],tank:[323,207],team:[252,195]},cues:['line2','move']},
+      {text:'队员避开危险线和首领正面，回到安全侧。',positions:{boss:[301,181],tank:[323,207],team:[252,195]},cues:['line2']},
+    ],
+  },
+  'witch-charge': {
+    background:sceneCircle(280,130,105) + sceneLabel(126,57,'后冲示例') + sceneLabel(435,207,'队友安全侧'),
+    actors:[point('boss',280,125,'首领','boss',24,sceneLine('M28 0 L67 0 M57 -8 L67 0 L57 8','gold')),point('team',352,192,'队'),point('team2',389,192,'队')],
+    cues:sceneCue('charge',sceneLine('M250 125 L188 125 M198 117 L188 125 L198 133','ally')) + sceneCue('scan','<path class="scene-scan" d="M210 125 L270 65 A87 87 0 0 1 292 115 Z"/>' + sceneLabel(339,67,'扫描朝空地','gold')),
+    steps:[
+      {text:'观察首领面向与起身动作，判断前冲还是后冲。'},
+      {text:'示例：首领向后冲，队员提前离开路径。',positions:{boss:[185,125]},cues:['charge']},
+      {text:'冲锋结束后，主 T 将扇形扫描带向空地。',positions:{boss:[185,125]},cues:['scan']},
+    ],
+  },
+  'witch-bomb': {
+    background:sceneCircle(280,130,103) + sceneCircle(280,130,54,'boundary') + sceneLine('M280 130 L207 56','hazard') + sceneLabel(119,54,'不祥气息','hazard') + sceneLabel(132,222,'蜘蛛组') + sceneLabel(451,222,'空处示例'),
+    actors:[point('boss',280,130,'首领','boss',24),point('bomb',315,164,'弹','hazard'),point('candidate',270,180,'候'),point('spider',188,191,'蛛'),point('team',350,85,'队')],
+    cues:sceneCue('escape',sceneLine('M330 176 L410 204 M399 195 L410 204 L395 207','hazard')),
+    steps:[
+      {text:'中圈候选位看到提示，先确认谁被标记。'},
+      {text:'炸弹位观察危险线、队友和其他炸弹的位置。'},
+      {text:'向约定空处撤离，别穿过人群或蜘蛛组。',positions:{bomb:[410,204]},cues:['escape']},
+    ],
+  },
+  'witch-spiders': {
+    background:sceneLabel(142,45,'场地中央','gold') + sceneLabel(399,45,'一个处理区示例','gold'),
+    actors:[point('boss',142,125,'首领','boss',24),point('big',355,125,'大','boss',23),point('s1',437,76,'小','hazard',13),point('s2',459,165,'小','hazard',13),point('s3',394,205,'小','hazard',13),point('team',325,186,'队')],
+    cues:sceneCue('gather',sceneLine('M426 92 L385 112 M395 103 L385 112 L398 113','ally')) + sceneCue('interrupt',sceneLine('M326 125 L179 125 M189 117 L179 125 L189 133','hazard') + sceneLabel(251,93,'转向首领 · 打断','hazard')),
+    steps:[
+      {text:'飞天后按团队分点，先接住各区大蜘蛛。'},
+      {text:'聚怪位将小蜘蛛带到大蜘蛛附近，再集中处理。',positions:{s1:[385,90],s2:[395,144],s3:[367,168]},cues:['gather']},
+      {text:'大蜘蛛转向首领准备回血时，及时控制打断。',positions:{s1:[385,90],s2:[395,144],s3:[367,168]},cues:['interrupt']},
+    ],
+  },
+  'witch-wave': {
+    background:sceneCircle(245,130,95) + sceneLabel(423,199,'远点位'),
+    actors:[point('boss',245,130,'首领','boss',24),point('team',207,176,'队'),point('far',422,130,'远')],
+    cues:sceneCue('wave','<path class="scene-wave" d="M280 83 Q312 130 280 177"/>') + sceneCue('arrive','<path class="scene-wave" d="M388 74 Q420 130 388 186"/>') + sceneCue('jump',sceneLine('M422 113 L422 77 M415 87 L422 77 L429 87','ally')+sceneLabel(474,82,'起跳','gold')),
+    steps:[
+      {text:'后期远点位观察首领的出招预兆。'},
+      {text:'震荡波出现，留意波纹接近自己的时机。',cues:['wave']},
+      {text:'波纹到达时起跳规避；时机以场内显示为准。',positions:{far:[422,100]},cues:['arrive','jump']},
+    ],
+  },
+};
+
+function sequenceSvg(key) {
+  const scene = RAID_SEQUENCES[key];
+  return `<svg class="sequence-svg" viewBox="0 0 560 270" role="img" aria-label="机制站位及移动顺序示意">${scene.background}${scene.cues || ''}${scene.actors.map(sceneActor).join('')}</svg>`;
+}
+function drawSequenceDiagram(key, caption) {
+  const scene = RAID_SEQUENCES[key];
+  return `<figure class="raid-diagram sequence-diagram" data-sequence="${key}" data-step="0"><div class="diagram-top"><span>机制动态演示</span><div class="diagram-controls"><button type="button" class="diagram-pause" data-action="toggle-diagram-motion" aria-pressed="false">暂停</button><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div></div>${sequenceSvg(key)}<div class="sequence-readout"><span class="sequence-count" data-step-count>01 / ${String(scene.steps.length).padStart(2,'0')}</span><span data-step-text>${scene.steps[0].text}</span><div class="sequence-controls"><button type="button" data-action="sequence-prev" aria-label="上一步">←</button><button type="button" data-action="sequence-next" aria-label="下一步">→</button></div></div><figcaption><span>${caption}</span><span class="diagram-motion-note">动画演示处理顺序；站位、路线和时机以团队安排及场内情况为准。</span></figcaption></figure>`;
+}
+function drawOverviewSequence(key) {
+  const scene = RAID_SEQUENCES[key];
+  return `<div class="overview-sequence" data-sequence="${key}" data-step="0">${sequenceSvg(key)}<div class="overview-readout"><span data-step-count>01 / ${String(scene.steps.length).padStart(2,'0')}</span><span data-step-text>${scene.steps[0].text}</span></div></div>`;
+}
+
 function drawRaidDiagram(key, caption, questionId = null) {
   const test = Boolean(questionId);
+  if (!test && RAID_SEQUENCES[key]) return drawSequenceDiagram(key, caption);
   const circle = (x, y, radius, style) => `<circle cx="${x}" cy="${y}" r="${radius}" class="${style}"/>`;
   const line = (path, style = 'map-rule') => `<path d="${path}" class="${style}"/>`;
   const label = (x, y, text, style = '') => `<text x="${x}" y="${y}" class="${style}">${text}</text>`;
@@ -4047,13 +4322,11 @@ function drawRaidDiagram(key, caption, questionId = null) {
     const dx = 4 * Math.sin(angle), dy = 4 * Math.cos(angle);
     const shaft = `M${x1} ${y1}L${x2} ${y2}`;
     const arrowhead = `M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`;
-    // Animate only existing route arrows; facing indicators remain static.
-    const traveler = `<circle class="map-flow-dot map-flow-trail" r="3"><animateMotion path="${shaft}" dur="3s" begin="-.18s" repeatCount="indefinite"/></circle><circle class="map-flow-dot" r="4"><animateMotion path="${shaft}" dur="3s" repeatCount="indefinite"/></circle>`;
-    return line(shaft + arrowhead, style) + (animate ? line(shaft, 'map-route-glow') + traveler : '');
+    return line(shaft + arrowhead, style);
   };
   const token = (x, y, text, style = 'map-ally', radius = 12) =>
-    circle(x, y, radius + 4, 'map-token-aura') + circle(x, y, radius, style) + circle(x, y, Math.max(radius - 3, 1), 'map-token-ring') + label(x, y + 4.5, text, 'map-token');
-  const arena = (x = 280, y = 135, radius = 106) => circle(x, y, radius + 5, 'map-field-halo') + circle(x, y, radius, 'map-field') + circle(x, y, radius - 12, 'map-grid');
+    circle(x, y, radius, style) + label(x, y + 4.5, text, 'map-token');
+  const arena = (x = 280, y = 135, radius = 106) => circle(x, y, radius, 'map-field');
   const boss = (x = 280, y = 135, text = '首领', style = 'map-boss') => token(x, y, text, style, 24);
   const spider = (x, y) => token(x, y, '大', 'map-boss', 17);
   const swarm = (x, y) => [[-16, -4], [9, -16], [12, 9], [-6, 15]].map(([dx,dy]) => circle(x+dx, y+dy, 5, 'map-hazard map-spiderling')).join('');
@@ -4174,13 +4447,10 @@ function drawRaidDiagram(key, caption, questionId = null) {
       throw new Error(`Unknown raid diagram: ${key}`);
   }
 
-  const vertical = [40,80,120,160,200,240,280,320,360,400,440,480,520].map(x => `M${x} 0v270`).join(' ');
-  const horizontal = [45,90,135,180,225].map(y => `M0 ${y}h560`).join(' ');
-  const grid = `<path class="map-underlay" d="${vertical} ${horizontal}"/>`;
   const legend = (legends[key] || []).map(([tone, text]) => `<span><i class="legend-mark legend-${tone}" aria-hidden="true"></i>${text}</span>`).join('');
   const legendMarkup = legend ? `<span class="diagram-legend">${legend}</span>` : '';
-  const motionNote = key === 'witch-line' ? '<span class="diagram-motion-note">旋转动画仅作示意，实际方向与速度以场内为准。</span>' : '';
-  return `<figure class="raid-diagram" data-diagram="${key}"><div class="diagram-top"><span>站位与路线示意</span><div class="diagram-controls"><button type="button" class="diagram-pause" data-action="toggle-diagram-motion" aria-pressed="false">暂停</button><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${grid}${art}</svg><figcaption><span>${caption}</span>${motionNote}${legendMarkup}</figcaption></figure>`;
+  const motionNote = key === 'witch-line' ? '<span class="diagram-motion-note">不祥气息的位置与方向以场内为准。</span>' : '';
+  return `<figure class="raid-diagram question-map" data-diagram="${key}"><div class="diagram-top"><span>站位示意</span><div class="diagram-controls"><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${art}</svg><figcaption><span>${caption}</span>${motionNote}${legendMarkup}</figcaption></figure>`;
 }
 </script>
   <script>// Original vector artwork shared by the collection, results and leaderboard.
@@ -4306,12 +4576,18 @@ function drawBadgeArtwork(badge) {
   let badgesReturn = 'home';
   let badgesRequest = 0;
   let badgeData = null;
+  let badgeOwner = null;
   let selectedBadges = [];
   let badgesDirty = false;
   let uploading = false;
   let connecting = false;
   let rankingRequest = 0;
   let honorRequest = 0;
+  let honorDetailRequest = 0;
+  let honorDetailBadge = '';
+  let honorDetailMode = 'history';
+  let honorDetailPage = 1;
+  let honorDetailPages = 1;
   let rankingPage = 1;
   let rankingPages = 1;
   let lastUploadError = '';
@@ -4532,6 +4808,7 @@ function drawBadgeArtwork(badge) {
     toast(localOnly ? '昵称已保存在本机，可以开始答题。' : number ? `资料已保存 · 榜单编号 ${number}` : '资料已保存');
     if(next==='start') beginExam();
     else if (next==='badges') openBadges();
+    else if (view === 'badges') void loadBadges();
     else if (view === 'history') loadHistory();
     else refreshRanking();
     if (!localOnly && nextPendingAttempt()) uploadPending();
@@ -4657,7 +4934,8 @@ function drawBadgeArtwork(badge) {
       let attempt = nextPendingAttempt();
       while (attempt) {
         const data = await request('/api/submit', {...participant, attemptId:attempt.attemptId,
-          version:attempt.version, answers:attempt.answers, elapsedSeconds:attempt.elapsedSeconds ?? null});
+          version:attempt.version, answers:attempt.answers, elapsedSeconds:attempt.elapsedSeconds ?? null,
+          completedAt:attempt.localSubmittedAt ?? null});
         if (identity !== participant || !activeIdentity(participant)) return;
         if (result?.attemptId === attempt.attemptId && (data.correctCount !== result.correctCount || data.totalCount !== result.totalCount)) {
           throw new Error('成绩核对失败，请刷新后联系团长。');
@@ -4743,7 +5021,7 @@ function drawBadgeArtwork(badge) {
     const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
     const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
     const badgeList = shownBadges.length ? `<div class="rank-badges" aria-label="展示的勋章">${shownBadges.map(badgeChip).join('')}</div>` : '';
-    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><div class="ranking-stats"><span class="ranking-stat"><small>正确题数</small><b>${entry.correctCount} / ${entry.totalCount}</b></span><span class="ranking-stat"><small>用时</small><b>${formatDuration(entry.elapsedSeconds)}</b></span><span class="ranking-stat"><small>最高分</small><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong></span></div>`;
+    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><div class="ranking-stats"><span class="ranking-stat"><small>用时</small><b>${formatDuration(entry.elapsedSeconds)}</b></span><span class="ranking-stat"><small>最高分</small><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong></span></div>`;
     return row;
   }
   async function refreshHonors() {
@@ -4759,11 +5037,57 @@ function drawBadgeArtwork(badge) {
         const entries = Array.isArray(board.entries) ? board.entries : [];
         const rows = entries.map(entry => `<li><span class="honor-rank">${entry.rank}</span><span class="honor-player"><b>${escape(entry.nickname)}</b><small>${formatPlayerNumber(entry.playerNumber)}</small></span><strong>${board.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`}</strong></li>`).join('');
         const holders = board.holderCount > 1 ? `${board.holderCount} 人并列第一` : '榜首可获得勋章';
-        return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders">${entries.length ? holders : '等待首位上榜玩家'}</div></article>`;
+        const more = entries.length ? `<button type="button" data-action="honor-show" data-badge="${escape(badge.id)}">查看全部 <span aria-hidden="true">→</span></button>` : '';
+        return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders"><span>${entries.length ? holders : '等待首位上榜玩家'}</span>${more}</div></article>`;
       }).join('');
     } catch (error) {
       if (requestId === honorRequest) container.innerHTML = `<p class="empty-state">${escape(error.message)} 点击刷新榜单可重试。</p>`;
     }
+  }
+  async function loadHonorDetail(page = 1) {
+    const requestId = ++honorDetailRequest;
+    const badge = honorDetailBadge;
+    const mode = honorDetailMode;
+    $('honor-detail-status').textContent = '正在读取名单…';
+    $('honor-detail-prev').disabled = true;
+    $('honor-detail-next').disabled = true;
+    try {
+      const data = await request(`/api/honors?badge=${encodeURIComponent(badge)}&mode=${mode}&page=${page}&pageSize=20`);
+      if (requestId !== honorDetailRequest || !$('honor-dialog').open || badge !== honorDetailBadge || mode !== honorDetailMode) return;
+      if (!data.badge || !Array.isArray(data.entries) || !Number.isSafeInteger(data.page) || !Number.isSafeInteger(data.pages)) throw new TypeError('趣味榜返回的数据无法识别。');
+      honorDetailPage = data.page; honorDetailPages = data.pages;
+      $('honor-dialog-title').textContent = data.badge.name;
+      $('honor-detail-description').textContent = data.badge.description;
+      $('honor-detail-status').textContent = mode === 'history'
+        ? `共 ${data.total} 人曾达成 · 其中 ${data.holderCount} 人当前持有`
+        : `共 ${data.total} 人上榜 · ${data.holderCount} 人并列榜首；同成绩按达到时间先后排列`;
+      $('honor-detail-list').innerHTML = data.entries.length ? data.entries.map(entry => {
+        const number = formatPlayerNumber(entry.playerNumber);
+        const value = data.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`;
+        const rank = mode === 'current' ? `<span class="honor-detail-rank">${entry.rank}</span>` : '';
+        const status = mode === 'history' ? `<small class="${entry.current ? 'is-current' : ''}">${entry.current ? '当前持有' : '曾经获得'}</small>` : '';
+        const time = mode === 'history' ? `<span class="honor-achieved">${new Date(entry.achievedAt).toLocaleDateString('zh-CN')} 首次达成</span>` : '';
+        return `<li>${rank}<span class="honor-detail-person"><strong>${escape(entry.nickname)}</strong><small>${escape(number)}</small></span>${status}<span class="honor-detail-value"><strong>${mode === 'history' ? '当时 ' : ''}${escape(value)}</strong>${time}</span></li>`;
+      }).join('') : '<li class="honor-detail-empty">暂无符合条件的记录。</li>';
+      $('honor-detail-page').textContent = `第 ${honorDetailPage} / ${honorDetailPages} 页`;
+      $('honor-detail-prev').disabled = honorDetailPage <= 1;
+      $('honor-detail-next').disabled = honorDetailPage >= honorDetailPages;
+    } catch (error) {
+      if (requestId !== honorDetailRequest || !$('honor-dialog').open) return;
+      $('honor-detail-status').textContent = `${error.message} 请关闭后重试。`;
+    }
+  }
+  function showHonorDetail(badge) {
+    honorDetailBadge = badge;
+    honorDetailMode = 'history';
+    honorDetailPage = honorDetailPages = 1;
+    $('honor-detail-list').replaceChildren();
+    $('honor-detail-page').textContent = '';
+    $('honor-dialog-title').textContent = '趣味榜';
+    $('honor-detail-description').textContent = '';
+    $('honor-dialog').querySelectorAll('[data-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === honorDetailMode)));
+    $('honor-dialog').showModal();
+    void loadHonorDetail();
   }
   async function refreshRanking(page = rankingPage) {
     const requestId = ++rankingRequest;
@@ -4889,41 +5213,55 @@ function drawBadgeArtwork(badge) {
   }
   function closeBadges() {
     ++badgesRequest;
+    $('badges-reload').disabled = false;
+    $('badges-save').disabled = false;
     setView(badgesReturn);
     if (badgesReturn === 'home') { void refreshRanking(); $('leaderboard').scrollIntoView(); }
   }
-  function renderBadges(enter = false) {
+  function renderBadges() {
     const grid = $('badges-grid');
-    grid.replaceChildren();
+    const existing = new Map([...grid.children].map(button => [button.dataset.badge, button]));
     const earned = badgeData.badges.filter(badge => badge.earned).length;
     const fastest = Number.isSafeInteger(badgeData.fastestSeconds) ? formatDuration(badgeData.fastestSeconds) : '暂无';
-    $('badges-status').textContent = `已获得 ${earned} / ${badgeData.badges.length} 枚 · 已选 ${selectedBadges.length} / ${badgeData.maxShown} 枚 · 全站最快 ${fastest}`;
+    $('badges-status').textContent = `已获得 ${earned} / ${badgeData.badges.length} 枚 · 已选 ${selectedBadges.length} / ${badgeData.maxShown} 枚 · 全站最快 ${fastest}${badgesDirty ? ' · 更改后请保存' : ''}`;
     $('badges-save').textContent = `保存展示（${selectedBadges.length}/${badgeData.maxShown}）`;
-    for (const badge of badgeData.badges) {
+    badgeData.badges.forEach((badge, index) => {
       const selected = selectedBadges.includes(badge.id);
-      const button = document.createElement('button');
+      const button = existing.get(badge.id) || document.createElement('button');
+      existing.delete(badge.id);
       button.type = 'button';
-      button.className = `badge-card tone-${badgeTone(badge)}${badge.earned ? ' earned' : ' locked'}${selected ? ' selected' : ''}`;
-      if (enter) button.classList.add('badge-enter');
       button.dataset.action = 'toggle-badge';
       button.dataset.badge = badge.id;
-      button.disabled = !badge.earned;
-      button.setAttribute('aria-pressed', String(selected));
-      let state = '未获得';
-      if (badge.earned) state = selected ? '✓ 展示中' : '＋ 已获得 · 可展示';
-      button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span></span>`;
-      grid.append(button);
-    }
+      const signature = JSON.stringify([badge, selected]);
+      if (button.dataset.signature !== signature) {
+        button.className = `badge-card tone-${badgeTone(badge)}${badge.earned ? ' earned' : ' locked'}${selected ? ' selected' : ''}`;
+        button.disabled = !badge.earned;
+        button.setAttribute('aria-pressed', String(selected));
+        const state = badge.earned ? (selected ? '✓ 展示中' : '＋ 已获得 · 可展示') : '未获得';
+        button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span></span>`;
+        button.dataset.signature = signature;
+      }
+      if (grid.children[index] !== button) grid.insertBefore(button, grid.children[index] || null);
+    });
+    for (const button of existing.values()) button.remove();
   }
   async function loadBadges() {
     const requestId = ++badgesRequest;
-    badgeData = null;
-    $('badges-grid').replaceChildren();
-    $('badges-save').hidden = true;
+    const sameOwner = profile && badgeOwner && badgeOwner.deviceId === identity.deviceId && badgeOwner.secret === identity.secret;
+    if (!sameOwner) {
+      badgeData = null;
+      badgeOwner = null;
+      selectedBadges = [];
+      badgesDirty = false;
+      $('badges-grid').replaceChildren();
+      $('badges-save').hidden = true;
+    }
     $('badges-reload').hidden = !profile;
     $('badges-profile').hidden = Boolean(profile);
-    if (!profile) { $('badges-status').textContent = '设置昵称或恢复原来的身份后，即可查看和展示勋章。'; return; }
-    $('badges-status').textContent = '正在读取勋章…';
+    if (!profile) { $('badges-reload').disabled = false; $('badges-status').textContent = '设置昵称或恢复原来的身份后，即可查看和展示勋章。'; return; }
+    $('badges-reload').disabled = true;
+    $('badges-save').disabled = true;
+    $('badges-status').textContent = badgeData ? '正在刷新勋章，当前选择会保留…' : '正在读取勋章…';
     const who = {...identity};
     try {
       const data = await request('/api/badges', who);
@@ -4931,17 +5269,26 @@ function drawBadgeArtwork(badge) {
       if (!Array.isArray(data.badges) || !Array.isArray(data.selected) || !Number.isSafeInteger(data.maxShown)) {
         throw new TypeError('暂时无法读取勋章，请稍后刷新。');
       }
+      const wanted = badgesDirty ? selectedBadges.slice() : data.selected.slice();
+      const earnedIds = new Set(data.badges.filter(badge => badge.earned).map(badge => badge.id));
+      selectedBadges = wanted.filter(id => earnedIds.has(id)).slice(0, data.maxShown);
+      const removed = wanted.length !== selectedBadges.length;
       badgeData = data;
-      selectedBadges = data.selected.slice();
-      badgesDirty = false;
+      badgeOwner = who;
+      badgesDirty = badgesDirty || JSON.stringify(selectedBadges) !== JSON.stringify(data.selected);
       $('badges-save').hidden = false;
-      $('badges-save').disabled = false;
-      renderBadges(true);
+      renderBadges();
+      if (removed) toast('部分勋章的获得状态已变化，已从待展示选择中移除。');
     } catch (error) {
-      if (requestId !== badgesRequest || view !== 'badges') return;
-      $('badges-status').textContent = profile.localOnly && error.status === 403
-        ? '资料和成绩还没有上传，连接成功后即可查看勋章。' : error.message;
+      if (requestId !== badgesRequest || view !== 'badges' || !activeIdentity(who)) return;
+      const message = profile.localOnly && error.status === 403 ? '资料和成绩还没有上传，连接成功后即可查看勋章。' : error.message;
+      $('badges-status').textContent = badgeData ? `刷新失败，仍显示上次内容。${message}` : message;
       if (error.unavailable) setConnectionUnavailable(true);
+    } finally {
+      if (requestId === badgesRequest) {
+        $('badges-reload').disabled = false;
+        $('badges-save').disabled = false;
+      }
     }
   }
   function toggleBadge(id) {
@@ -4951,7 +5298,6 @@ function drawBadgeArtwork(badge) {
     else { toast(`最多展示 ${badgeData.maxShown} 枚勋章。`); return; }
     badgesDirty = true;
     renderBadges();
-    $('badges-status').textContent += ' · 更改后请保存';
     const button = [...$('badges-grid').children].find(item => item.dataset.badge === id);
     if (button) { button.classList.add('badge-change'); button.focus({preventScroll:true}); }
   }
@@ -4959,24 +5305,77 @@ function drawBadgeArtwork(badge) {
     if (!badgeData || !activeIdentity()) return;
     const requestId = ++badgesRequest;
     const who = {...identity};
+    const submitted = selectedBadges.slice();
     $('badges-save').disabled = true;
+    $('badges-reload').disabled = true;
     try {
-      const data = await request('/api/badges/select', {...who, selected:selectedBadges});
+      const data = await request('/api/badges/select', {...who, selected:submitted});
       if (requestId !== badgesRequest || view !== 'badges' || !activeIdentity(who)) return;
       badgeData = data;
-      selectedBadges = data.selected.slice();
-      badgesDirty = false;
+      badgeOwner = who;
+      const editedDuringSave = JSON.stringify(selectedBadges) !== JSON.stringify(submitted);
+      const earnedIds = new Set(data.badges.filter(badge => badge.earned).map(badge => badge.id));
+      selectedBadges = (editedDuringSave ? selectedBadges : data.selected).filter(id => earnedIds.has(id)).slice(0, data.maxShown);
+      badgesDirty = JSON.stringify(selectedBadges) !== JSON.stringify(data.selected);
       renderBadges();
       void refreshRanking();
-      toast('勋章展示已保存。');
+      toast(badgesDirty ? '已保存提交时的选择；之后的改动请再次保存。' : '勋章展示已保存。');
     } catch (error) {
       if (requestId !== badgesRequest || view !== 'badges') return;
       $('badges-status').textContent = error.message;
       if (error.unavailable) setConnectionUnavailable(true);
     } finally {
-      if (requestId === badgesRequest) $('badges-save').disabled = false;
+      if (requestId === badgesRequest) { $('badges-save').disabled = false; $('badges-reload').disabled = false; }
     }
   }
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)') || {matches:false};
+  function applySequence(container, index) {
+    const scene = RAID_SEQUENCES[container.dataset.sequence];
+    if (!scene) return;
+    const next = (index + scene.steps.length) % scene.steps.length;
+    const step = scene.steps[next];
+    const resetting = next === 0 && Number(container.dataset.step) === scene.steps.length - 1;
+    if (resetting) container.classList.add('sequence-resetting');
+    container.dataset.step = String(next);
+    for (const actor of scene.actors) {
+      const node = container.querySelector(`[data-actor="${actor.id}"]`);
+      const [x, y] = step.positions?.[actor.id] || [actor.x, actor.y];
+      if (node) node.style.transform = `translate(${x}px, ${y}px)`;
+    }
+    container.querySelectorAll('[data-cue]').forEach(node => {
+      node.classList.toggle('active', (step.cues || []).includes(node.dataset.cue));
+    });
+    container.querySelector('[data-step-text]').textContent = step.text;
+    container.querySelector('[data-step-count]').textContent = `${String(next + 1).padStart(2,'0')} / ${String(scene.steps.length).padStart(2,'0')}`;
+    if (resetting) requestAnimationFrame(() => requestAnimationFrame(() => container.classList.remove('sequence-resetting')));
+  }
+  function initializeSequences(root) {
+    root.querySelectorAll('[data-sequence]').forEach(container => {
+      if (reduceMotion.matches) container.classList.add('motion-paused');
+      const pause = container.querySelector('[data-action="toggle-diagram-motion"]');
+      if (pause && container.classList.contains('motion-paused')) {
+        pause.textContent = '播放'; pause.setAttribute('aria-pressed', 'true');
+      }
+      applySequence(container, Number(container.dataset.step) || 0);
+    });
+  }
+  function stepSequence(target, delta) {
+    const container = target.closest('[data-sequence]');
+    if (!container) return;
+    container.classList.add('motion-paused');
+    const pause = container.querySelector('[data-action="toggle-diagram-motion"]');
+    if (pause) { pause.textContent = '播放'; pause.setAttribute('aria-pressed', 'true'); }
+    applySequence(container, Number(container.dataset.step) + delta);
+  }
+  if (document.querySelectorAll) setInterval(() => {
+    if (document.hidden || reduceMotion.matches) return;
+    const dialog = $('diagram-dialog');
+    document.querySelectorAll('[data-sequence]').forEach(container => {
+      if (container.classList.contains('motion-paused') || (dialog.open && !dialog.contains(container))) return;
+      const rect = container.getBoundingClientRect();
+      if (rect.width && rect.bottom > 0 && rect.top < innerHeight) applySequence(container, Number(container.dataset.step) + 1);
+    });
+  }, 3500);
   function openDiagram(target) {
     const figure = target.closest('.raid-diagram');
     if (!figure) return;
@@ -4984,7 +5383,7 @@ function drawBadgeArtwork(badge) {
     copy.querySelector('[data-action="zoom-diagram"]')?.remove();
     $('diagram-dialog-content').replaceChildren(copy);
     $('diagram-dialog').showModal();
-    if (copy.classList.contains('motion-paused')) copy.querySelector('svg[role="img"]')?.pauseAnimations?.();
+    if (copy.dataset.sequence) applySequence(copy, Number(copy.dataset.step) || 0);
   }
   function toggleDiagramMotion(target) {
     const figure = target.closest('.raid-diagram');
@@ -4992,18 +5391,38 @@ function drawBadgeArtwork(badge) {
     const paused = figure.classList.toggle('motion-paused');
     target.textContent = paused ? '播放' : '暂停';
     target.setAttribute('aria-pressed', String(paused));
-    const svg = figure.querySelector('svg[role="img"]');
-    if (paused) svg?.pauseAnimations?.(); else svg?.unpauseAnimations?.();
+    if (paused && figure.dataset.sequence) applySequence(figure, Number(figure.dataset.step) || 0);
   }
+  function setCurrentGuideStage(index) {
+    $('guide-timeline').querySelectorAll('[data-stage]').forEach(button => {
+      if (Number(button.dataset.stage) === index) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
+    });
+  }
+  let stageScrollScheduled = false;
+  function updateCurrentGuideStage() {
+    stageScrollScheduled = false;
+    if (view !== 'guide') return;
+    const stages = [...$('guide-stages').children];
+    if (!stages.length) return;
+    const active = stages.reduce((best, stage, i) => stage.getBoundingClientRect().top <= 150 ? i : best, 0);
+    setCurrentGuideStage(active);
+  }
+  window.addEventListener('scroll', () => {
+    if (view !== 'guide' || stageScrollScheduled) return;
+    stageScrollScheduled = true;
+    requestAnimationFrame(updateCurrentGuideStage);
+  }, {passive:true});
   function renderGuide(chapterId) {
     const guide = RAID_GUIDE[chapterId];
     $('guide-title').textContent = guide.title;
     $('guide-intro').textContent = guide.intro;
-    $('guide-chapters').innerHTML = SECTIONS.map(chapter => {
+    const chapterNotes = {twins:'球 · 花 · 治疗',spirit:'业火 · 隔离 · 染灯',witch:'冲锋 · 炸弹 · 蜘蛛'};
+    $('guide-chapters').innerHTML = SECTIONS.map((chapter, i) => {
       const active = chapter.id === chapterId ? ' aria-current="page"' : '';
-      return `<a href="#guide-${chapter.id}"${active}>${escape(chapter.short)}</a>`;
+      return `<a href="#guide-${chapter.id}"${active}><span class="chapter-number">${String(i + 1).padStart(2,'0')}</span><span class="chapter-copy"><strong>${escape(chapter.short)}</strong><small>${chapterNotes[chapter.id]}</small></span></a>`;
     }).join('');
-    $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}">${escape(stage.timing)}</button>`).join('');
+    $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}"${i === 0 ? ' aria-current="step"' : ''}><span class="timeline-number">${String(i + 1).padStart(2,'0')}</span><span>${escape(stage.timing)}</span></button>`).join('');
     $('guide-stages').innerHTML = guide.stages.map((stage, i) => `<article class="guide-stage" id="guide-stage-${i}">
       <p class="eyebrow">${escape(stage.timing)}</p>
       <h2 tabindex="-1">${escape(stage.title)}</h2>
@@ -5013,6 +5432,7 @@ function drawBadgeArtwork(badge) {
       </div>
       ${stage.check ? `<p class="stage-check">${escape(stage.check)}</p>` : ''}
     </article>`).join('');
+    initializeSequences($('guide-stages'));
     setView('guide');
     $('guide-title').focus({preventScroll:true});
   }
@@ -5269,6 +5689,7 @@ function drawBadgeArtwork(badge) {
       updateProfileLabel(); closeProfile();
       await refreshRanking();
       if(view==='history') await loadHistory();
+      if(view==='badges') await loadBadges();
       toast('线上资料与成绩已删除。');
     }
     catch(err){$('profile-error').textContent=err.message;}
@@ -5280,8 +5701,22 @@ function drawBadgeArtwork(badge) {
     ['reload-badges', () => { void loadBadges(); }],
     ['toggle-badge', target => toggleBadge(target.dataset.badge)],
     ['save-badges', () => { void saveBadges(); }],
+    ['honor-show', target => showHonorDetail(target.dataset.badge)],
+    ['close-honor-detail', () => { ++honorDetailRequest; $('honor-dialog').close(); }],
+    ['honor-mode', target => {
+      const mode = target.dataset.mode;
+      if (!['history', 'current'].includes(mode) || mode === honorDetailMode) return;
+      honorDetailMode = mode;
+      $('honor-dialog').querySelectorAll('[data-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
+      $('honor-detail-list').replaceChildren();
+      void loadHonorDetail();
+    }],
+    ['honor-prev', () => { if (honorDetailPage > 1) void loadHonorDetail(honorDetailPage - 1); }],
+    ['honor-next', () => { if (honorDetailPage < honorDetailPages) void loadHonorDetail(honorDetailPage + 1); }],
     ['zoom-diagram', target => openDiagram(target)],
     ['toggle-diagram-motion', target => toggleDiagramMotion(target)],
+    ['sequence-prev', target => stepSequence(target, -1)],
+    ['sequence-next', target => stepSequence(target, 1)],
     ['close-diagram', () => $('diagram-dialog').close()],
   ]);
   document.addEventListener('click',(e)=>{
@@ -5323,6 +5758,7 @@ function drawBadgeArtwork(badge) {
       case 'history-profile': showProfile();break;
       case 'guide-stage': {
         const stage = $('guide-stage-' + target.dataset.stage);
+        setCurrentGuideStage(Number(target.dataset.stage));
         stage.scrollIntoView({block:'start'});
         stage.querySelector('h2').focus({preventScroll:true});
         break;
@@ -5342,6 +5778,8 @@ function drawBadgeArtwork(badge) {
   });
   window.addEventListener('pagehide', pauseTimer);
   window.addEventListener('pageshow', () => { resumeTimer(); if (view === 'exam') updateExamTimer(); });
+  document.querySelectorAll?.('[data-overview]').forEach(node => { node.innerHTML = drawOverviewSequence(node.dataset.overview); });
+  if (document.querySelectorAll) initializeSequences(document);
   readGuideHash();
   $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); initializeTransfer(); void refreshRanking();
   if (profile?.localOnly) setConnectionUnavailable(true);

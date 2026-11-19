@@ -3,6 +3,7 @@
 
 import hashlib
 import hmac
+import itertools
 import json
 import logging
 import math
@@ -122,6 +123,10 @@ def initialize():
             CREATE TABLE IF NOT EXISTS attempt_timings (
                 attempt_id TEXT PRIMARY KEY REFERENCES attempts(id) ON DELETE CASCADE,
                 elapsed_seconds INTEGER NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS attempt_completion_times (
+                attempt_id TEXT PRIMARY KEY REFERENCES attempts(id) ON DELETE CASCADE,
+                completed_at INTEGER NOT NULL
             );
             CREATE TABLE IF NOT EXISTS badge_selections (
                 participant_id TEXT PRIMARY KEY REFERENCES participants(id) ON DELETE CASCADE,
@@ -249,6 +254,9 @@ def submit(db, body):
             now = int(time.time() * 1000)
             db.execute('INSERT INTO attempts VALUES (?, ?, ?, ?, ?, ?)',
                        (attempt_id, device, submitted_version, result['correctCount'], result['totalCount'], now))
+            completed_at = body.get('completedAt')
+            if type(completed_at) is int and 946684800000 <= completed_at <= now + 300000:
+                db.execute('INSERT INTO attempt_completion_times VALUES (?, ?)', (attempt_id, completed_at))
             if elapsed is not None:
                 db.execute('INSERT INTO attempt_timings VALUES (?, ?)', (attempt_id, elapsed))
             for badge_id in mistake_badges(body['answers'], submitted_version):
@@ -324,15 +332,30 @@ def earned_badges(rows, fastest):
 
 def honor_statistics(db):
     """One row per player; only uploaded attempts and recorded timings are used."""
-    rows = db.execute('''SELECT p.id AS participant_id, p.nickname, n.number,
-                                COUNT(a.id) AS rounds,
-                                SUM(CASE WHEN a.correct_count = a.total_count THEN 1 ELSE 0 END) AS perfects,
-                                MIN(t.elapsed_seconds) AS fastest,
-                                MIN(CASE WHEN a.correct_count = a.total_count THEN t.elapsed_seconds END) AS perfect_fastest
-                         FROM participants p JOIN attempts a ON a.participant_id = p.id
-                         LEFT JOIN participant_numbers n ON n.participant_id = p.id
-                         LEFT JOIN attempt_timings t ON t.attempt_id = a.id
-                         GROUP BY p.id, p.nickname, n.number''').fetchall()
+    rows = db.execute('''WITH stats AS (
+                           SELECT p.id AS participant_id, p.nickname, n.number,
+                                  COUNT(a.id) AS rounds,
+                                  SUM(CASE WHEN a.correct_count = a.total_count THEN 1 ELSE 0 END) AS perfects,
+                                  MIN(t.elapsed_seconds) AS fastest,
+                                  MIN(CASE WHEN a.correct_count = a.total_count THEN t.elapsed_seconds END) AS perfect_fastest,
+                                  MAX(COALESCE(c.completed_at, a.submitted_at)) AS rounds_at,
+                                  MAX(CASE WHEN a.correct_count = a.total_count THEN COALESCE(c.completed_at, a.submitted_at) END) AS perfects_at
+                           FROM participants p JOIN attempts a ON a.participant_id = p.id
+                           LEFT JOIN participant_numbers n ON n.participant_id = p.id
+                           LEFT JOIN attempt_timings t ON t.attempt_id = a.id
+                           LEFT JOIN attempt_completion_times c ON c.attempt_id = a.id
+                           GROUP BY p.id, p.nickname, n.number
+                         ) SELECT stats.*,
+                           (SELECT MIN(COALESCE(c2.completed_at, a2.submitted_at))
+                            FROM attempts a2 JOIN attempt_timings t2 ON t2.attempt_id = a2.id
+                            LEFT JOIN attempt_completion_times c2 ON c2.attempt_id = a2.id
+                            WHERE a2.participant_id = stats.participant_id AND t2.elapsed_seconds = stats.fastest) AS fastest_at,
+                           (SELECT MIN(COALESCE(c2.completed_at, a2.submitted_at))
+                            FROM attempts a2 JOIN attempt_timings t2 ON t2.attempt_id = a2.id
+                            LEFT JOIN attempt_completion_times c2 ON c2.attempt_id = a2.id
+                            WHERE a2.participant_id = stats.participant_id AND a2.correct_count = a2.total_count
+                              AND t2.elapsed_seconds = stats.perfect_fastest) AS perfect_fastest_at
+                         FROM stats''').fetchall()
     return [dict(row) for row in rows]
 
 
@@ -344,30 +367,124 @@ HONOR_CATEGORIES = (
 )
 
 
+def honor_eligible(stats, metric, direction, minimum):
+    eligible = [row for row in stats if row[metric] is not None and row[metric] >= minimum]
+    eligible.sort(key=lambda row: (row[metric] if direction == 'asc' else -row[metric],
+                                   row[metric + '_at'] if row[metric + '_at'] is not None else float('inf'),
+                                   row['number'] if row['number'] is not None else float('inf'),
+                                   row['participant_id']))
+    return eligible
+
+
+def honor_entries(eligible, metric, offset, limit):
+    entries, previous, rank = [], None, 0
+    for index, row in enumerate(eligible):
+        if index == 0 or row[metric] != previous:
+            rank = index + 1
+        previous = row[metric]
+        if offset <= index < offset + limit:
+            entries.append({'rank': rank, 'nickname': row['nickname'], 'playerNumber': row['number'],
+                            'value': row[metric]})
+        if index >= offset + limit:
+            break
+    return entries
+
+
 def honor_boards(db):
     """Show five players per board while awarding every tied record holder."""
     stats = honor_statistics(db)
     boards, winners = [], {}
     for badge_id, metric, direction, minimum in HONOR_CATEGORIES:
-        eligible = [row for row in stats if row[metric] is not None and row[metric] >= minimum]
-        eligible.sort(key=lambda row: (row[metric] if direction == 'asc' else -row[metric],
-                                      row['number'] if row['number'] is not None else float('inf'),
-                                      row['participant_id']))
+        eligible = honor_eligible(stats, metric, direction, minimum)
         best = eligible[0][metric] if eligible else None
         winners[badge_id] = {row['participant_id'] for row in eligible if row[metric] == best}
-        entries = []
-        previous = None
-        rank = 0
-        for index, row in enumerate(eligible[:5]):
-            if index == 0 or row[metric] != previous:
-                rank = index + 1
-            previous = row[metric]
-            entries.append({'rank': rank, 'nickname': row['nickname'], 'playerNumber': row['number'],
-                            'value': row[metric]})
-        boards.append({'badge': BADGE_BY_ID[badge_id], 'entries': entries,
+        boards.append({'badge': BADGE_BY_ID[badge_id], 'entries': honor_entries(eligible, metric, 0, 5),
                        'valueType': 'time' if direction == 'asc' else 'count',
-                       'holderCount': len(winners[badge_id])})
+                       'holderCount': len(winners[badge_id]), 'total': len(eligible)})
     return {'boards': boards}, winners
+
+
+def honor_page(db, badge_id, page=1, page_size=20):
+    category = next((item for item in HONOR_CATEGORIES if item[0] == badge_id), None)
+    if not category:
+        raise ApiError('趣味榜类型无效。')
+    if not 1 <= page <= 100000000 or not 1 <= page_size <= 100:
+        raise ApiError('趣味榜页码无效。')
+    _, metric, direction, minimum = category
+    eligible = honor_eligible(honor_statistics(db), metric, direction, minimum)
+    total = len(eligible)
+    pages = max(1, (total + page_size - 1) // page_size)
+    page = min(page, pages)
+    best = eligible[0][metric] if eligible else None
+    return {'badge': BADGE_BY_ID[badge_id], 'entries': honor_entries(eligible, metric, (page - 1) * page_size, page_size),
+            'valueType': 'time' if direction == 'asc' else 'count',
+            'holderCount': sum(row[metric] == best for row in eligible),
+            'page': page, 'pageSize': page_size, 'total': total, 'pages': pages}
+
+
+def honor_history_page(db, badge_id, page=1, page_size=20):
+    """Reconstruct record holders from surviving completion times, without writing history."""
+    category = next((item for item in HONOR_CATEGORIES if item[0] == badge_id), None)
+    if not category:
+        raise ApiError('趣味榜类型无效。')
+    if not 1 <= page <= 100000000 or not 1 <= page_size <= 100:
+        raise ApiError('趣味榜页码无效。')
+    _, _, direction, minimum = category
+    rows = db.execute('''SELECT a.participant_id, COALESCE(c.completed_at, a.submitted_at) AS completed_at, a.correct_count, a.total_count,
+                                t.elapsed_seconds, p.nickname, n.number
+                         FROM attempts a JOIN participants p ON p.id = a.participant_id
+                         LEFT JOIN participant_numbers n ON n.participant_id = p.id
+                         LEFT JOIN attempt_timings t ON t.attempt_id = a.id
+                         LEFT JOIN attempt_completion_times c ON c.attempt_id = a.id
+                         ORDER BY COALESCE(c.completed_at, a.submitted_at), a.id''')
+    values, metadata, achieved = {}, {}, {}
+    record = None
+    # Completions sharing a millisecond are evaluated together; their ID ordering
+    # cannot prove which happened first.
+    for completed_at, batch in itertools.groupby(rows, key=lambda row: row['completed_at']):
+        changed = set()
+        for row in batch:
+            participant = row['participant_id']
+            metadata[participant] = (row['nickname'], row['number'])
+            perfect = row['correct_count'] == row['total_count']
+            elapsed = row['elapsed_seconds']
+            previous = values.get(participant)
+            if badge_id == 'site_rounds':
+                value = (previous or 0) + 1
+            elif badge_id == 'site_perfects':
+                if not perfect:
+                    continue
+                value = (previous or 0) + 1
+            else:
+                if elapsed is None or (badge_id == 'site_perfect_fast' and not perfect):
+                    continue
+                value = elapsed if previous is None else min(previous, elapsed)
+                if previous is not None and elapsed > previous:
+                    continue
+            values[participant] = value
+            if value < minimum:
+                continue
+            changed.add(participant)
+            if record is None or (value < record if direction == 'asc' else value > record):
+                record = value
+        for participant in changed:
+            if values[participant] == record:
+                achieved.setdefault(participant, (completed_at, values[participant]))
+    ordered = sorted(achieved, key=lambda participant: (achieved[participant][0],
+                     metadata[participant][1] if metadata[participant][1] is not None else float('inf'), participant))
+    total = len(ordered)
+    pages = max(1, (total + page_size - 1) // page_size)
+    page = min(page, pages)
+    entries = []
+    for participant in ordered[(page - 1) * page_size:page * page_size]:
+        nickname, number = metadata[participant]
+        when, value = achieved[participant]
+        entries.append({'nickname': nickname, 'playerNumber': number, 'value': value,
+                        'achievedAt': when, 'current': values.get(participant) == record})
+    return {'badge': BADGE_BY_ID[badge_id], 'entries': entries,
+            'valueType': 'time' if direction == 'asc' else 'count',
+            'holderCount': sum(value == record for value in values.values()) if record is not None else 0,
+            'page': page, 'pageSize': page_size, 'total': total, 'pages': pages}
 
 
 def badge_states(db, participant_ids):
@@ -568,8 +685,28 @@ class Handler(BaseHTTPRequestHandler):
         url = urlsplit(self.path)
         if url.path == '/api/honors':
             try:
+                params = parse_qs(url.query, keep_blank_values=True)
+                badge = params.get('badge')
                 with closing(database()) as db:
-                    self.respond(200, honor_boards(db)[0])
+                    if badge is None:
+                        self.respond(200, honor_boards(db)[0])
+                    else:
+                        if len(badge) != 1:
+                            raise ApiError('趣味榜类型无效。')
+                        def honor_number(name, default):
+                            value = params.get(name)
+                            if value is None:
+                                return default
+                            if len(value) != 1 or not re.fullmatch(r'[0-9]{1,9}', value[0]):
+                                raise ApiError('趣味榜页码无效。')
+                            return int(value[0])
+                        mode = params.get('mode', ['current'])
+                        if mode not in (['current'], ['history']):
+                            raise ApiError('趣味榜类型无效。')
+                        action = honor_history_page if mode == ['history'] else honor_page
+                        self.respond(200, action(db, badge[0], honor_number('page', 1), honor_number('pageSize', 20)))
+            except ApiError as error:
+                self.respond(error.status, {'error': str(error)})
             except Exception:
                 logging.exception('Honor board request failed')
                 self.respond(503, {'error': '趣味榜暂时不可用，请稍后重试。'})
