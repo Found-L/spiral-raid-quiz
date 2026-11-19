@@ -9,8 +9,8 @@ function drawRaidDiagram(key, caption, questionId = null) {
     const dx = 4 * Math.sin(angle), dy = 4 * Math.cos(angle);
     const shaft = `M${x1} ${y1}L${x2} ${y2}`;
     const arrowhead = `M${base[0] + dx} ${base[1] - dy}L${x2} ${y2} ${base[0] - dx} ${base[1] + dy}`;
-    // Only the teaching guide adds a moving highlight; the underlying arrow stays visible.
-    return line(shaft + arrowhead, style) + (!test && animate ? line(shaft, 'map-route-glow') : '');
+    // Animate only existing route arrows; facing indicators remain static.
+    return line(shaft + arrowhead, style) + (animate ? line(shaft, 'map-route-glow') : '');
   };
   const token = (x, y, text, style = 'map-ally', radius = 12) =>
     circle(x, y, radius, style) + circle(x, y, Math.max(radius - 3, 1), 'map-token-ring') + label(x, y + 4.5, text, 'map-token');
@@ -45,8 +45,8 @@ function drawRaidDiagram(key, caption, questionId = null) {
       break;
     case 'twins-orbs':
       art = [arena(145, 135, 95), arena(415, 135, 95), boss(145, 135, '灼热剑', 'map-hazard'), boss(415, 135, '酷寒剑', 'map-ally'),
-        circle(94, 81, 8, 'map-hazard'), circle(195, 178, 8, 'map-ally'),
-        circle(365, 81, 8, 'map-hazard'), circle(465, 178, 8, 'map-ally'),
+        circle(94, 81, 8, 'map-hazard map-orb'), circle(195, 178, 8, 'map-ally map-orb'),
+        circle(365, 81, 8, 'map-hazard map-orb'), circle(465, 178, 8, 'map-ally map-orb'),
         label(145, 26, '灼热剑侧', 'map-gold-text'), label(415, 26, '酷寒剑侧', 'map-soft'),
         label(91, 65, '火球'), label(195, 207, '冰球'), label(365, 65, '火球'), label(465, 207, '冰球')].join('');
       if (!test) art += label(145, 252, '同色挡球 · 异色治疗') + label(415, 252, '同色挡球 · 异色治疗');
@@ -93,8 +93,8 @@ function drawRaidDiagram(key, caption, questionId = null) {
         label(280, 98, '隔离内'), label(280, 172, '外场'), label(280, 232, 'A 出场后 · 约 30 秒后遗症')].join('');
       break;
     case 'witch-line':
-      art = [arena(), boss(305, 154, '首领'), line('M280 135L184 90 M280 135L323 38', 'map-red-line'),
-        token(340, 156, 'T'), token(293, 192, '近'), token(234, 164, '队'), label(113, 72, '不祥气息'), line('M155 76l25 12')].join('');
+      art = [arena(), `<g class="map-rotating-danger">${line('M280 135L184 90 M280 135L323 38', 'map-red-line')}</g>`, boss(305, 154, '首领'),
+        token(340, 156, 'T'), token(293, 192, '近'), token(234, 164, '队'), label(113, 72, '不祥气息')].join('');
       if (!test) art += line('M348 168q6 37-35 50', 'map-ally-line') + line('M348 168q6 37-35 50', 'map-route-glow')
         + arrow(334, 207, 313, 218, 'map-ally-line', false) + label(448, 208, '沿内侧带位');
       break;
@@ -132,5 +132,6 @@ function drawRaidDiagram(key, caption, questionId = null) {
   const grid = `<path class="map-underlay" d="${vertical} ${horizontal}"/>`;
   const legend = (legends[key] || []).map(([tone, text]) => `<span><i class="legend-mark legend-${tone}" aria-hidden="true"></i>${text}</span>`).join('');
   const legendMarkup = legend ? `<span class="diagram-legend">${legend}</span>` : '';
-  return `<figure class="raid-diagram"><div class="diagram-top"><span>站位与路线示意</span><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${grid}${art}</svg><figcaption><span>${caption}</span>${legendMarkup}</figcaption></figure>`;
+  const motionNote = key === 'witch-line' ? '<span class="diagram-motion-note">旋转动画仅作示意，实际方向与速度以场内为准。</span>' : '';
+  return `<figure class="raid-diagram"><div class="diagram-top"><span>站位与路线示意</span><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div><svg viewBox="0 0 560 270" role="img" aria-label="${caption}">${grid}${art}</svg><figcaption><span>${caption}</span>${motionNote}${legendMarkup}</figcaption></figure>`;
 }

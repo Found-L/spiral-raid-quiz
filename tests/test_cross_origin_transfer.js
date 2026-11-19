@@ -58,7 +58,7 @@ function createHarness(origin, initial, hash = '') {
     return {ok:true,status:200,json:async()=>payload};
   };
   delete require.cache[require.resolve('../app.js')]; require('../app.js');
-  return {storage, opener, child, submissions, getElement, windowListeners,
+  return {storage, opener, child, submissions, getElement, windowListeners, documentListeners,
     online:()=>{online=true;}, failOn:suffix=>{failOnce=suffix;},
     click:(action,extra={})=>documentListeners.click({target:{closest:selector=>selector==='[data-action]' ? {dataset:{action,...extra}} : null}})};
 }
@@ -147,7 +147,7 @@ const wait = () => new Promise(resolve => setTimeout(resolve, 30));
   const completeAnswers = Object.fromEntries(bank.questions.map(q=>[q.id,q.answer]));
   const timed = createHarness('https://www.lysue.com', {
     ':identity':sourceIdentity, ':profile':{nickname:'计时测试'},
-    ':draft':{version:bank.version,index:0,answers:completeAnswers,startedAt:Date.now()-73000}
+    ':draft':{version:bank.version,index:0,answers:completeAnswers,elapsedMs:73000}
   });
   timed.online(); timed.click('start');
   assert.match(timed.getElement('exam-timer').textContent, /01:1[34]/);
@@ -163,5 +163,86 @@ const wait = () => new Promise(resolve => setTimeout(resolve, 30));
   assert.equal(untimed.getElement('exam-timer').textContent, '用时 未记录');
   untimed.click('submit'); await wait();
   assert.equal(untimed.submissions[0].elapsedSeconds, null);
+
+  const legacy = createHarness('https://www.lysue.com', {
+    ':identity':destinationIdentity, ':profile':{nickname:'旧计时'},
+    ':draft':{version:bank.version,index:0,answers:completeAnswers,startedAt:Date.now()-18*3600*1000}
+  });
+  legacy.online(); legacy.click('start');
+  assert.equal(legacy.getElement('exam-timer').textContent, '用时 未记录');
+  assert.match(legacy.getElement('draft-update-notice').textContent, /旧进度/);
+  legacy.click('submit'); await wait();
+  assert.equal(legacy.submissions[0].elapsedSeconds, null);
+
+  const realNow = Date.now;
+  let now = 1700000000000;
+  Date.now = () => now;
+  let active = createHarness('https://www.lysue.com', {
+    ':identity':sourceIdentity, ':profile':{nickname:'随机计时测试'},
+    ':draft':{version:bank.version,index:0,answers:{}}
+  });
+  active.online(); active.click('start');
+  const initial = read(active, ':draft');
+  assert.equal(new Set(initial.order).size, bank.questions.length);
+  assert.notDeepEqual(initial.order, bank.questions.map(q=>q.id));
+  const alphabetically = (a,b) => a.localeCompare(b);
+  for (const q of bank.questions) assert.deepEqual([...initial.optionOrder[q.id]].sort(alphabetically), q.options.map(o=>o.id).sort(alphabetically));
+  const firstInput = active.getElement('question-options').children[0].children[0];
+  firstInput.checked = true; firstInput.events.change();
+  assert.deepEqual(read(active, ':draft').answers[initial.order[0]], [firstInput.value]);
+  now += 5000; active.click('leave-exam');
+  now += 18 * 3600 * 1000; active.click('start');
+  assert.match(active.getElement('exam-timer').textContent, /00:05/);
+  assert.deepEqual(read(active, ':draft').order, initial.order);
+  assert.deepEqual(read(active, ':draft').optionOrder, initial.optionOrder);
+  document.hidden = true; active.documentListeners.visibilitychange();
+  now += 10000;
+  document.hidden = false; active.documentListeners.visibilitychange();
+  assert.match(active.getElement('exam-timer').textContent, /00:05/);
+  active.click('leave-exam'); active.windowListeners.pagehide();
+  const reloadedDraft = read(active, ':draft');
+  active = createHarness('https://www.lysue.com', {
+    ':identity':sourceIdentity, ':profile':{nickname:'随机计时测试'}, ':draft':reloadedDraft
+  });
+  active.online(); active.click('start');
+  assert.deepEqual(read(active, ':draft').order, initial.order);
+  assert.deepEqual(read(active, ':draft').optionOrder, initial.optionOrder);
+  assert.deepEqual(read(active, ':draft').answers[initial.order[0]], [firstInput.value]);
+  active.click('restart');
+  assert.equal(active.getElement('restart-dialog').open, true);
+  active.click('cancel-restart');
+  assert.deepEqual(read(active, ':draft').order, initial.order);
+  active.click('restart'); active.click('confirm-restart');
+  const fresh = read(active, ':draft');
+  assert.deepEqual(fresh.answers, {});
+  assert.notDeepEqual(fresh.order, initial.order);
+  assert.equal(active.getElement('exam-timer').textContent, '用时 00:00');
+  for (let i = 0; i < fresh.order.length; i++) {
+    const q = bank.questions.find(item => item.id === fresh.order[i]);
+    for (const answer of q.answer) {
+      const option = active.getElement('question-options').children.find(label => label.children[0].value === answer);
+      option.children[0].checked = true; option.children[0].events.change();
+    }
+    if (i < fresh.order.length - 1) active.click('next');
+  }
+  now += 7000; active.click('submit'); await wait();
+  assert.deepEqual(active.submissions[0].answers, completeAnswers);
+  assert.equal(active.submissions[0].elapsedSeconds, 7);
+  assert.deepEqual(read(active, ':last-result').order, fresh.order);
+
+  const swap = createHarness('https://www.lysue.com', {
+    ':identity':sourceIdentity, ':profile':{nickname:'切换前'},
+    ':draft':{version:bank.version,index:0,answers:{}},
+    ':local-profiles':[{id:'archive',snapshot:{schema:1,identity:destinationIdentity,
+      profile:{nickname:'切换后'},pending:[],draft:{version:bank.version,index:0,answers:{}},lastResult:null}}]
+  });
+  swap.online(); swap.click('start');
+  const swapChoice = swap.getElement('question-options').children[0].children[0];
+  swapChoice.checked = true; swapChoice.events.change();
+  now += 3500; swap.click('restore-local-profile', {archiveId:'archive'}); await wait();
+  assert.deepEqual(read(swap, ':identity'), destinationIdentity);
+  assert.equal(read(swap, ':local-profiles')[0].snapshot.draft.elapsedMs, 3500);
+  assert.equal(Object.keys(read(swap, ':local-profiles')[0].snapshot.draft.answers).length, 1);
+  Date.now = realNow;
   console.log('PASS transfer, rollback, file import and timed/untimed exam submissions');
 })().catch(error=>{console.error(error);process.exitCode=1;});

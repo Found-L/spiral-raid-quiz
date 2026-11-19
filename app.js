@@ -1,9 +1,12 @@
 (() => {
   'use strict';
   const localPreview = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('api')==='local';
-  const API = localPreview ? 'http://127.0.0.1:8787' : 'https://www.lysue.com/spiral-raid-quiz';
+  const previewPort = new URLSearchParams(location.search).get('api-port');
+  const localApiPort = /^\d{1,5}$/.test(previewPort || '') ? previewPort : '8787';
+  const API = localPreview ? `http://127.0.0.1:${localApiPort}` : 'https://www.lysue.com/spiral-raid-quiz';
   const bank = JSON.parse(document.getElementById('question-bank').textContent);
-  const qs = bank.questions;
+  const bankQuestions = bank.questions;
+  let qs = bankQuestions;
   const SECTIONS = [
     {id:'twins', title:'灼热剑与酷寒剑', short:'双剑'},
     {id:'spirit', title:'超魔灵', short:'超魔灵'},
@@ -60,8 +63,7 @@
         const previousAnswers = draft.answers;
         const answers = Object.fromEntries(Object.entries(previousAnswers).filter(([id]) => !changedIds.has(id)));
         const cleared = Object.keys(previousAnswers).filter(id => changedIds.has(id)).length;
-        draft={version:bank.version,index:draft.index,answers,migrationCleared:cleared,
-          startedAt:draft.startedAt,timingUnknown:draft.timingUnknown};
+        draft={...draft,version:bank.version,answers,migrationCleared:cleared};
       } else draft={version:bank.version,index:0,answers:{}};
     }
     return draft;
@@ -86,11 +88,17 @@
   let rankingRequest = 0;
   let lastUploadError = '';
   let examTimer = null;
+  let runningSince = null;
+  let timerTicks = 0;
   const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame','bomb','spider','laser','lantern','heart','compass']);
+  const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame','bomb','spider','laser','lantern','heart','compass','orb']);
   const badgeTones = new Set(['gold','teal','red','violet']);
   const badgeTone = badge => badgeTones.has(badge.tone) ? badge.tone : 'gold';
-  const badgeIcon = badge => `<svg class="icon" aria-hidden="true"><use href="#badge-${badgeIcons.has(badge.icon) ? badge.icon : 'spark'}"/></svg>`;
+  function badgeIcon(badge) {
+    if (badge.icon === 'bomb') return `<svg class="icon badge-bomb-art" viewBox="0 0 64 64" aria-hidden="true"><circle cx="30" cy="37" r="21" fill="#ec7358" stroke="#ffd1a0" stroke-width="2"/><path d="M39 18c1-6 4-9 10-10" fill="none" stroke="#ffda8c" stroke-width="3" stroke-linecap="round"/><path d="M50 3v5m-4-1 4 2 4-2m-2 5 3 2" fill="none" stroke="#fff2bb" stroke-width="2.3" stroke-linecap="round"/><path d="M17 30q4-4 8-1m7 0q4-4 8-1" fill="none" stroke="#4c2525" stroke-width="2.5" stroke-linecap="round"/><circle cx="21" cy="34" r="2.4" fill="#3b2222" stroke="none"/><circle cx="37" cy="34" r="2.4" fill="#3b2222" stroke="none"/><path d="M22 41q8 10 17 0Z" fill="#53242c" stroke="none"/><path d="M25 42q5 3 11 0" fill="none" stroke="#fff0c7" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="39" r="2.5" fill="#ffb192" stroke="none"/><circle cx="43" cy="39" r="2.5" fill="#ffb192" stroke="none"/></svg>`;
+    const symbol = badgeIcons.has(badge.icon) ? badge.icon : 'spark';
+    return `<svg class="icon" aria-hidden="true"><use href="#badge-${symbol}"/></svg>`;
+  }
   const badgeChip = badge => `<span class="badge-chip tone-${badgeTone(badge)}" title="${escape(badge.description || '')}">${badgeIcon(badge)}${escape(badge.name)}</span>`;
   const sectionOf = (id) => SECTIONS.find(x=>x.id===id);
   const formatPlayerNumber = (number) => Number.isSafeInteger(number) && number > 0
@@ -105,11 +113,60 @@
       : `${String(minutes).padStart(2,'0')}:${String(remainder).padStart(2,'0')}`;
   }
   function elapsedTime() {
-    if (draft.timingUnknown || !Number.isSafeInteger(draft.startedAt) || draft.startedAt > Date.now()) return null;
-    const seconds = Math.floor((Date.now() - draft.startedAt) / 1000);
+    if (draft.timingUnknown || !Number.isSafeInteger(draft.elapsedMs) || draft.elapsedMs < 0) return null;
+    const activeMs = draft.elapsedMs + (runningSince === null ? 0 : Math.max(0, Date.now() - runningSince));
+    const seconds = Math.floor(activeMs / 1000);
     return seconds <= 365 * 24 * 3600 ? seconds : null;
   }
-  function updateExamTimer() { $('exam-timer').textContent = `用时 ${formatDuration(elapsedTime())}`; }
+  function updateExamTimer() { $('exam-timer').textContent = `用时 ${formatDuration(elapsedTime())}${runningSince === null && !draft.timingUnknown ? '（已暂停）' : ''}`; }
+  function checkpointTimer() {
+    if (runningSince !== null) {
+      const now = Date.now();
+      draft.elapsedMs += Math.max(0, now - runningSince);
+      runningSince = now;
+    }
+  }
+  function pauseTimer() {
+    if (runningSince === null) return;
+    checkpointTimer(); runningSince = null;
+    storeDraft();
+  }
+  function resumeTimer() {
+    if (view === 'exam' && !document.hidden && !draft.timingUnknown && runningSince === null) runningSince = Date.now();
+  }
+  function shuffle(items) {
+    const values = items.slice();
+    for (let i = values.length - 1; i > 0; i--) {
+      const max = Math.floor(0x100000000 / (i + 1)) * (i + 1);
+      let n; do { n = crypto.getRandomValues(new Uint32Array(1))[0]; } while (n >= max);
+      const j = n % (i + 1);
+      [values[i], values[j]] = [values[j], values[i]];
+    }
+    return values;
+  }
+  function isPermutation(order, ids) {
+    return Array.isArray(order) && order.length === ids.length && new Set(order).size === ids.length && order.every(id => ids.includes(id));
+  }
+  function prepareExam() {
+    const ids = bankQuestions.map(q => q.id);
+    const previousId = isPermutation(draft.order, ids) ? draft.order[index] : bankQuestions[index]?.id;
+    if (!isPermutation(draft.order, ids)) {
+      draft.order = shuffle(ids);
+      index = previousId && Object.keys(draft.answers).length ? Math.max(0, draft.order.indexOf(previousId)) : 0;
+    }
+    if (!draft.optionOrder || typeof draft.optionOrder !== 'object' || Array.isArray(draft.optionOrder)) draft.optionOrder = {};
+    for (const question of bankQuestions) {
+      const optionIds = question.options.map(option => option.id);
+      if (!isPermutation(draft.optionOrder[question.id], optionIds)) draft.optionOrder[question.id] = shuffle(optionIds);
+    }
+    const byId = new Map(bankQuestions.map(q => [q.id, q]));
+    qs = draft.order.map(id => byId.get(id));
+    if (!Number.isSafeInteger(draft.elapsedMs) || draft.elapsedMs < 0) {
+      // Legacy wall-clock drafts cannot be converted into reliable active time.
+      draft.timingUnknown = Boolean(Object.keys(draft.answers).length);
+      draft.elapsedMs = 0;
+    }
+  }
   function scrollToLeaderboard() {
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     requestAnimationFrame(() => $('leaderboard').scrollIntoView({behavior:reduceMotion ? 'auto' : 'smooth'}));
@@ -136,9 +193,16 @@
   function supportedAttempt(attempt) { return attempt.version === bank.version || Object.prototype.hasOwnProperty.call(bank.draft_migrations || {}, attempt.version); }
   function nextPendingAttempt() { return pendingAttempts().find(supportedAttempt); }
   function setView(which) {
+    if (view === 'exam' && which !== 'exam') pauseTimer();
     view = which;
     if (examTimer !== null) { clearInterval(examTimer); examTimer = null; }
-    if (which === 'exam') { updateExamTimer(); examTimer = setInterval(updateExamTimer, 1000); }
+    if (which === 'exam') {
+      resumeTimer(); updateExamTimer();
+      examTimer = setInterval(() => {
+        updateExamTimer();
+        if (runningSince !== null && ++timerTicks % 5 === 0) { checkpointTimer(); storeDraft(); }
+      }, 1000);
+    }
     if (which === 'home' && location.hash.startsWith('#guide-')) window.history.replaceState(null, '', '#guide');
     for (const section of ['home', 'exam', 'result', 'guide', 'history', 'badges']) {
       $(section + '-view').classList.toggle('hidden', section !== which);
@@ -213,16 +277,28 @@
     }
     return nickname;
   }
-  function finishProfile(stored, localOnly=false) {
-    const updated = {nickname:stored.nickname, playerNumber:stored.playerNumber, localOnly};
-    if (!save(':identity', candidate)) { $('profile-error').textContent='浏览器无法保存身份，请检查存储设置。'; return; }
+  function saveCandidateProfile(updated, switching) {
+    if (!save(':identity', candidate)) {
+      if (switching) resumeTimer();
+      $('profile-error').textContent='浏览器无法保存身份，请检查存储设置。';
+      return false;
+    }
     if (!save(':profile', updated)) {
       save(':identity', identity);
+      if (switching) resumeTimer();
       $('profile-error').textContent='浏览器无法保存昵称，请检查存储设置。';
-      return;
+      return false;
     }
-    if(candidate.deviceId!==identity.deviceId) { remove(':pending');remove(':draft');remove(':last-result');draft={version:bank.version,index:0,answers:{}};index=0; }
+    return true;
+  }
+  function finishProfile(stored, localOnly=false) {
+    const updated = {nickname:stored.nickname, playerNumber:stored.playerNumber, localOnly};
+    const switching = candidate.deviceId !== identity.deviceId;
+    if (switching) pauseTimer();
+    if (!saveCandidateProfile(updated, switching)) return;
+    if(switching) { remove(':pending');remove(':draft');remove(':last-result');draft={version:bank.version,index:0,answers:{}};index=0;qs=bankQuestions; }
     identity=candidate; profile=updated; updateProfileLabel();
+    if (switching && view === 'exam') setView('home');
     const next=afterProfile; $('profile-dialog').close(); afterProfile=null;
     setConnectionUnavailable(localOnly);
     const number = formatPlayerNumber(profile.playerNumber);
@@ -253,15 +329,28 @@
   function start() { if(!profile) showProfile('start'); else beginExam(); }
   function beginExam() {
     if (location.hash.startsWith('#guide-')) window.history.replaceState(null, '', location.pathname + location.search);
-    if (!Number.isSafeInteger(draft.startedAt) && !draft.timingUnknown) {
-      if (Object.keys(draft.answers).length) draft.timingUnknown = true;
-      else draft.startedAt = Date.now();
-      if (!save(':draft',draft)) return;
-    }
+    prepareExam();
+    if (!save(':draft',draft)) return;
     const notice = $('draft-update-notice');
-    notice.hidden = !draft.migrationCleared;
-    notice.textContent = draft.migrationCleared ? `题库已更新，其他作答已保留；${draft.migrationCleared} 道调整过的题目需要重新作答。` : '';
+    const notes = [];
+    if (draft.migrationCleared) notes.push(`题库已更新，其他作答已保留；${draft.migrationCleared} 道调整过的题目需要重新作答。`);
+    if (draft.timingUnknown) notes.push('旧进度无法准确计算答题用时；可继续作答，或选择重新考核以记录用时。');
+    notice.hidden = !notes.length;
+    notice.textContent = notes.join(' ');
     setView('exam'); updateProfileLabel(); renderQuestion();
+  }
+  function restartExam() {
+    if (view === 'exam' && Object.keys(draft.answers).length) { $('restart-dialog').showModal(); return; }
+    performRestart();
+  }
+  function performRestart() {
+    if (!activeIdentity()) { toast('本机资料已在其他页面切换，请刷新后继续。'); return; }
+    if ($('restart-dialog').open) $('restart-dialog').close();
+    pauseTimer();
+    const previousDraft = draft, previousIndex = index, previousQuestions = qs;
+    draft = {version:bank.version,index:0,answers:{}}; index = 0; qs = bankQuestions;
+    if (!save(':draft',draft)) { draft = previousDraft; index = previousIndex; qs = previousQuestions; resumeTimer(); return; }
+    beginExam();
   }
   function questionDiagram(question) {
     const diagram = QUESTION_DIAGRAMS[question.id];
@@ -285,10 +374,14 @@
       figure.innerHTML = questionDiagram(q);
       figure.hidden = !figure.firstElementChild;
       figure.dataset.question = q.id;
+      const card = $('question-card');
+      card.classList.remove('question-enter');
+      requestAnimationFrame(() => card.classList.add('question-enter'));
     }
     $('answered-count').textContent=String(done); $('progress-fill').style.width=`${100*done/qs.length}%`;
     const wrap=$('question-options'); wrap.replaceChildren();
-    q.options.forEach((opt,i)=>{
+    const optionsById = new Map(q.options.map(option => [option.id, option]));
+    draft.optionOrder[q.id].map(id => optionsById.get(id)).forEach((opt,i)=>{
       const label=document.createElement('label'); const selected=(draft.answers[q.id]||[]).includes(opt.id); label.className='option'+(selected?' selected':'');
       const input=document.createElement('input'); input.type=q.type==='multiple'?'checkbox':'radio'; input.name='answer'; input.value=opt.id; input.checked=selected;
       input.addEventListener('change',()=>selectOption(q,opt.id,input.checked));
@@ -321,7 +414,8 @@
     const elapsedSeconds=elapsedTime();
     const pending={attemptId:hex(16),version:bank.version,answers,elapsedSeconds,localSubmittedAt:Date.now()};
     if (!save(':pending', [...pendingAttempts(), pending])) return;
-    result={...grade(answers),answers,elapsedSeconds,attemptId:pending.attemptId}; save(':last-result',result); remove(':draft');
+    result={...grade(answers),answers,order:draft.order.slice(),elapsedSeconds,attemptId:pending.attemptId}; save(':last-result',result);
+    pauseTimer(); remove(':draft');
     draft={version:bank.version,index:0,answers:{}}; index=0; onlyWrong=false; setView('result'); renderResult(); uploadPending();
   }
   async function uploadPending() {
@@ -398,7 +492,9 @@
     renderResultBadges();
     $('review-toggle').textContent=onlyWrong?'查看全部题目':'只看错题';
     const list=$('review-list'); list.replaceChildren();
-    qs.forEach((q,i)=>{
+    const reviewById = new Map(bankQuestions.map(q => [q.id, q]));
+    const reviewQuestions = isPermutation(result.order, bankQuestions.map(q => q.id)) ? result.order.map(id => reviewById.get(id)) : bankQuestions;
+    reviewQuestions.forEach((q,i)=>{
       const selected=result.answers[q.id]||[], correct=isCorrect(q,selected); if(onlyWrong&&correct)return;
       const chosen=q.options.filter(o=>selected.includes(o.id)).map(o=>o.text).join('；')||'未作答';
       const expected=q.options.filter(o=>q.answer.includes(o.id)).map(o=>o.text).join('；');
@@ -794,18 +890,20 @@
   }
   function confirmTransfer() {
     if (!incomingTransfer) return;
+    pauseTimer();
     try {
       const {next, archives} = mergeForTransfer(incomingTransfer);
       persistSnapshot(next, archives);
       if (transferSender) transferSender.postMessage({type:transferPrefix + ':done'}, GITHUB_ORIGIN);
       closeTransfer(); syncTransferredProfile();
       toast('资料已转移，正在同步成绩。');
-    } catch (error) { $('transfer-error').textContent = error.message; }
+    } catch (error) { resumeTimer(); $('transfer-error').textContent = error.message; }
   }
   function restoreLocalProfile(id) {
     const archives = savedProfiles();
     const chosen = archives.find(entry => entry.id === id);
     if (!chosen || !confirm('切换到这份本机资料？当前资料和待上传成绩也会保留。')) return;
+    pauseTimer();
     try {
       const current = currentSnapshot();
       const remaining = archives.filter(entry => entry.id !== id);
@@ -816,7 +914,7 @@
       persistSnapshot(next, remaining);
       closeProfile();
       if (profile) syncTransferredProfile(); else { setView('home'); toast('已切换到未设置昵称的本机资料。'); }
-    } catch (error) { $('profile-error').textContent = error.message; }
+    } catch (error) { resumeTimer(); $('profile-error').textContent = error.message; }
   }
   function startTransfer() {
     if (!profile) { toast('请先在此网址设置昵称。'); return; }
@@ -890,7 +988,17 @@
   }
   async function deleteProfile() {
     if(!profile || !confirm('确认删除你的线上资料和全部成绩？删除后无法恢复。'))return;
-    try { await request('/api/delete-profile',identity); remove(':profile');remove(':pending');remove(':last-result');remove(':draft');draft={version:bank.version,index:0,answers:{}};index=0;profile=null;identity=makeIdentity();candidate=identity;save(':identity',identity);updateProfileLabel();closeProfile();refreshRanking();if(view==='history')loadHistory();toast('线上资料与成绩已删除。'); }
+    try {
+      await request('/api/delete-profile',identity);
+      if(view==='exam') setView('home');
+      remove(':profile'); remove(':pending'); remove(':last-result'); remove(':draft');
+      draft={version:bank.version,index:0,answers:{}}; index=0; qs=bankQuestions;
+      profile=null; identity=makeIdentity(); candidate=identity; save(':identity',identity);
+      updateProfileLabel(); closeProfile();
+      await refreshRanking();
+      if(view==='history') await loadHistory();
+      toast('线上资料与成绩已删除。');
+    }
     catch(err){$('profile-error').textContent=err.message;}
   }
   const featureActions = new Map([
@@ -928,7 +1036,9 @@
       case 'refresh-ranking': refreshRanking();break;
       case 'retry-upload': uploadPending();break;
       case 'retry-connection': retryConnection();break;
-      case 'restart': draft={version:bank.version,index:0,answers:{}};index=0;save(':draft',draft);beginExam();break;
+      case 'restart': restartExam();break;
+      case 'confirm-restart': performRestart();break;
+      case 'cancel-restart': $('restart-dialog').close();break;
       case 'results-home': setView('home');void refreshRanking();scrollToLeaderboard();break;
       case 'toggle-review': onlyWrong=!onlyWrong;renderResult();break;
       case 'open-history': openHistory();break;
@@ -951,6 +1061,12 @@
     if (event.key === KEY + ':transfer-revision' && event.newValue) location.reload();
   });
   window.addEventListener('online', () => { if (!$('connection-notice').hidden) void retryConnection(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) pauseTimer(); else resumeTimer();
+    if (view === 'exam') updateExamTimer();
+  });
+  window.addEventListener('pagehide', pauseTimer);
+  window.addEventListener('pageshow', () => { resumeTimer(); if (view === 'exam') updateExamTimer(); });
   readGuideHash();
   $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); initializeTransfer(); void refreshRanking();
   if (profile?.localOnly) setConnectionUnavailable(true);
