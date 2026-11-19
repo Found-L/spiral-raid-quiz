@@ -125,7 +125,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
         art = arena() + spider(364, 178) + swarm(399, 191) + spider(195, 150) + swarm(160, 172)
           + spider(279, 49) + swarm(312, 51) + label(417, 162, '小蜘蛛')
           + label(379, 231, '处理区 A') + label(176, 222, '处理区 B') + label(223, 40, '处理区 C');
-        if (questionId === 'q071' || questionId === 'q094') {
+        if (['q071','q094'].includes(questionId)) {
           art += arrow(349, 166, 306, 140, 'map-red-line', false) + label(270, 119, '首领方向', 'map-gold-text');
         }
         break;

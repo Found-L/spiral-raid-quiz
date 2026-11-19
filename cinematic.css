@@ -46,7 +46,7 @@
 .chapter-step-controls button { flex: none; width: 28px; height: 30px; border: 1px solid #527269; border-radius: 6px; color: #d8e8de; background: #1b3031; font-size: 15px; white-space: nowrap; }
 .chapter-step-controls .diagram-pause { width: auto; min-height: 30px; padding: 0 7px; font-size: 11px; }
 .chapter-step-controls button:hover { color: #fff2cf; border-color: #e5c384; background: #34433b; }
-.chapter-art.motion-paused *, .chapter-art.motion-paused *:before, .chapter-art.motion-paused *:after { animation-play-state: paused !important; }
+.chapter-art.motion-paused .sequence-svg *, .chapter-art.motion-paused .chapter-scene:after { animation-play-state: paused; }
 .overview-danger-ray { transform-box: view-box; transform-origin: 280px 130px; }
 .overview-danger-ray .scene-path { filter: drop-shadow(0 0 5px #ff786b); }
 .raid-diagram { box-shadow: inset 0 0 45px #56c3ad16, 0 9px 25px #0003; }
@@ -80,7 +80,7 @@
 @keyframes landscape-breathe { from { transform: scale(1.025); } to { transform: scale(1.09) translateX(-1%); } }
 @keyframes radiance-breathe { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
 @keyframes mist-drift { from { transform: translate3d(-6%, 1%, 0); opacity: .5; } to { transform: translate3d(8%, -2%, 0); opacity: 1; } }
-@keyframes ember-rise { 0%,100% { opacity: 0; transform: translateY(6px) scale(.5); } 25% { opacity: .9; } 75% { opacity: .7; } 100% { transform: translateY(-35px) scale(1.15); } }
+@keyframes ember-rise { 0% { opacity: 0; transform: translateY(6px) scale(.5); } 25% { opacity: .9; } 75% { opacity: .7; } 100% { opacity: 0; transform: translateY(-35px) scale(1.15); } }
 @keyframes danger-sweep { from { transform: rotate(-12deg); } to { transform: rotate(16deg); } }
 @keyframes core-breathe { 0%,100% { opacity: .82; } 50% { opacity: 1; } }
 @keyframes surface-sweep { 0%,100% { opacity: .2; } 50% { opacity: 1; } }
@@ -94,4 +94,4 @@
   .chapter-step-controls { grid-column: 2; margin-left: 0; justify-self: end; }
   .ambient-world span { width: 150vw; height: 150vw; }
 }
-@media (prefers-reduced-motion: reduce) { .ambient-world:before, .ambient-world span, .hero-landscape, .hero-radiance, .hero-mist, .hero-embers, .hero-embers i, .overview-danger-ray, .chapter-art *, .chapter-scene:after { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) { .ambient-world:before, .ambient-world span, .hero-landscape, .hero-radiance, .hero-mist, .hero-embers, .hero-embers i, .overview-danger-ray, .chapter-art *, .chapter-scene:after { animation: none; } }
