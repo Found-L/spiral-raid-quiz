@@ -55,10 +55,25 @@ function shareId(url) { return new URL(url).searchParams.get('share'); }
     });
     const page = await owner.newPage(), errors = [];
     page.on('pageerror', error => errors.push(error.message));
+    await page.emulateMedia({reducedMotion:'no-preference'});
     await page.goto(url);
     await page.locator('.ranking-row').first().waitFor();
     await page.locator('[data-action="share-ranking"]').click();
     await page.locator('#share-content:not([hidden])').waitFor();
+    assert.equal(await page.locator('#share-artwork').getAttribute('data-kind'), 'ranking');
+    assert.equal(await page.locator('.share-orbit-inner').evaluate(node => getComputedStyle(node).animationName), 'share-orbit');
+    const beforeOrbit = await page.locator('.share-orbit-inner').evaluate(node => getComputedStyle(node).transform);
+    await page.waitForFunction(before => getComputedStyle(document.querySelector('.share-orbit-inner')).transform !== before, beforeOrbit, {timeout:5000});
+    await page.emulateMedia({reducedMotion:'reduce'});
+    assert.equal(await page.locator('.share-orbit-inner').evaluate(node => getComputedStyle(node).animationName), 'none', 'reduced motion disables decorative animation');
+    await page.emulateMedia({reducedMotion:'no-preference'});
+    const colors = await page.locator('#share-poster').evaluate(canvas => {
+      const context = canvas.getContext('2d'), found = new Set();
+      for (let x = 130; x < 950; x += 40) found.add([...context.getImageData(x, 210, 1, 1).data].join(','));
+      return found.size;
+    });
+    assert(colors > 10, 'the exported poster includes the detailed illustrated background');
+    assert(fs.readFileSync(path.join(root, 'index.html'), 'utf8').includes('data:image/webp;base64,'), 'poster background is bundled for offline rendering');
     const rankUrl = await page.locator('#share-link').inputValue();
     assert.match(shareId(rankUrl), /^[a-f0-9]{32}$/);
     assert(!rankUrl.includes('a'.repeat(32)) && !rankUrl.includes('1'.repeat(64)), 'share URL contains no identity');
@@ -75,6 +90,7 @@ function shareId(url) { return new URL(url).searchParams.get('share'); }
     await page.locator('[data-action="open-badges"]').first().click();
     await page.locator('.badge-shell[data-badge="first"] .badge-share').click();
     await page.locator('#share-content:not([hidden])').waitFor();
+    assert.equal(await page.locator('#share-artwork').getAttribute('data-kind'), 'badge');
     const badgeUrl = await page.locator('#share-link').inputValue();
     const badge = await (await fetch(`http://127.0.0.1:${apiPort}/api/shares/${shareId(badgeUrl)}`)).json();
     assert.equal(badge.snapshot.kind, 'badge'); assert.equal(badge.snapshot.badge.id, 'first');
@@ -83,6 +99,7 @@ function shareId(url) { return new URL(url).searchParams.get('share'); }
     await page.locator('[data-action="close-badges"]').click();
     await page.locator('[data-action="share-honor"][data-badge="quickest"]').click();
     await page.locator('#share-content:not([hidden])').waitFor();
+    assert.equal(await page.locator('#share-artwork').getAttribute('data-kind'), 'honor');
     const honorUrl = await page.locator('#share-link').inputValue();
     const honor = await (await fetch(`http://127.0.0.1:${apiPort}/api/shares/${shareId(honorUrl)}`)).json();
     assert.equal(honor.snapshot.kind, 'honor'); assert.equal(honor.snapshot.badge.id, 'quickest'); assert.equal(honor.snapshot.rank, 1);
