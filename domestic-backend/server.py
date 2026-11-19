@@ -35,6 +35,9 @@ MAX_SHOWN_BADGES = 3
 # Order determines the default selection for players who have not chosen badges yet.
 BADGES = [
     {'id': 'quickest', 'name': '快枪手', 'description': '全站已计时答卷用时最短，不看分数；并列同得，纪录被超越后让出。', 'icon': 'bolt', 'tone': 'gold'},
+    {'id': 'site_rounds', 'name': '寺院劳模', 'description': '全站累计完成轮数最多，至少完成 2 轮；并列同得，纪录被超越后让出。', 'icon': 'temple', 'tone': 'teal'},
+    {'id': 'site_perfects', 'name': '满分制造机', 'description': '全站累计满分答卷最多，至少获得 1 次满分；并列同得，纪录被超越后让出。', 'icon': 'crown', 'tone': 'violet'},
+    {'id': 'site_perfect_fast', 'name': '满分速通王', 'description': '全站已计时的满分答卷用时最短；并列同得，纪录被超越后让出。', 'icon': 'bolt', 'tone': 'gold'},
     {'id': 'perfect_fast', 'name': '闪电机制王', 'description': '10 分钟内完成一份满分答卷。', 'icon': 'bolt', 'tone': 'gold'},
     {'id': 'perfect', 'name': '教科书成精', 'description': '任意一轮获得满分。', 'icon': 'crown', 'tone': 'gold'},
     {'id': 'almost', 'name': '就差一丢丢', 'description': '任意一轮只错 1 题。', 'icon': 'target', 'tone': 'violet'},
@@ -319,11 +322,60 @@ def earned_badges(rows, fastest):
     return earned
 
 
+def honor_statistics(db):
+    """One row per player; only uploaded attempts and recorded timings are used."""
+    rows = db.execute('''SELECT p.id AS participant_id, p.nickname, n.number,
+                                COUNT(a.id) AS rounds,
+                                SUM(CASE WHEN a.correct_count = a.total_count THEN 1 ELSE 0 END) AS perfects,
+                                MIN(t.elapsed_seconds) AS fastest,
+                                MIN(CASE WHEN a.correct_count = a.total_count THEN t.elapsed_seconds END) AS perfect_fastest
+                         FROM participants p JOIN attempts a ON a.participant_id = p.id
+                         LEFT JOIN participant_numbers n ON n.participant_id = p.id
+                         LEFT JOIN attempt_timings t ON t.attempt_id = a.id
+                         GROUP BY p.id, p.nickname, n.number''').fetchall()
+    return [dict(row) for row in rows]
+
+
+HONOR_CATEGORIES = (
+    ('quickest', 'fastest', 'asc', 0),
+    ('site_rounds', 'rounds', 'desc', 2),
+    ('site_perfects', 'perfects', 'desc', 1),
+    ('site_perfect_fast', 'perfect_fastest', 'asc', 0),
+)
+
+
+def honor_boards(db):
+    """Show five players per board while awarding every tied record holder."""
+    stats = honor_statistics(db)
+    boards, winners = [], {}
+    for badge_id, metric, direction, minimum in HONOR_CATEGORIES:
+        eligible = [row for row in stats if row[metric] is not None and row[metric] >= minimum]
+        eligible.sort(key=lambda row: (row[metric] if direction == 'asc' else -row[metric],
+                                      row['number'] if row['number'] is not None else float('inf'),
+                                      row['participant_id']))
+        best = eligible[0][metric] if eligible else None
+        winners[badge_id] = {row['participant_id'] for row in eligible if row[metric] == best}
+        entries = []
+        previous = None
+        rank = 0
+        for index, row in enumerate(eligible[:5]):
+            if index == 0 or row[metric] != previous:
+                rank = index + 1
+            previous = row[metric]
+            entries.append({'rank': rank, 'nickname': row['nickname'], 'playerNumber': row['number'],
+                            'value': row[metric]})
+        boards.append({'badge': BADGE_BY_ID[badge_id], 'entries': entries,
+                       'valueType': 'time' if direction == 'asc' else 'count',
+                       'holderCount': len(winners[badge_id])})
+    return {'boards': boards}, winners
+
+
 def badge_states(db, participant_ids):
     """Derive achievements from saved attempts and keep only eligible displayed badges."""
     participant_ids = list(dict.fromkeys(participant_ids))
-    fastest = db.execute('''SELECT MIN(t.elapsed_seconds) FROM attempt_timings t
-                            JOIN attempts a ON a.id = t.attempt_id''').fetchone()[0]
+    boards, winners = honor_boards(db)
+    fastest_entries = boards['boards'][0]['entries']
+    fastest = fastest_entries[0]['value'] if fastest_entries else None
     if not participant_ids:
         return {}, fastest
     placeholders = ','.join('?' for _ in participant_ids)
@@ -345,6 +397,7 @@ def badge_states(db, participant_ids):
     states = {}
     for participant_id, rows in by_player.items():
         earned = earned_badges(rows, fastest) | mistakes[participant_id]
+        earned.update(badge_id for badge_id, holders in winners.items() if participant_id in holders)
         ordered = [badge['id'] for badge in BADGES if badge['id'] in earned]
         if participant_id in saved:
             selected = list(dict.fromkeys(item for item in saved[participant_id]
@@ -381,7 +434,7 @@ def select_badges(db, body):
         authenticated(db, device, secret_hash, '请保存昵称，或恢复原来的身份后设置勋章。')
         states, fastest = badge_states(db, [device])
         if any(item not in states[device]['earned'] for item in selected):
-            raise ApiError('有勋章尚未获得，或最快纪录已被超越，请刷新后重新选择。')
+            raise ApiError('有勋章尚未获得，或全站纪录已被超越，请刷新后重新选择。')
         db.execute('''INSERT INTO badge_selections (participant_id, selections, updated_at) VALUES (?, ?, ?)
                       ON CONFLICT(participant_id) DO UPDATE SET selections=excluded.selections,
                       updated_at=excluded.updated_at''',
@@ -513,6 +566,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         url = urlsplit(self.path)
+        if url.path == '/api/honors':
+            try:
+                with closing(database()) as db:
+                    self.respond(200, honor_boards(db)[0])
+            except Exception:
+                logging.exception('Honor board request failed')
+                self.respond(503, {'error': '趣味榜暂时不可用，请稍后重试。'})
+            return
         if url.path != '/api/leaderboard':
             return self.respond(404, {'error': '页面不存在。'})
         try:

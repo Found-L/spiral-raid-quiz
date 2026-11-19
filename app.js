@@ -86,6 +86,7 @@
   let uploading = false;
   let connecting = false;
   let rankingRequest = 0;
+  let honorRequest = 0;
   let rankingPage = 1;
   let rankingPages = 1;
   let lastUploadError = '';
@@ -517,11 +518,31 @@
     const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
     const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
     const badgeList = shownBadges.length ? `<div class="rank-badges" aria-label="展示的勋章">${shownBadges.map(badgeChip).join('')}</div>` : '';
-    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><span>${entry.correctCount} / ${entry.totalCount}</span><span>${formatDuration(entry.elapsedSeconds)}</span><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong>`;
+    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><div class="ranking-stats"><span class="ranking-stat"><small>正确题数</small><b>${entry.correctCount} / ${entry.totalCount}</b></span><span class="ranking-stat"><small>用时</small><b>${formatDuration(entry.elapsedSeconds)}</b></span><span class="ranking-stat"><small>最高分</small><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong></span></div>`;
     return row;
+  }
+  async function refreshHonors() {
+    const requestId = ++honorRequest;
+    const container = $('honor-boards');
+    try {
+      const data = await request('/api/honors');
+      if (requestId !== honorRequest) return;
+      const boards = Array.isArray(data.boards) ? data.boards : [];
+      if (!boards.length) { container.innerHTML = '<p class="empty-state">暂无趣味榜数据。</p>'; return; }
+      container.innerHTML = boards.map(board => {
+        const badge = board.badge;
+        const entries = Array.isArray(board.entries) ? board.entries : [];
+        const rows = entries.map(entry => `<li><span class="honor-rank">${entry.rank}</span><span class="honor-player"><b>${escape(entry.nickname)}</b><small>${formatPlayerNumber(entry.playerNumber)}</small></span><strong>${board.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`}</strong></li>`).join('');
+        const holders = board.holderCount > 1 ? `${board.holderCount} 人并列第一` : '榜首可获得勋章';
+        return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders">${entries.length ? holders : '等待首位上榜玩家'}</div></article>`;
+      }).join('');
+    } catch (error) {
+      if (requestId === honorRequest) container.innerHTML = `<p class="empty-state">${escape(error.message)} 点击刷新榜单可重试。</p>`;
+    }
   }
   async function refreshRanking(page = rankingPage) {
     const requestId = ++rankingRequest;
+    void refreshHonors();
     $('ranking-pagination').hidden = true;
     const list=$('ranking-list'); list.replaceChildren(); const loading=document.createElement('p'); loading.className='empty-state'; loading.textContent='正在读取榜单…'; list.append(loading);
     try {
@@ -738,6 +759,16 @@
     copy.querySelector('[data-action="zoom-diagram"]')?.remove();
     $('diagram-dialog-content').replaceChildren(copy);
     $('diagram-dialog').showModal();
+    if (copy.classList.contains('motion-paused')) copy.querySelector('svg[role="img"]')?.pauseAnimations?.();
+  }
+  function toggleDiagramMotion(target) {
+    const figure = target.closest('.raid-diagram');
+    if (!figure) return;
+    const paused = figure.classList.toggle('motion-paused');
+    target.textContent = paused ? '播放' : '暂停';
+    target.setAttribute('aria-pressed', String(paused));
+    const svg = figure.querySelector('svg[role="img"]');
+    if (paused) svg?.pauseAnimations?.(); else svg?.unpauseAnimations?.();
   }
   function renderGuide(chapterId) {
     const guide = RAID_GUIDE[chapterId];
@@ -1025,6 +1056,7 @@
     ['toggle-badge', target => toggleBadge(target.dataset.badge)],
     ['save-badges', () => { void saveBadges(); }],
     ['zoom-diagram', target => openDiagram(target)],
+    ['toggle-diagram-motion', target => toggleDiagramMotion(target)],
     ['close-diagram', () => $('diagram-dialog').close()],
   ]);
   document.addEventListener('click',(e)=>{
