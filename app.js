@@ -924,12 +924,12 @@
       case 'next': if(index===qs.length-1)submitExam();else goto(index+1);break;
       case 'submit': submitExam();break;
       case 'leave-exam': setView('home');refreshRanking();break;
-      case 'show-leaderboard': setView('home');refreshRanking();scrollToLeaderboard();break;
+      case 'show-leaderboard': setView('home');void refreshRanking();scrollToLeaderboard();break;
       case 'refresh-ranking': refreshRanking();break;
       case 'retry-upload': uploadPending();break;
       case 'retry-connection': retryConnection();break;
       case 'restart': draft={version:bank.version,index:0,answers:{}};index=0;save(':draft',draft);beginExam();break;
-      case 'results-home': setView('home');refreshRanking();scrollToLeaderboard();break;
+      case 'results-home': setView('home');void refreshRanking();scrollToLeaderboard();break;
       case 'toggle-review': onlyWrong=!onlyWrong;renderResult();break;
       case 'open-history': openHistory();break;
       case 'close-history': closeHistory();break;

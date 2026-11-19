@@ -43,6 +43,7 @@
   background: #151d25;
   color: #d5d4c9;
   font-size: 13px;
+  transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
 }
 .guide-chapters a[aria-current],
 .guide-chapters a:hover,
@@ -55,6 +56,7 @@
   border-top-color: #7b684d;
   background: #121a23;
   scroll-margin-top: 16px;
+  transition: border-color .22s ease, box-shadow .22s ease;
 }
 .guide-stage > .eyebrow { margin-bottom: 9px; letter-spacing: .06em; }
 .guide-stage h2 { margin: 0 0 16px; font: 600 clamp(20px, 2.9vw, 30px)/1.38 var(--serif); }
@@ -154,7 +156,7 @@
 .close-button:hover { color: var(--gold); border-color: var(--line); background: #222a30; }
 .close-button .icon { width: 19px; height: 19px; }
 
-.guide-card { border-radius: 3px; }
+.guide-card { border-radius: 3px; transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
 .guide-card .diagram {
   border: 1px solid rgba(229,214,181,.07);
   border-radius: 3px;
@@ -241,7 +243,7 @@
 .badges-actions { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 15px; padding: 8px 0; background: rgba(11,16,23,.96); }
 .badges-note { margin: 18px 0 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
 .rank-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-.badge-chip { display: inline-flex; align-items: center; gap: 3px; max-width: 100%; padding: 2px 6px; border: 1px solid color-mix(in srgb, var(--badge-color) 45%, transparent); border-radius: 3px; color: var(--badge-color); background: rgba(224,196,151,.04); font-size: 10px; line-height: 1.4; white-space: nowrap; }
+.badge-chip { display: inline-flex; align-items: center; gap: 3px; max-width: 100%; padding: 2px 6px; border: 1px solid color-mix(in srgb, var(--badge-color) 45%, transparent); border-radius: 3px; color: var(--badge-color); background: rgba(224,196,151,.04); font-size: 10px; line-height: 1.4; white-space: nowrap; transition: background .2s ease, border-color .2s ease; }
 .badge-chip .icon { width: 12px; height: 12px; stroke-width: 1.8; }
 .result-honors { display: inline-grid; gap: 7px; margin-top: 15px; padding: 13px 18px; border: 1px solid #826b4b; border-radius: 8px; background: #271f1a; text-align: left; }
 .result-honors > span { color: #f0d19d; font-size: 13px; font-weight: 700; }
@@ -260,18 +262,14 @@
 
 /* Movement keeps the original route and markers visible, including when animation is off. */
 .map-route-glow { fill: none; stroke: #fff5d5; stroke-width: 1.8; stroke-linecap: round; stroke-dasharray: 4 18; opacity: .85; pointer-events: none; }
-.guide-card { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
 .guide-card:focus-within { border-color: var(--accent); }
-.guide-stage { transition: border-color .22s ease, box-shadow .22s ease; }
 .guide-stage:focus-within { border-color: #ad9167; box-shadow: 0 0 0 2px #d3aa7017; }
-.guide-timeline button, .guide-chapters a { transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease; }
-.ranking-row { transition: background .2s ease, border-color .2s ease; }
+.ranking-list .ranking-row { transition: background .2s ease, border-color .2s ease; }
 .ranking-row:first-child { background: linear-gradient(90deg, #d9b8780d, transparent 65%); }
-.rank-number { width: 30px; min-width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #6b604c; border-radius: 50%; background: #211f1b; font-size: 14px; }
+.ranking-list .rank-number { width: 30px; min-width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #6b604c; border-radius: 50%; background: #211f1b; font-size: 14px; }
 .ranking-row:nth-child(2) .rank-number { color: #c5d1d2; border-color: #647a7d; background: #1b282b; }
 .ranking-row:nth-child(3) .rank-number { color: #ddb39b; border-color: #86675a; background: #2b211e; }
 .badge-card .badge-crest { transition: transform .24s ease, box-shadow .24s ease; }
-.badge-chip { transition: background .2s ease, border-color .2s ease; }
 
 @media (hover: hover) and (pointer: fine) {
   .guide-card:hover { transform: translateY(-4px); border-color: var(--accent); box-shadow: 0 12px 28px #0004; }
@@ -303,9 +301,8 @@
 @keyframes badge-select { 0% { transform: scale(.98); } 55% { transform: scale(1.015); } 100% { transform: scale(1); } }
 
 @media (max-width: 680px) {
-  .rank-number { width: 24px; min-width: 24px; height: 24px; font-size: 12px; }
+  .ranking-list .rank-number { width: 24px; min-width: 24px; height: 24px; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; scroll-behavior: auto !important; }
   .map-route-glow { display: none; }
 }
