@@ -938,7 +938,7 @@
     if (copy.dataset.sequence) applySequence(copy, Number(copy.dataset.step) || 0);
   }
   function toggleDiagramMotion(target) {
-    const figure = target.closest('.raid-diagram');
+    const figure = target.closest('.raid-diagram, .chapter-art');
     if (!figure) return;
     const paused = figure.classList.toggle('motion-paused');
     target.textContent = paused ? '播放' : '暂停';

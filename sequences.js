@@ -163,6 +163,50 @@ const RAID_SEQUENCES = {
       {text:'波纹到达时起跳规避；起跳提示不代表平面移动。',cues:['arrive','jump']},
     ],
   },
+  // The covers reuse the same labelled actors as the larger tactical maps.
+  'overview-twins': {
+    background: twinField(),
+    actors: [point('fire',142,130,'火','hazard',24),point('ice',418,130,'冰','ally',24),
+      point('ft',142,184,'T','hazard',15),point('it',418,184,'T','ally',15),
+      point('fh',79,182,'疗','ally',15),point('ih',481,182,'疗','ally',15)],
+    cues: sceneCue('lift', sceneLabel(142,61,'主 T 被抓','gold')+sceneLabel(418,61,'主 T 被抓','gold')+
+      '<path d="M93 170 Q113 144 130 103 M467 170 Q447 144 430 103" class="scene-heal-beam"/>')+
+      sceneCue('hits',sceneLabel(142,222,'三、四刀注意大加','gold')+sceneLabel(418,222,'三、四刀注意大加','gold')),
+    steps: [
+      {text:'两侧分别确认主 T 与治疗位。'},
+      {text:'主 T 被抓起时，两侧治疗同时对准各自主 T。',positions:{ft:[142,88],it:[418,88]},cues:['lift']},
+      {text:'连续四刀期间稳住血量，第三、第四刀准备大加。',positions:{ft:[142,88],it:[418,88]},cues:['lift','hits']},
+    ],
+  },
+  'overview-spirit': {
+    background: sceneCircle(280,130,100) + sceneLabel(280,252,'同一场地 · 示意','gold'),
+    actors: [point('boss',280,130,'首领','boss',23),point('tank',308,166,'T','ally',15),
+      point('a',98,68,'火','ally',14),point('b',80,125,'火','ally',14),point('c',98,182,'火','ally',14),
+      point('bomb',316,103,'弹','hazard',15),point('inside',224,158,'内','ally',14)],
+    cues: sceneCue('select',sceneLabel(96,222,'远点业火','gold')+sceneLabel(414,85,'近点炸弹','hazard'))+
+      sceneCue('escape',sceneLine('M335 111 L417 181 M408 170 L417 181 L402 178','hazard'))+
+      sceneCue('lamps',sceneLabel(118,74,'隔离内','gold')+sceneLabel(421,75,'主 T 引灯','gold')+
+        [ [280,30],[367,80],[367,180],[280,230],[193,180],[193,80] ].map(([x,y]) =>
+          `<circle cx="${x}" cy="${y}" r="9" class="scene-piece lamp"/>`).join('')+
+        sceneLine('M302 112 L354 82 M342 82 L354 82 L348 91','gold')),
+    steps: [
+      {text:'业火与炸弹同时点名：远点接业火，近点认炸弹。',hidden:['inside'],cues:['select']},
+      {text:'炸弹位向空处撤离，业火组继续准备隔离。',positions:{bomb:[420,184]},hidden:['inside'],cues:['select','escape']},
+      {text:'染灯与隔离同时进行：主 T 引灯，内场继续躲避。',positions:{tank:[321,103]},hidden:['a','b','c','bomb'],cues:['lamps']},
+    ],
+  },
+  'overview-witch': {
+    background: sceneCircle(280,130,104) + '<g class="overview-danger-ray">'+sceneLine('M280 130 L206 56','hazard')+'</g>'+
+      sceneLabel(104,52,'不祥气息','hazard')+sceneLabel(280,255,'路线仅作示意'),
+    actors: [point('boss',315,154,'首领','boss',24),point('tank',348,166,'T','ally',15),
+      point('team',295,203,'队','ally',15),point('bomb',335,105,'弹','hazard',15)],
+    cues: sceneCue('withdraw',sceneLine('M348 115 L422 189 M410 184 L422 189 L418 176','hazard')+sceneLabel(443,220,'空处','gold')),
+    steps: [
+      {text:'主 T 留意不祥气息，带首领保持距离。'},
+      {text:'炸弹被点名后避开队友，向约定空处撤离。',positions:{bomb:[424,192]},cues:['withdraw']},
+      {text:'带位与炸弹同时处理，落点和路线以现场为准。',positions:{bomb:[424,192],boss:[302,169],tank:[328,184]},cues:['withdraw']},
+    ],
+  },
 };
 
 function sequenceSvg(key) {
@@ -174,36 +218,20 @@ function drawSequenceDiagram(key, caption) {
   return `<figure class="raid-diagram sequence-diagram" data-sequence="${key}" data-step="0"><div class="diagram-top"><span>机制动态演示</span><div class="diagram-controls"><button type="button" class="diagram-pause" data-action="toggle-diagram-motion" aria-pressed="false">暂停</button><button type="button" class="diagram-zoom" data-action="zoom-diagram" aria-label="放大查看机制示意图"><svg class="icon" aria-hidden="true"><use href="#icon-zoom"/></svg>放大</button></div></div><div class="diagram-canvas">${sequenceSvg(key)}</div><div class="sequence-readout"><span class="sequence-count" data-step-count>01 / ${String(scene.steps.length).padStart(2,'0')}</span><span data-step-text>${scene.steps[0].text}</span><div class="sequence-controls"><button type="button" data-action="sequence-prev" aria-label="上一步">←</button><button type="button" data-action="sequence-next" aria-label="下一步">→</button></div></div><figcaption><span>${caption}</span><span class="diagram-motion-note">画面突出关键动作；可能同时发生的机制需一起留意，位置与时机以实战为准。</span></figcaption></figure>`;
 }
 function drawOverviewSequence(key) {
-  // Chapter artwork conveys a theme; precise positions are reserved for the guide.
-  const art = {
-    'twins-orbs': `<svg viewBox="0 0 560 220" aria-hidden="true">
-      <defs><radialGradient id="overview-fire"><stop stop-color="#e58d6c" stop-opacity=".32"/><stop offset="1" stop-color="#e58d6c" stop-opacity="0"/></radialGradient><radialGradient id="overview-ice"><stop stop-color="#83cfc8" stop-opacity=".28"/><stop offset="1" stop-color="#83cfc8" stop-opacity="0"/></radialGradient></defs>
-      <circle cx="172" cy="104" r="112" fill="url(#overview-fire)" class="chapter-glow"/><circle cx="388" cy="104" r="112" fill="url(#overview-ice)" class="chapter-glow chapter-delay"/>
-      <path d="M174 27 184 91 174 151 164 91Z" class="chapter-blade fire-blade"/><path d="M150 99h48 M164 153h20 M174 151v24" class="chapter-sword fire-sword"/>
-      <path d="M386 27 396 91 386 151 376 91Z" class="chapter-blade ice-blade"/><path d="M362 99h48 M376 153h20 M386 151v24" class="chapter-sword ice-sword"/>
-      <path d="M116 151 Q142 133 166 128 M444 151 Q418 133 394 128" class="chapter-heal-flow"/>
-      <circle cx="110" cy="155" r="9" class="chapter-healer"/><circle cx="450" cy="155" r="9" class="chapter-healer"/>
-      <circle cx="174" cy="125" r="10" class="chapter-tank"/><circle cx="386" cy="125" r="10" class="chapter-tank"/>
-      <text x="174" y="130" class="chapter-tank-text">T</text><text x="386" y="130" class="chapter-tank-text">T</text>
-      <text x="174" y="201" class="chapter-label">灼热</text><text x="386" y="201" class="chapter-label">酷寒</text></svg>`,
-    'spirit-select': `<svg viewBox="0 0 560 220" aria-hidden="true">
-      <defs><radialGradient id="overview-lamp"><stop stop-color="#ebc888" stop-opacity=".30"/><stop offset="1" stop-color="#ebc888" stop-opacity="0"/></radialGradient></defs>
-      <circle cx="280" cy="108" r="125" fill="url(#overview-lamp)" class="chapter-glow"/>
-      <path d="M280 35 331 67v69l-51 36-51-36V67Z" class="chapter-shrine"/><path d="M280 59 306 76v45l-26 18-26-18V76Z" class="chapter-shrine-inner"/>
-      <path d="M280 104 334 45 354 62Z" class="chapter-lamp-beam"/>
-      <g class="chapter-lights"><circle cx="152" cy="108" r="6"/><circle cx="216" cy="37" r="6"/><circle cx="344" cy="37" r="6"/><circle cx="408" cy="108" r="6"/><circle cx="344" cy="179" r="6"/><circle cx="216" cy="179" r="6"/></g>
-      <text x="280" y="204" class="chapter-label">六灯 · 隔离</text></svg>`,
-    'witch-bomb': `<svg viewBox="0 0 560 220" aria-hidden="true">
-      <defs><radialGradient id="overview-witch"><stop stop-color="#76c1b9" stop-opacity=".28"/><stop offset="1" stop-color="#76c1b9" stop-opacity="0"/></radialGradient></defs>
-      <circle cx="280" cy="106" r="125" fill="url(#overview-witch)" class="chapter-glow"/>
-      <circle cx="280" cy="106" r="72" class="chapter-arena"/><circle cx="280" cy="106" r="30" class="chapter-core"/>
-      <path d="M280 106 223 62" class="chapter-danger"/><circle cx="280" cy="106" r="7" class="chapter-pulse"/>
-      <path d="M310 136 Q330 147 348 137" class="chapter-escape"/><circle cx="310" cy="136" r="7" class="chapter-runner"/>
-      <path d="M365 70c17 13 27 26 29 40M365 142c17-13 27-26 29-40" class="chapter-web"/>
-      <text x="280" y="203" class="chapter-label">危险线 · 分工</text></svg>`,
-  }[key] || '';
-  const notes = {'twins-orbs':'挡球 · 踩花 · 抬血','spirit-select':'业火 · 隔离 · 染灯','witch-bomb':'带位 · 炸弹 · 蜘蛛'};
-  return `<div class="chapter-art" aria-label="${notes[key]}">${art}<div class="chapter-art-note"><span>MECHANIC OVERVIEW</span><strong>${notes[key]}</strong></div></div>`;
+  const overview = {
+    'twins-orbs': ['overview-twins','双剑 · 抬血'],
+    'spirit-select': ['overview-spirit','超魔灵 · 同步分工'],
+    'witch-bomb': ['overview-witch','黑风魔女 · 带位与炸弹'],
+  }[key];
+  if (!overview) return '';
+  const [id, title] = overview;
+  const scene = RAID_SEQUENCES[id];
+  return `<div class="chapter-art" data-sequence="${id}" data-step="0" aria-label="${title}">
+    <div class="chapter-scene">${sequenceSvg(id)}<span class="chapter-scene-tag">动态示意</span></div>
+    <div class="chapter-status"><span class="chapter-counter" data-step-count>01 / ${String(scene.steps.length).padStart(2,'0')}</span>
+      <span class="chapter-status-text" data-step-text>${scene.steps[0].text}</span>
+      <div class="chapter-step-controls"><button type="button" class="diagram-pause" data-action="toggle-diagram-motion" aria-pressed="false">暂停</button><button type="button" data-action="sequence-prev" aria-label="${title}上一步">←</button><button type="button" data-action="sequence-next" aria-label="${title}下一步">→</button></div>
+    </div></div>`;
 }
 
 if (typeof module !== 'undefined' && module.exports) module.exports = {RAID_SEQUENCES};

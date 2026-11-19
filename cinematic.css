@@ -1,0 +1,97 @@
+/* Atmospheric light stays behind controls and never acts as a mechanic marker. */
+.site-shell { position: relative; isolation: isolate; }
+.ambient-world { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; background: #0b1017; }
+.ambient-world:before { content: ''; position: absolute; inset: -12% 0; opacity: .35; background-image: radial-gradient(circle at 12% 23%, #e8c58b 0 1px, transparent 2px), radial-gradient(circle at 73% 19%, #84d8c1 0 1px, transparent 2px), radial-gradient(circle at 39% 58%, #e8c58b 0 1px, transparent 2px), radial-gradient(circle at 86% 71%, #84d8c1 0 1px, transparent 2px), radial-gradient(circle at 24% 84%, #e8c58b 0 1px, transparent 2px); }
+.ambient-world span { position: absolute; width: 85vw; height: 85vw; max-width: 1100px; max-height: 1100px; border-radius: 50%; opacity: .48; }
+.ambient-world span:nth-child(1) { top: -48%; right: -35%; background: radial-gradient(circle, #367f7539 0, #1c535127 28%, transparent 69%); }
+.ambient-world span:nth-child(2) { top: 20%; left: -45%; background: radial-gradient(circle, #91603d30 0, #41363019 36%, transparent 70%); }
+.ambient-world span:nth-child(3) { bottom: -65%; right: -30%; background: radial-gradient(circle, #4e8a8528 0, transparent 68%); }
+.topbar { background: linear-gradient(110deg, #101923f0, #0c131bf5); }
+.hero { background: radial-gradient(ellipse at 78% 45%, #18383a 0, #101b24 37%, #0d141d 76%); }
+.hero-art { width: min(58vw, 820px); max-width: none; margin-right: -8vw; }
+.hero-art:before { inset: 10% 3%; background: radial-gradient(ellipse, #ecba6c30, #2f827b22 42%, transparent 73%); }
+.hero-scene { position: relative; aspect-ratio: 16 / 9; overflow: hidden; mask-image: radial-gradient(ellipse 69% 68% at 51% 51%, #000 43%, transparent 100%); }
+.hero-landscape { width: 100%; height: 100%; display: block; object-fit: cover; transform: scale(1.025); }
+.hero-radiance { position: absolute; inset: 0; background: radial-gradient(ellipse 20% 24% at 65% 51%, #ffd28d70, #d99b4e16 45%, transparent 75%); mix-blend-mode: screen; pointer-events: none; }
+.hero-mist { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; }
+.hero-mist-near { background: radial-gradient(ellipse 38% 15% at 30% 75%, #79d2c02a, transparent 80%), radial-gradient(ellipse 37% 13% at 80% 69%, #74c6b41d, transparent 85%); }
+.hero-mist-far { background: radial-gradient(ellipse 26% 10% at 26% 45%, #8acfc11b, transparent 80%), radial-gradient(ellipse 30% 13% at 74% 80%, #c0e1ce20, transparent 80%); }
+.hero-embers { position: absolute; inset: 0; pointer-events: none; }
+.hero-embers i { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #ffe2a4; box-shadow: 0 0 9px 3px #f6be6c75; }
+.hero-embers i:nth-child(1) { left: 41%; top: 65%; } .hero-embers i:nth-child(2) { left: 61%; top: 37%; }
+.hero-embers i:nth-child(3) { left: 75%; top: 65%; } .hero-embers i:nth-child(4) { left: 56%; top: 75%; }
+.hero-embers i:nth-child(5) { left: 30%; top: 50%; } .hero-embers i:nth-child(6) { left: 71%; top: 27%; }
+.art-caption { bottom: -13px; left: 50%; transform: translateX(-50%); white-space: nowrap; }
+.hero h1 em { text-shadow: 0 0 28px #e5ad6540; }
+.btn-primary { box-shadow: 0 4px 22px #d5a55d29, inset 0 1px #fff5d24d; }
+.btn-primary:hover { box-shadow: 0 8px 28px #e7bc7365, inset 0 1px #fff8db80; }
+.btn-ghost:hover, .profile-trigger:hover { box-shadow: 0 0 22px #a3d8c31a; }
+.guide-card { background: radial-gradient(ellipse at 50% -20%, color-mix(in srgb, var(--accent) 21%, transparent), transparent 65%), linear-gradient(155deg, #19262e, #101820 74%); }
+.guide-card:after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, transparent 30%, #e8dbc607 47%, transparent 63%); opacity: .7; }
+.guide-card:focus-within, .guide-card:hover { box-shadow: 0 16px 38px #0007, 0 0 25px color-mix(in srgb, var(--accent) 15%, transparent); }
+.chapter-art { margin-top: 17px; background: #101c22; border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent); box-shadow: inset 0 0 38px #0005; }
+.chapter-scene { position: relative; background: radial-gradient(ellipse at 50% 45%, color-mix(in srgb, var(--accent) 19%, #10232a), #0c171f 83%); }
+.chapter-scene:after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(135deg, transparent 40%, #c6e7d808 49%, transparent 60%); }
+.chapter-scene-tag { position: absolute; top: 10px; right: 12px; color: #b6c5bb; font-size: 10px; letter-spacing: .07em; }
+.chapter-art .sequence-svg { width: 100%; display: block; }
+.chapter-art .scene-zone { fill-opacity: .13; stroke-opacity: .35; }
+.chapter-art .scene-piece { filter: drop-shadow(0 0 8px #9edac444); }
+.chapter-art .scene-piece.hazard { filter: drop-shadow(0 0 8px #e779654f); }
+.chapter-art .scene-piece.boss, .chapter-art .scene-piece.lamp { filter: drop-shadow(0 0 9px #f4bc6470); }
+.chapter-art .scene-label { font-size: 16px; }
+.chapter-status { min-height: 74px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; background: #0c171ed9; }
+.chapter-counter { color: #e4bf83; font: 13px Georgia,serif; white-space: nowrap; }
+.chapter-status-text { flex: 1; min-width: 0; color: #dfebe1; font-size: 12px; line-height: 1.5; }
+.chapter-step-controls { display: flex; align-items: center; gap: 4px; }
+.chapter-step-controls button { flex: none; width: 28px; height: 30px; border: 1px solid #527269; border-radius: 6px; color: #d8e8de; background: #1b3031; font-size: 15px; white-space: nowrap; }
+.chapter-step-controls .diagram-pause { width: auto; min-height: 30px; padding: 0 7px; font-size: 11px; }
+.chapter-step-controls button:hover { color: #fff2cf; border-color: #e5c384; background: #34433b; }
+.chapter-art.motion-paused *, .chapter-art.motion-paused *:before, .chapter-art.motion-paused *:after { animation-play-state: paused !important; }
+.overview-danger-ray { transform-box: view-box; transform-origin: 280px 130px; }
+.overview-danger-ray .scene-path { filter: drop-shadow(0 0 5px #ff786b); }
+.raid-diagram { box-shadow: inset 0 0 45px #56c3ad16, 0 9px 25px #0003; }
+.diagram-top { background: linear-gradient(100deg, #1c3740, #14252e); }
+.sequence-readout { background: linear-gradient(105deg, #1c3a39, #162b30); }
+.question-card, .result-head, .leaderboard-wrap, .honor-card { box-shadow: 0 12px 40px #0003; }
+.question-card { background: radial-gradient(ellipse at 85% 0%, #39756d23, transparent 40%), linear-gradient(145deg, #1a2930, #121b23 75%); }
+.ranking-row:hover { background: linear-gradient(90deg, #31544b80, #17262b); }
+.honor-card { background-image: radial-gradient(ellipse at 20% 0%, color-mix(in srgb, var(--badge-color) 18%, transparent), transparent 50%), linear-gradient(145deg, #1b2930, #111a22); }
+.badge-card.earned .badge-art { filter: drop-shadow(0 0 8px color-mix(in srgb, var(--badge-color) 40%, transparent)); }
+.option:hover, .option.selected { box-shadow: inset 3px 0 #e9c282, 0 0 18px #d5b57e1b; }
+@media (prefers-reduced-motion: no-preference) {
+  .ambient-world span:nth-child(1) { animation: ambient-drift 18s ease-in-out infinite alternate; }
+  .ambient-world span:nth-child(2) { animation: ambient-drift 24s ease-in-out infinite alternate-reverse; }
+  .ambient-world span:nth-child(3) { animation: ambient-drift 20s ease-in-out infinite alternate; }
+  .ambient-world:before { animation: ambient-stars 16s ease-in-out infinite alternate; }
+  .hero-landscape { animation: landscape-breathe 18s ease-in-out infinite alternate; }
+  .hero-radiance { animation: radiance-breathe 4s ease-in-out infinite; }
+  .hero-mist-near { animation: mist-drift 9s ease-in-out infinite alternate; }
+  .hero-mist-far { animation: mist-drift 14s ease-in-out infinite alternate-reverse; }
+  .hero-embers i { animation: ember-rise 6s ease-in-out infinite; }
+  .hero-embers i:nth-child(2n) { animation-delay: -3s; }
+  .hero-embers i:nth-child(3n) { animation-delay: -1.5s; }
+  .overview-danger-ray { animation: danger-sweep 5s ease-in-out infinite alternate; }
+  .chapter-art .scene-piece.boss { animation: core-breathe 3.2s ease-in-out infinite; }
+  .chapter-art .scene-piece.lamp { animation: core-breathe 2.8s ease-in-out infinite; }
+  .chapter-scene:after { animation: surface-sweep 6s ease-in-out infinite; }
+}
+@keyframes ambient-drift { from { transform: translate3d(-4%, 0, 0) scale(.96); } to { transform: translate3d(7%, 5%, 0) scale(1.12); } }
+@keyframes ambient-stars { from { transform: translate3d(0, 3%, 0); opacity: .18; } to { transform: translate3d(2%, -3%, 0); opacity: .55; } }
+@keyframes landscape-breathe { from { transform: scale(1.025); } to { transform: scale(1.09) translateX(-1%); } }
+@keyframes radiance-breathe { 0%,100% { opacity: .45; } 50% { opacity: 1; } }
+@keyframes mist-drift { from { transform: translate3d(-6%, 1%, 0); opacity: .5; } to { transform: translate3d(8%, -2%, 0); opacity: 1; } }
+@keyframes ember-rise { 0%,100% { opacity: 0; transform: translateY(6px) scale(.5); } 25% { opacity: .9; } 75% { opacity: .7; } 100% { transform: translateY(-35px) scale(1.15); } }
+@keyframes danger-sweep { from { transform: rotate(-12deg); } to { transform: rotate(16deg); } }
+@keyframes core-breathe { 0%,100% { opacity: .82; } 50% { opacity: 1; } }
+@keyframes surface-sweep { 0%,100% { opacity: .2; } 50% { opacity: 1; } }
+@media (max-width: 900px) { .hero-art { width: min(58vw, 680px); } .chapter-status { align-items: flex-start; flex-wrap: wrap; } .chapter-status-text { flex-basis: calc(100% - 65px); } .chapter-step-controls { margin-left: auto; } }
+@media (max-width: 680px) {
+  .hero { padding-bottom: 48px; }
+  .hero-art { align-self: center; width: min(110%, 530px); margin: 22px 0 5px; }
+  .art-caption { bottom: -5px; }
+  .chapter-status { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 5px 10px; }
+  .chapter-status-text { grid-column: 2; }
+  .chapter-step-controls { grid-column: 2; margin-left: 0; justify-self: end; }
+  .ambient-world span { width: 150vw; height: 150vw; }
+}
+@media (prefers-reduced-motion: reduce) { .ambient-world:before, .ambient-world span, .hero-landscape, .hero-radiance, .hero-mist, .hero-embers, .hero-embers i, .overview-danger-ray, .chapter-art *, .chapter-scene:after { animation: none !important; } }
