@@ -1,0 +1,49 @@
+.badge-people { color: #a6b9b3; font-size: 12px; line-height: 1.5; }
+.rank-social { margin-top: 9px; max-width: 540px; display: grid; gap: 5px; }
+.rank-social-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.rank-social-open { display: flex; align-items: center; gap: 12px; width: fit-content; max-width: 100%; padding: 3px 0; border: 0; background: transparent; color: #d8c497; font-size: 12px; text-align: left; }
+.rank-social-open:hover { color: #ffe3ab; }
+.rank-social-reactions { display: flex; flex-wrap: wrap; gap: 8px; color: #d7d9ce; }
+.social-preview { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow-wrap: anywhere; width: fit-content; max-width: 100%; padding: 0; border: 0; background: transparent; color: #aab7af; font-size: 12px; line-height: 1.5; text-align: left; }
+.social-preview b { color: #d3be91; font-size: 11px; }
+.social-preview small { color: #d7c9a8; white-space: nowrap; }
+.social-dialog { width: min(94vw, 620px); max-height: min(90vh, 900px); padding: clamp(18px, 3vw, 30px); }
+.social-dialog .eyebrow { margin-bottom: 8px; }
+.social-dialog h2 { margin-bottom: 2px; }
+.social-section-label { margin: 22px 0 8px; color: #d6c39d; font-weight: 700; }
+.social-reaction-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+.social-reaction-summary { display: flex; flex-wrap: wrap; gap: 10px; color: #c1cfc3; font-size: 13px; }
+.social-reactions { display: grid; gap: 12px; margin-top: 12px; padding: 14px; border: 1px solid #485852; border-radius: 7px; background: #101a1e; }
+.social-reaction-group > span { display: block; margin-bottom: 6px; color: #b9c3b9; font-size: 12px; }
+.social-reaction-group > div { display: flex; flex-wrap: wrap; gap: 7px; }
+.social-my-reaction, .social-reaction-hint { margin: 7px 0 0; color: #a9b6ac; font-size: 12px; }
+.social-reactions button, .social-reaction-bar button, .social-sort button, .social-pages button, .social-comment-actions button { border: 1px solid #485852; border-radius: 5px; background: #192622; color: #e0e4da; padding: 5px 10px; font-size: 12px; }
+.social-reactions button { min-width: 58px; font-size: 17px; }
+.social-reactions button span { font-size: 12px; }
+.social-reactions button[aria-pressed="true"], .social-sort button[aria-pressed="true"], .social-comment-actions button[aria-pressed="true"] { color: #f4d998; border-color: #d4b778; background: #3b3425; }
+.social-dialog button:disabled { opacity: .45; cursor: default; }
+.social-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 26px 0 10px; }
+.social-sort, .social-pages, .social-comment-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.social-status { display: block; color: #e9c991; font-size: 12px; }
+.social-status:empty { display: none; }
+.social-list { list-style: none; margin: 0; padding: 0; }
+.social-comment { padding: 14px 0; border-top: 1px solid #ffffff15; }
+.social-comment.is-hidden { opacity: .7; }
+.social-comment-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.social-comment-head small { color: #97a39e; }
+.social-comment p { margin: 6px 0 9px; color: #e4e8df; overflow-wrap: anywhere; white-space: pre-wrap; }
+.social-comment-actions button { padding: 3px 8px; background: transparent; }
+.social-empty { padding: 20px 0; color: #99a9a0; }
+.social-pages { justify-content: flex-end; margin: 12px 0 20px; color: #abb8ae; font-size: 12px; }
+.social-dialog form { display: grid; gap: 8px; border-top: 1px solid #ffffff18; padding-top: 18px; }
+.social-dialog form label { font-weight: 700; color: #d9cfb8; }
+.social-dialog textarea { width: 100%; resize: vertical; min-height: 66px; padding: 10px; color: #f0eee6; background: #101920; border: 1px solid #46534e; border-radius: 4px; }
+.social-dialog form p { margin: 0; }
+.social-form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.social-dialog form .btn { min-height: 38px; }
+@media (max-width: 680px) {
+  .rank-social { max-width: 100%; }
+  .social-dialog { width: calc(100vw - 24px); max-height: 90vh; padding: 18px; }
+  .social-reaction-group > div { gap: 6px; }
+  .social-reactions button { min-width: 50px; }
+}

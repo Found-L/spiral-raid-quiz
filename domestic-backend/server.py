@@ -17,6 +17,9 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit
 
+import badge_metrics
+import social
+
 ROOT = Path(__file__).resolve().parent
 BANK = json.loads((ROOT / 'questions.json').read_text(encoding='utf-8'))
 QUESTIONS = BANK['questions']
@@ -142,6 +145,9 @@ def initialize():
             CREATE INDEX IF NOT EXISTS attempts_participant_time ON attempts(participant_id, submitted_at, id);
             CREATE INDEX IF NOT EXISTS attempt_timings_elapsed ON attempt_timings(elapsed_seconds);
         ''')
+        social.initialize(db)
+        badge_metrics.record_current(db, honor_boards)
+        badge_metrics.invalidate()
 
 
 def credentials(body):
@@ -263,7 +269,9 @@ def submit(db, body):
                 db.execute('INSERT INTO attempt_mistake_badges VALUES (?, ?)', (attempt_id, badge_id))
         triggered = {row['badge_id'] for row in db.execute(
             'SELECT badge_id FROM attempt_mistake_badges WHERE attempt_id = ?', (attempt_id,))}
+        badge_metrics.record_current(db, honor_boards)
         db.execute('COMMIT')
+        badge_metrics.invalidate()
         return {'ok': True, **result, 'submittedAt': now, 'elapsedSeconds': elapsed,
                 'triggeredBadges': [badge for badge in BADGES if badge['id'] in triggered]}
     except Exception:
@@ -423,7 +431,7 @@ def honor_page(db, badge_id, page=1, page_size=20):
 
 
 def honor_history_page(db, badge_id, page=1, page_size=20):
-    """Reconstruct record holders from surviving completion times, without writing history."""
+    """Combine inferred historical holders with recorded holder events."""
     category = next((item for item in HONOR_CATEGORIES if item[0] == badge_id), None)
     if not category:
         raise ApiError('趣味榜类型无效。')
@@ -470,6 +478,13 @@ def honor_history_page(db, badge_id, page=1, page_size=20):
         for participant in changed:
             if values[participant] == record:
                 achieved.setdefault(participant, (completed_at, values[participant]))
+    for event in db.execute('''SELECT e.participant_id, e.achieved_at, p.nickname, n.number
+                               FROM badge_record_events e JOIN participants p ON p.id=e.participant_id
+                               LEFT JOIN participant_numbers n ON n.participant_id=e.participant_id
+                               WHERE e.badge_id=?''', (badge_id,)):
+        participant = event['participant_id']
+        metadata.setdefault(participant, (event['nickname'], event['number']))
+        achieved.setdefault(participant, (event['achieved_at'], None))
     ordered = sorted(achieved, key=lambda participant: (achieved[participant][0],
                      metadata[participant][1] if metadata[participant][1] is not None else float('inf'), participant))
     total = len(ordered)
@@ -480,7 +495,8 @@ def honor_history_page(db, badge_id, page=1, page_size=20):
         nickname, number = metadata[participant]
         when, value = achieved[participant]
         entries.append({'nickname': nickname, 'playerNumber': number, 'value': value,
-                        'achievedAt': when, 'current': values.get(participant) == record})
+                        'achievedAt': when, 'recordedOnly': value is None,
+                        'current': record is not None and values.get(participant) == record})
     return {'badge': BADGE_BY_ID[badge_id], 'entries': entries,
             'valueType': 'time' if direction == 'asc' else 'count',
             'holderCount': sum(value == record for value in values.values()) if record is not None else 0,
@@ -526,9 +542,9 @@ def badge_states(db, participant_ids):
     return states, fastest
 
 
-def badge_catalog(state, fastest):
+def badge_catalog(state, fastest, counts):
     return {'badges': [{**badge, 'earned': badge['id'] in state['earned'],
-                        'selected': badge['id'] in state['selected']} for badge in BADGES],
+                        'selected': badge['id'] in state['selected'], 'stats': counts[badge['id']]} for badge in BADGES],
             'selected': state['selected'], 'fastestSeconds': fastest, 'maxShown': MAX_SHOWN_BADGES}
 
 
@@ -536,7 +552,8 @@ def badges(db, body):
     device, secret_hash = credentials(body)
     authenticated(db, device, secret_hash, '请保存昵称，或恢复原来的身份后查看勋章。')
     states, fastest = badge_states(db, [device])
-    return badge_catalog(states[device], fastest)
+    counts = badge_metrics.counts(db, BADGES, MISTAKE_RULES, badge_states, honor_boards, HONOR_CATEGORIES)
+    return badge_catalog(states[device], fastest, counts)
 
 
 def select_badges(db, body):
@@ -557,11 +574,12 @@ def select_badges(db, body):
                       updated_at=excluded.updated_at''',
                    (device, json.dumps(selected, ensure_ascii=False), int(time.time() * 1000)))
         db.execute('COMMIT')
-        states[device]['selected'] = selected
-        return {'ok': True, **badge_catalog(states[device], fastest)}
     except Exception:
         db.execute('ROLLBACK')
         raise
+    states[device]['selected'] = selected
+    counts = badge_metrics.counts(db, BADGES, MISTAKE_RULES, badge_states, honor_boards, HONOR_CATEGORIES)
+    return {'ok': True, **badge_catalog(states[device], fastest, counts)}
 
 
 def leaderboard(db, requested_version=None, latest=False, page=1, page_size=100):
@@ -606,11 +624,13 @@ def leaderboard(db, requested_version=None, latest=False, page=1, page_size=100)
         db.execute('ROLLBACK')
         raise
     states, _ = badge_states(db, [row['participant_id'] for row in rows])
+    interactions = social.summaries(db, [row['participant_id'] for row in rows])
     entries = [{'rank': offset + index + 1, 'playerNumber': row['number'], 'nickname': row['nickname'],
                 'correctCount': row['correct_count'], 'totalCount': row['total_count'],
                 'quizVersion': row['quiz_version'], 'elapsedSeconds': row['elapsed_seconds'],
                 'submittedAt': row['submitted_at'], 'score': score(row['correct_count'], row['total_count']),
-                'badges': [BADGE_BY_ID[item] for item in states[row['participant_id']]['selected']]}
+                'badges': [BADGE_BY_ID[item] for item in states[row['participant_id']]['selected']],
+                'social': interactions[row['participant_id']]}
                for index, row in enumerate(rows)]
     return {'version': selected_version or VERSION, 'view': 'latest' if latest else 'version', 'entries': entries,
             'page': page, 'pageSize': page_size, 'total': total, 'pages': pages}
@@ -646,7 +666,9 @@ def delete_profile(db, body):
         authenticated(db, device, secret_hash, '浏览器身份不匹配。')
         db.execute('DELETE FROM attempts WHERE participant_id = ?', (device,))
         db.execute('DELETE FROM participants WHERE id = ?', (device,))
+        badge_metrics.record_current(db, honor_boards)
         db.execute('COMMIT')
+        badge_metrics.invalidate()
         return {'ok': True}
     except Exception:
         db.execute('ROLLBACK')
@@ -742,7 +764,10 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         routes = {'/api/profile': profile, '/api/submit': submit, '/api/badges': badges,
                   '/api/badges/select': select_badges,
-                  '/api/history': history, '/api/delete-profile': delete_profile}
+                  '/api/history': history, '/api/delete-profile': delete_profile,
+                  '/api/social/view': social.view}
+        routes.update({f'/api/social/{name}': (lambda db, body, name=name: social.mutate(db, body, name))
+                       for name in ('reaction', 'comment', 'like', 'delete', 'hide')})
         action = routes.get(urlsplit(self.path).path)
         if not action:
             return self.respond(404, {'error': '页面不存在。'})
@@ -760,7 +785,7 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(200, result)
         except (json.JSONDecodeError, UnicodeDecodeError):
             self.respond(400, {'error': '请求格式不正确。'})
-        except ApiError as error:
+        except (ApiError, social.SocialError) as error:
             self.respond(error.status, {'error': str(error)})
         except (BrokenPipeError, ConnectionResetError):
             return

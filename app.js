@@ -522,11 +522,13 @@
   function rankingRow(entry) {
     const row=document.createElement('div'); row.className='ranking-row';
     row.dataset.rank = String(entry.rank);
+    row.dataset.playerKey = String(entry.playerNumber ?? `rank-${entry.rank}`);
+    row.dataset.signature = JSON.stringify(entry);
     const number = formatPlayerNumber(entry.playerNumber);
     const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
     const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
     const badgeList = shownBadges.length ? `<div class="rank-badges" aria-label="展示的勋章">${shownBadges.map(badgeChip).join('')}</div>` : '';
-    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><div class="ranking-stats"><span class="ranking-stat"><small>用时</small><b>${formatDuration(entry.elapsedSeconds)}</b></span><span class="ranking-stat"><small>最高分</small><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong></span></div>`;
+    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}${socialUI.summary(entry)}</div></div><div class="ranking-stats"><span class="ranking-stat"><small>用时</small><b>${formatDuration(entry.elapsedSeconds)}</b></span><span class="ranking-stat"><small>最高分</small><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong></span></div>`;
     return row;
   }
   async function refreshHonors() {
@@ -536,6 +538,9 @@
       const data = await request('/api/honors');
       if (requestId !== honorRequest) return;
       const boards = Array.isArray(data.boards) ? data.boards : [];
+      const signature = JSON.stringify(boards);
+      if (container.dataset.signature === signature) return;
+      container.dataset.signature = signature;
       if (!boards.length) { container.innerHTML = '<p class="empty-state">暂无趣味榜数据。</p>'; return; }
       container.innerHTML = boards.map(board => {
         const badge = board.badge;
@@ -546,7 +551,10 @@
         return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders"><span>${entries.length ? holders : '等待首位上榜玩家'}</span>${more}</div></article>`;
       }).join('');
     } catch (error) {
-      if (requestId === honorRequest) container.innerHTML = `<p class="empty-state">${escape(error.message)} 点击刷新榜单可重试。</p>`;
+      if (requestId === honorRequest) {
+        if (container.querySelector('.honor-card')) toast('趣味榜暂未刷新，请稍后重试。');
+        else { delete container.dataset.signature; container.innerHTML = `<p class="empty-state">${escape(error.message)} 点击刷新榜单可重试。</p>`; }
+      }
     }
   }
   async function loadHonorDetail(page = 1) {
@@ -568,11 +576,11 @@
         : `共 ${data.total} 人上榜 · ${data.holderCount} 人并列榜首；同成绩按达到时间先后排列`;
       $('honor-detail-list').innerHTML = data.entries.length ? data.entries.map(entry => {
         const number = formatPlayerNumber(entry.playerNumber);
-        const value = data.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`;
+        const value = entry.recordedOnly ? '纪录已留档' : data.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`;
         const rank = mode === 'current' ? `<span class="honor-detail-rank">${entry.rank}</span>` : '';
         const status = mode === 'history' ? `<small class="${entry.current ? 'is-current' : ''}">${entry.current ? '当前持有' : '曾经获得'}</small>` : '';
-        const time = mode === 'history' ? `<span class="honor-achieved">${new Date(entry.achievedAt).toLocaleDateString('zh-CN')} 首次达成</span>` : '';
-        return `<li>${rank}<span class="honor-detail-person"><strong>${escape(entry.nickname)}</strong><small>${escape(number)}</small></span>${status}<span class="honor-detail-value"><strong>${mode === 'history' ? '当时 ' : ''}${escape(value)}</strong>${time}</span></li>`;
+        const time = mode === 'history' ? `<span class="honor-achieved">${new Date(entry.achievedAt).toLocaleDateString('zh-CN')} ${entry.recordedOnly ? '记录时间' : '首次达成'}</span>` : '';
+        return `<li>${rank}<span class="honor-detail-person"><strong>${escape(entry.nickname)}</strong><small>${escape(number)}</small></span>${status}<span class="honor-detail-value"><strong>${mode === 'history' && !entry.recordedOnly ? '当时 ' : ''}${escape(value)}</strong>${time}</span></li>`;
       }).join('') : '<li class="honor-detail-empty">暂无符合条件的记录。</li>';
       $('honor-detail-page').textContent = `第 ${honorDetailPage} / ${honorDetailPages} 页`;
       $('honor-detail-prev').disabled = honorDetailPage <= 1;
@@ -597,13 +605,19 @@
   async function refreshRanking(page = rankingPage) {
     const requestId = ++rankingRequest;
     void refreshHonors();
-    $('ranking-pagination').hidden = true;
-    const list=$('ranking-list'); list.replaceChildren(); const loading=document.createElement('p'); loading.className='empty-state'; loading.textContent='正在读取榜单…'; list.append(loading);
+    const list=$('ranking-list');
+    const hadRows = Boolean(list.querySelector('.ranking-row'));
+    list.setAttribute('aria-busy', 'true');
+    if (!hadRows) list.innerHTML = '<p class="empty-state">正在读取榜单…</p>';
     try {
       const data=await request(`/api/leaderboard?view=latest&page=${page}&pageSize=20`);
       if (requestId !== rankingRequest) return;
-      list.replaceChildren();
-      if(!data.entries?.length){loading.textContent='还没有成绩，来做第一个上榜的人。';list.append(loading);return;}
+      if (!Array.isArray(data.entries)) throw new TypeError('榜单返回的数据无法识别。');
+      if (!data.entries.length) {
+        list.innerHTML = '<p class="empty-state">还没有成绩，来做第一个上榜的人。</p>';
+        $('ranking-pagination').hidden = true;
+        return;
+      }
       rankingPage = Number.isSafeInteger(data.page) ? data.page : 1;
       rankingPages = Number.isSafeInteger(data.pages) ? data.pages : 1;
       $('ranking-page-status').textContent = `共 ${data.total ?? data.entries.length} 人 · 第 ${rankingPage} / ${rankingPages} 页`;
@@ -612,12 +626,29 @@
       $('ranking-page-input').value = String(rankingPage);
       $('ranking-page-input').max = String(rankingPages);
       $('ranking-pagination').hidden = rankingPages <= 1;
-      for(const entry of data.entries) list.append(rankingRow(entry));
+      const existing = new Map([...list.querySelectorAll('.ranking-row')].map(row => [row.dataset.playerKey, row]));
+      for (const [index, entry] of data.entries.entries()) {
+        const key = String(entry.playerNumber ?? `rank-${entry.rank}`);
+        let row = existing.get(key);
+        existing.delete(key);
+        if (!row) row = rankingRow(entry);
+        else if (row.dataset.signature !== JSON.stringify(entry)) {
+          const updated = rankingRow(entry);
+          row.innerHTML = updated.innerHTML;
+          row.dataset.rank = updated.dataset.rank;
+          row.dataset.signature = updated.dataset.signature;
+        }
+        if (list.children[index] !== row) list.insertBefore(row, list.children[index] || null);
+      }
+      for (const row of existing.values()) row.remove();
+      for (const placeholder of list.querySelectorAll('.empty-state')) placeholder.remove();
     } catch(err){
       if(requestId !== rankingRequest) return;
-      loading.textContent=err.message+' 可以稍后点击刷新。';
-      list.replaceChildren(loading);
+      if (list.querySelector('.ranking-row')) toast(`${err.message} 榜单保留上次内容。`);
+      else { const message=document.createElement('p'); message.className='empty-state'; message.textContent=err.message+' 可以稍后点击刷新。'; list.replaceChildren(message); }
       if(err.unavailable) setConnectionUnavailable(true);
+    } finally {
+      if (requestId === rankingRequest) list.setAttribute('aria-busy', 'false');
     }
   }
   $('ranking-page-form').addEventListener('submit', event => {
@@ -743,7 +774,9 @@
         button.disabled = !badge.earned;
         button.setAttribute('aria-pressed', String(selected));
         const state = badge.earned ? (selected ? '✓ 展示中' : '＋ 已获得 · 可展示') : '未获得';
-        button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span></span>`;
+        const stats = badge.stats || {};
+        const count = stats.masked ? '少于 3 人' : Number.isSafeInteger(stats.historyCount) ? `历史推算 ${stats.historyCount} 人 · 当前 ${stats.currentCount} 人` : Number.isSafeInteger(stats.count) ? `${stats.count} 人获得` : '人数暂不可用';
+        button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span><span class="badge-people">${escape(count)}</span></span>`;
         button.dataset.signature = signature;
       }
       if (grid.children[index] !== button) grid.insertBefore(button, grid.children[index] || null);
@@ -1184,7 +1217,7 @@
     if (candidate.deviceId !== identity.deviceId) $('profile-player-number').hidden = true;
   }
   async function deleteProfile() {
-    if(!profile || !confirm('确认删除你的线上资料和全部成绩？删除后无法恢复。'))return;
+    if(!profile || !confirm('确认删除你的线上资料、成绩和相关互动？删除后无法恢复。'))return;
     try {
       await request('/api/delete-profile',identity);
       if(view==='exam') setView('home');
@@ -1199,6 +1232,9 @@
     }
     catch(err){$('profile-error').textContent=err.message;}
   }
+  const socialUI = typeof createSocialUI === 'function'
+    ? createSocialUI({request, getProfile:() => profile, getIdentity:() => identity, activeIdentity, showProfile, refreshRanking, escape, formatPlayerNumber})
+    : {summary:() => ''};
   const featureActions = new Map([
     ['open-badges', () => openBadges()],
     ['close-badges', () => closeBadges()],
