@@ -22,10 +22,11 @@
 .social-reactions button span { font-size: 12px; }
 .social-reactions button[aria-pressed="true"], .social-sort button[aria-pressed="true"], .social-comment-actions button[aria-pressed="true"] { color: #f4d998; border-color: #d4b778; background: #3b3425; }
 .social-dialog button:disabled { opacity: .45; cursor: default; }
+.social-dialog[aria-busy="true"] button:disabled { opacity: .85; }
+.social-dialog textarea:disabled { opacity: .9; }
 .social-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 26px 0 10px; }
 .social-sort, .social-pages, .social-comment-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-.social-status { display: block; color: #e9c991; font-size: 12px; }
-.social-status:empty { display: none; }
+.social-status { display: block; min-height: 1.7em; color: #e9c991; font-size: 12px; }
 .social-list { list-style: none; margin: 0; padding: 0; }
 .social-comment { padding: 14px 0; border-top: 1px solid #ffffff15; }
 .social-comment.is-hidden { opacity: .7; }

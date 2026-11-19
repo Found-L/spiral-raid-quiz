@@ -548,7 +548,8 @@
         const rows = entries.map(entry => `<li><span class="honor-rank">${entry.rank}</span><span class="honor-player"><b>${escape(entry.nickname)}</b><small>${formatPlayerNumber(entry.playerNumber)}</small></span><strong>${board.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`}</strong></li>`).join('');
         const holders = board.holderCount > 1 ? `${board.holderCount} 人并列第一` : '榜首可获得勋章';
         const more = entries.length ? `<button type="button" data-action="honor-show" data-badge="${escape(badge.id)}">查看全部 <span aria-hidden="true">→</span></button>` : '';
-        return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders"><span>${entries.length ? holders : '等待首位上榜玩家'}</span>${more}</div></article>`;
+        const share = entries.length ? `<button type="button" data-action="share-honor" data-badge="${escape(badge.id)}">分享我的名次</button>` : '';
+        return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders"><span>${entries.length ? holders : '等待首位上榜玩家'}</span><div class="honor-actions">${more}${share}</div></div></article>`;
       }).join('');
     } catch (error) {
       if (requestId === honorRequest) {
@@ -756,15 +757,17 @@
   }
   function renderBadges() {
     const grid = $('badges-grid');
-    const existing = new Map([...grid.children].map(button => [button.dataset.badge, button]));
+    const existing = new Map([...grid.children].map(shell => [shell.dataset.badge, shell]));
     const earned = badgeData.badges.filter(badge => badge.earned).length;
     const fastest = Number.isSafeInteger(badgeData.fastestSeconds) ? formatDuration(badgeData.fastestSeconds) : '暂无';
     $('badges-status').textContent = `已获得 ${earned} / ${badgeData.badges.length} 枚 · 已选 ${selectedBadges.length} / ${badgeData.maxShown} 枚 · 全站最快 ${fastest}${badgesDirty ? ' · 更改后请保存' : ''}`;
     $('badges-save').textContent = `保存展示（${selectedBadges.length}/${badgeData.maxShown}）`;
     badgeData.badges.forEach((badge, index) => {
       const selected = selectedBadges.includes(badge.id);
-      const button = existing.get(badge.id) || document.createElement('button');
+      const shell = existing.get(badge.id) || document.createElement('div');
       existing.delete(badge.id);
+      shell.className = 'badge-shell'; shell.dataset.badge = badge.id;
+      const button = shell.querySelector('.badge-card') || document.createElement('button');
       button.type = 'button';
       button.dataset.action = 'toggle-badge';
       button.dataset.badge = badge.id;
@@ -779,7 +782,15 @@
         button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span><span class="badge-people">${escape(count)}</span></span>`;
         button.dataset.signature = signature;
       }
-      if (grid.children[index] !== button) grid.insertBefore(button, grid.children[index] || null);
+      if (!button.parentElement) shell.append(button);
+      let share = shell.querySelector('.badge-share');
+      if (badge.earned && !share) {
+        share = document.createElement('button'); share.type = 'button'; share.className = 'badge-share';
+        share.dataset.action = 'share-badge'; share.dataset.badge = badge.id;
+        share.textContent = '分享'; share.setAttribute('aria-label', `分享${badge.name}勋章`);
+        shell.append(share);
+      } else if (!badge.earned && share) share.remove();
+      if (grid.children[index] !== shell) grid.insertBefore(shell, grid.children[index] || null);
     });
     for (const button of existing.values()) button.remove();
   }
@@ -1238,6 +1249,9 @@
   const socialUI = typeof createSocialUI === 'function'
     ? createSocialUI({request, getProfile:() => profile, getIdentity:() => identity, activeIdentity, showProfile, refreshRanking, escape, formatPlayerNumber})
     : {summary:() => ''};
+  const shareUI = typeof createShareUI === 'function'
+    ? createShareUI({request, getProfile:() => profile, getIdentity:() => identity, activeIdentity, showProfile, toast, formatDuration, formatPlayerNumber})
+    : {start:() => {}, openFromUrl:() => {}};
   const featureActions = new Map([
     ['open-badges', () => openBadges()],
     ['close-badges', () => closeBadges()],
@@ -1245,6 +1259,9 @@
     ['reload-badges', () => { void loadBadges(); }],
     ['toggle-badge', target => toggleBadge(target.dataset.badge)],
     ['save-badges', () => { void saveBadges(); }],
+    ['share-badge', target => { void shareUI.start('badge', target.dataset.badge); }],
+    ['share-ranking', () => { void shareUI.start('ranking'); }],
+    ['share-honor', target => { void shareUI.start('honor', target.dataset.badge); }],
     ['honor-show', target => showHonorDetail(target.dataset.badge)],
     ['close-honor-detail', () => { ++honorDetailRequest; $('honor-dialog').close(); }],
     ['honor-mode', target => {
@@ -1326,6 +1343,7 @@
   if (document.querySelectorAll) initializeSequences(document);
   readGuideHash();
   $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); initializeTransfer(); void refreshRanking();
+  void shareUI.openFromUrl();
   if (profile?.localOnly) setConnectionUnavailable(true);
   if(nextPendingAttempt() && profile) uploadPending();
 })();

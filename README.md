@@ -16,6 +16,8 @@ GitHub 入口：<https://found-l.github.io/spiral-raid-quiz/>
 
 排行榜每位玩家的互动区显示收到最多的表情和一条热评；没有获赞评价时显示最新评价。点互动区可以查看全部公开评价、贴表情、写评价和点赞。表情包含鼓励、吐槽和恶搞，点击“添加表情”后选择，再次选择已贴的表情可取消。保存昵称后即可参与，无须自己上榜；每个身份对同一玩家可选择一个表情、写一条评价，评价可修改或删除，修改内容会清空原有点赞。被评价人可隐藏或恢复自己的页面上的评价。互动不影响成绩和排名，删除线上资料会同时删除与该身份有关的互动。身份保存在浏览器中，一个人使用多个身份可能重复计数。
 
+在“我的勋章”中可分享已获得的单枚勋章，在综合榜和各趣味榜可分享自己的名次。分享弹窗提供图片下载和链接复制；支持图片分享的设备还可直接调用系统分享。朋友打开链接会看到同一张卡片。卡片保存分享时的记录，之后成绩、排名和勋章可能变化；删除线上资料会使相关分享链接失效。分享链接不包含身份码。
+
 成绩榜下方设有全站趣味榜：快枪手、寺院劳模、满分制造机和满分速通王，每榜展示前 5 人。各榜首可获得相应的纪录勋章，所有并列第一者都获奖；纪录变化时勋章随之易主。统计包含已上传的新旧题库，缺少用时的答卷不参加计时榜。
 
 题目依据螺旋寺院在巅峰服上线后的实战资料和提供的魔女试卷编写。题目直接描述阶段、机制和操作；涉及团队分工时，按题干中的团队安排作答。实战请以当前版本和团长安排为准。图为分工示意。
@@ -35,7 +37,7 @@ GitHub 入口：<https://found-l.github.io/spiral-raid-quiz/>
 ## 项目结构
 
 - `index.html` 是包含样式、脚本、题库和插图的独立网页，部署在 GitHub Pages 和国内服务器。
-- `template.html`、`style.css`、`detail.css`、`social.css`、`app.js`、`social-ui.js`、`badge-art.js`、`guide.js`、`sequences.js`、`diagrams.js` 和 `questions.json` 是网页源码。修改题库时先运行 `python build_questions.py`，再运行 `python build_page.py` 生成网页并同步国内服务题库。
+- `template.html`、`style.css`、`detail.css`、`social.css`、`share.css`、`app.js`、`social-ui.js`、`share-ui.js`、`badge-art.js`、`guide.js`、`sequences.js`、`diagrams.js` 和 `questions.json` 是网页源码。修改题库时先运行 `python build_questions.py`，再运行 `python build_page.py` 生成网页并同步国内服务题库。
 - `domestic-backend/` 是国内共享计分与排行榜服务；两个入口使用同一份 SQLite 数据库。`banks/` 保留旧版题库，以接收旧版页面或离线待上传的成绩。旧的 Sites 接口负责兼容旧版网页。
 - `backend-source/` 是 Sites 兼容接口的源码快照，旧接口转发到国内成绩服务。
 

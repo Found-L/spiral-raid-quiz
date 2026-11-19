@@ -1,0 +1,26 @@
+.badge-shell { position: relative; min-width: 0; }
+.badge-shell > .badge-card { width: 100%; height: 100%; }
+.badge-shell > .badge-card.earned { padding-bottom: 55px; }
+.badge-shell > .badge-card.selected { padding-bottom: 54px; }
+.badge-share { position: absolute; right: 13px; bottom: 12px; padding: 6px 10px; border: 1px solid #c3a87380; border-radius: 5px; color: #f0d7a5; background: #19242b; font-size: 12px; font-weight: 700; }
+.badge-share:hover, .badge-share:focus-visible { color: #fff2d2; border-color: #e7c891; }
+.honor-holders .honor-actions { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+.share-dialog { width: min(580px, calc(100vw - 28px)); max-height: min(92vh, 1000px); overflow: auto; }
+.share-dialog h2 { margin: 0; }
+.share-dialog .eyebrow { margin-bottom: 7px; }
+.share-status { display: block; color: #e5c68c; font-size: 13px; min-height: 1.4em; margin-top: 8px; }
+.share-note { margin: 3px 0 14px; color: #aebdb8; font-size: 12px; line-height: 1.6; }
+#share-poster { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; border: 1px solid #8e7959; border-radius: 6px; background: #101920; box-shadow: 0 12px 40px #0007; }
+.share-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+.share-actions .btn { flex: 1 1 120px; min-height: 42px; gap: 8px; }
+.share-link-label { display: block; margin: 15px 0 6px; color: #c6d0c8; font-size: 12px; }
+input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px solid #40514f; border-radius: 4px; background: #0b141b; color: #e4d7bd; font-size: 12px; }
+.social-confirm-dialog { width: min(430px, calc(100vw - 28px)); }
+.social-confirm-dialog h2 { margin: 0; font-size: 21px; }
+.social-confirm-dialog p { line-height: 1.7; }
+@media (max-width: 560px) {
+  .share-dialog { padding: 18px; }
+  .share-dialog .eyebrow { font-size: 9px; letter-spacing: .1em; }
+  #share-poster { max-width: 300px; }
+  .share-actions .btn { flex-basis: 45%; }
+}
