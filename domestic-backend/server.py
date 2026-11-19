@@ -9,6 +9,7 @@ import logging
 import math
 import os
 import re
+import secrets
 import sqlite3
 import time
 import unicodedata
@@ -146,6 +147,14 @@ def initialize():
             CREATE INDEX IF NOT EXISTS attempt_timings_elapsed ON attempt_timings(elapsed_seconds);
         ''')
         social.initialize(db)
+        db.executescript('''
+            CREATE TABLE IF NOT EXISTS share_cards (
+                id TEXT PRIMARY KEY,
+                participant_id TEXT NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+                snapshot TEXT NOT NULL, created_at INTEGER NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS share_cards_owner ON share_cards(participant_id);
+        ''')
         badge_metrics.record_current(db, honor_boards)
         badge_metrics.invalidate()
 
@@ -582,6 +591,30 @@ def select_badges(db, body):
     return {'ok': True, **badge_catalog(states[device], fastest, counts)}
 
 
+def ranked_leaderboard_rows(db, selected_version, limit, offset=0, participant_id=None):
+    """Use one ordering for public pages and an individual player's share card."""
+    order = sorted((version for version in BANKS if version != VERSION), key=version_order) + [VERSION]
+    priorities = {version: index for index, version in enumerate(order)}
+    db.create_function('quiz_version_rank', 1, lambda version: priorities.get(version, -1), deterministic=True)
+    return db.execute('''WITH ranked AS (
+            SELECT a.participant_id, a.quiz_version, a.correct_count, a.total_count, a.submitted_at, t.elapsed_seconds,
+              ROW_NUMBER() OVER (PARTITION BY a.participant_id
+                ORDER BY quiz_version_rank(a.quiz_version) DESC, ROUND(10000.0 * a.correct_count / a.total_count) DESC,
+                  (t.elapsed_seconds IS NULL), t.elapsed_seconds ASC, a.submitted_at ASC, a.id ASC) AS rn
+            FROM attempts a LEFT JOIN attempt_timings t ON t.attempt_id = a.id
+            WHERE (? IS NULL OR a.quiz_version = ?)
+        ), numbered AS (
+            SELECT p.id AS participant_id, n.number, p.nickname, r.quiz_version, r.correct_count,
+              r.total_count, r.submitted_at, r.elapsed_seconds,
+              ROW_NUMBER() OVER (ORDER BY ROUND(10000.0 * r.correct_count / r.total_count) DESC,
+                (r.elapsed_seconds IS NULL), r.elapsed_seconds ASC, r.submitted_at ASC, p.id ASC) AS position
+            FROM ranked r JOIN participants p ON p.id = r.participant_id
+            LEFT JOIN participant_numbers n ON n.participant_id = p.id WHERE r.rn = 1
+        ) SELECT * FROM numbered WHERE (? IS NULL OR participant_id = ?)
+          ORDER BY position LIMIT ? OFFSET ?''',
+        (selected_version, selected_version, participant_id, participant_id, limit, offset)).fetchall()
+
+
 def leaderboard(db, requested_version=None, latest=False, page=1, page_size=100):
     selected_version = VERSION if requested_version is None and not latest else requested_version
     if selected_version is not None and selected_version not in BANKS:
@@ -589,9 +622,6 @@ def leaderboard(db, requested_version=None, latest=False, page=1, page_size=100)
     if (not isinstance(page, int) or isinstance(page, bool) or page < 1 or
             not isinstance(page_size, int) or isinstance(page_size, bool) or not 1 <= page_size <= 100):
         raise ApiError('榜单页码无效。')
-    order = sorted((version for version in BANKS if version != VERSION), key=version_order) + [VERSION]
-    priorities = {version: index for index, version in enumerate(order)}
-    db.create_function('quiz_version_rank', 1, lambda version: priorities.get(version, -1), deterministic=True)
     db.execute('BEGIN IMMEDIATE')
     try:
         # Older profiles can have scores but no public number.
@@ -606,34 +636,101 @@ def leaderboard(db, requested_version=None, latest=False, page=1, page_size=100)
         pages = max(1, (total + page_size - 1) // page_size)
         page = min(page, pages)
         offset = (page - 1) * page_size
-        rows = db.execute('''WITH ranked AS (
-                SELECT a.participant_id, a.quiz_version, a.correct_count, a.total_count, a.submitted_at, t.elapsed_seconds,
-                  ROW_NUMBER() OVER (PARTITION BY a.participant_id
-                    ORDER BY quiz_version_rank(a.quiz_version) DESC, ROUND(10000.0 * a.correct_count / a.total_count) DESC,
-                      (t.elapsed_seconds IS NULL), t.elapsed_seconds ASC, a.submitted_at ASC, a.id ASC) AS rn
-                FROM attempts a LEFT JOIN attempt_timings t ON t.attempt_id = a.id
-                WHERE (? IS NULL OR a.quiz_version = ?)
-            ) SELECT p.id AS participant_id, n.number, p.nickname, r.quiz_version, r.correct_count, r.total_count, r.submitted_at, r.elapsed_seconds
-              FROM ranked r JOIN participants p ON p.id = r.participant_id
-              LEFT JOIN participant_numbers n ON n.participant_id = p.id WHERE r.rn = 1
-              ORDER BY ROUND(10000.0 * r.correct_count / r.total_count) DESC,
-                (r.elapsed_seconds IS NULL), r.elapsed_seconds ASC, r.submitted_at ASC, p.id ASC LIMIT ? OFFSET ?''',
-                (selected_version, selected_version, page_size, offset)).fetchall()
+        rows = ranked_leaderboard_rows(db, selected_version, page_size, offset)
         db.execute('COMMIT')
     except Exception:
         db.execute('ROLLBACK')
         raise
     states, _ = badge_states(db, [row['participant_id'] for row in rows])
     interactions = social.summaries(db, [row['participant_id'] for row in rows])
-    entries = [{'rank': offset + index + 1, 'playerNumber': row['number'], 'nickname': row['nickname'],
+    entries = [{'rank': row['position'], 'playerNumber': row['number'], 'nickname': row['nickname'],
                 'correctCount': row['correct_count'], 'totalCount': row['total_count'],
                 'quizVersion': row['quiz_version'], 'elapsedSeconds': row['elapsed_seconds'],
                 'submittedAt': row['submitted_at'], 'score': score(row['correct_count'], row['total_count']),
                 'badges': [BADGE_BY_ID[item] for item in states[row['participant_id']]['selected']],
                 'social': interactions[row['participant_id']]}
-               for index, row in enumerate(rows)]
+               for row in rows]
     return {'version': selected_version or VERSION, 'view': 'latest' if latest else 'version', 'entries': entries,
             'page': page, 'pageSize': page_size, 'total': total, 'pages': pages}
+
+
+def share_badge(db, participant_id, badge_id):
+    if not isinstance(badge_id, str) or badge_id not in BADGE_BY_ID:
+        raise ApiError('勋章不存在。')
+    states, _ = badge_states(db, [participant_id])
+    if badge_id not in states[participant_id]['earned']:
+        raise ApiError('这枚勋章尚未获得，或纪录已被超越。')
+    return {'badge': BADGE_BY_ID[badge_id]}
+
+
+def share_ranking(db, participant_id):
+    rows = ranked_leaderboard_rows(db, None, 1, participant_id=participant_id)
+    if not rows:
+        raise ApiError('上传成绩后即可分享综合排名。')
+    row = rows[0]
+    total = db.execute('''SELECT COUNT(DISTINCT a.participant_id) FROM attempts a
+                          JOIN participants p ON p.id=a.participant_id''').fetchone()[0]
+    return {'rank': row['position'], 'total': total,
+            'score': score(row['correct_count'], row['total_count']),
+            'elapsedSeconds': row['elapsed_seconds'], 'quizVersion': row['quiz_version']}
+
+
+def share_honor(db, participant_id, badge_id):
+    category = next((item for item in HONOR_CATEGORIES if item[0] == badge_id), None)
+    if not category:
+        raise ApiError('趣味榜类型无效。')
+    _, metric, direction, minimum = category
+    eligible = honor_eligible(honor_statistics(db), metric, direction, minimum)
+    index = next((i for i, row in enumerate(eligible) if row['participant_id'] == participant_id), None)
+    if index is None:
+        raise ApiError('暂未进入这个趣味榜，继续练习后再来分享吧。')
+    entry = honor_entries(eligible, metric, index, 1)[0]
+    return {'badge': BADGE_BY_ID[badge_id], 'rank': entry['rank'], 'total': len(eligible),
+            'value': entry['value'], 'valueType': 'time' if direction == 'asc' else 'count'}
+
+
+def create_share(db, body):
+    device, secret_hash = credentials(body)
+    kind, badge_id = body.get('kind'), body.get('badgeId')
+    if kind not in ('badge', 'ranking', 'honor'):
+        raise ApiError('分享类型无效。')
+    db.execute('BEGIN IMMEDIATE')
+    try:
+        authenticated(db, device, secret_hash, '请保存昵称，或恢复原来的身份后分享。')
+        db.execute('''INSERT INTO participant_numbers (participant_id)
+                      SELECT id FROM participants WHERE id=? AND NOT EXISTS
+                      (SELECT 1 FROM participant_numbers WHERE participant_id=?)''', (device, device))
+        player = db.execute('''SELECT p.nickname, n.number FROM participants p JOIN participant_numbers n
+                               ON n.participant_id=p.id WHERE p.id=?''', (device,)).fetchone()
+        if kind == 'badge':
+            details = share_badge(db, device, badge_id)
+        elif kind == 'honor':
+            details = share_honor(db, device, badge_id)
+        else:
+            details = share_ranking(db, device)
+        snapshot = {'kind': kind, 'nickname': player['nickname'], 'playerNumber': player['number'], **details}
+        encoded = json.dumps(snapshot, ensure_ascii=False, sort_keys=True, separators=(',', ':'))
+        existing = db.execute('''SELECT id, created_at FROM share_cards
+                                 WHERE participant_id=? AND snapshot=? LIMIT 1''', (device, encoded)).fetchone()
+        if existing:
+            share_id, created_at = existing['id'], existing['created_at']
+        else:
+            share_id, created_at = secrets.token_hex(16), int(time.time() * 1000)
+            db.execute('INSERT INTO share_cards VALUES (?, ?, ?, ?)', (share_id, device, encoded, created_at))
+        db.execute('COMMIT')
+        return {'id': share_id, 'snapshot': {**snapshot, 'createdAt': created_at}}
+    except Exception:
+        db.execute('ROLLBACK')
+        raise
+
+
+def read_share(db, share_id):
+    if not re.fullmatch(r'[a-f0-9]{32}', share_id):
+        raise ApiError('分享链接无效或已失效。', 404)
+    row = db.execute('SELECT snapshot, created_at FROM share_cards WHERE id=?', (share_id,)).fetchone()
+    if not row:
+        raise ApiError('分享链接无效或已失效。', 404)
+    return {'id': share_id, 'snapshot': {**json.loads(row['snapshot']), 'createdAt': row['created_at']}}
 
 
 def history(db, body):
@@ -705,6 +802,16 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         url = urlsplit(self.path)
+        if url.path.startswith('/api/shares/'):
+            try:
+                with closing(database()) as db:
+                    self.respond(200, read_share(db, url.path.removeprefix('/api/shares/')))
+            except ApiError as error:
+                self.respond(error.status, {'error': str(error)})
+            except Exception:
+                logging.exception('Share request failed')
+                self.respond(503, {'error': '分享内容暂时不可用，请稍后重试。'})
+            return
         if url.path == '/api/honors':
             try:
                 params = parse_qs(url.query, keep_blank_values=True)
@@ -765,7 +872,7 @@ class Handler(BaseHTTPRequestHandler):
         routes = {'/api/profile': profile, '/api/submit': submit, '/api/badges': badges,
                   '/api/badges/select': select_badges,
                   '/api/history': history, '/api/delete-profile': delete_profile,
-                  '/api/social/view': social.view}
+                  '/api/social/view': social.view, '/api/shares': create_share}
         routes.update({f'/api/social/{name}': (lambda db, body, name=name: social.mutate(db, body, name))
                        for name in ('reaction', 'comment', 'like', 'delete', 'hide')})
         action = routes.get(urlsplit(self.path).path)

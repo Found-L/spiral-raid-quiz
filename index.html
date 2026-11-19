@@ -759,10 +759,11 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .social-reactions button span { font-size: 12px; }
 .social-reactions button[aria-pressed="true"], .social-sort button[aria-pressed="true"], .social-comment-actions button[aria-pressed="true"] { color: #f4d998; border-color: #d4b778; background: #3b3425; }
 .social-dialog button:disabled { opacity: .45; cursor: default; }
+.social-dialog[aria-busy="true"] button:disabled { opacity: .85; }
+.social-dialog textarea:disabled { opacity: .9; }
 .social-list-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 26px 0 10px; }
 .social-sort, .social-pages, .social-comment-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-.social-status { display: block; color: #e9c991; font-size: 12px; }
-.social-status:empty { display: none; }
+.social-status { display: block; min-height: 1.7em; color: #e9c991; font-size: 12px; }
 .social-list { list-style: none; margin: 0; padding: 0; }
 .social-comment { padding: 14px 0; border-top: 1px solid #ffffff15; }
 .social-comment.is-hidden { opacity: .7; }
@@ -783,6 +784,33 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   .social-dialog { width: calc(100vw - 24px); max-height: 90vh; padding: 18px; }
   .social-reaction-group > div { gap: 6px; }
   .social-reactions button { min-width: 50px; }
+}
+
+.badge-shell { position: relative; min-width: 0; }
+.badge-shell > .badge-card { width: 100%; height: 100%; }
+.badge-shell > .badge-card.earned { padding-bottom: 55px; }
+.badge-shell > .badge-card.selected { padding-bottom: 54px; }
+.badge-share { position: absolute; right: 13px; bottom: 12px; padding: 6px 10px; border: 1px solid #c3a87380; border-radius: 5px; color: #f0d7a5; background: #19242b; font-size: 12px; font-weight: 700; }
+.badge-share:hover, .badge-share:focus-visible { color: #fff2d2; border-color: #e7c891; }
+.honor-holders .honor-actions { display: flex; flex-wrap: wrap; gap: 6px 12px; }
+.share-dialog { width: min(580px, calc(100vw - 28px)); max-height: min(92vh, 1000px); overflow: auto; }
+.share-dialog h2 { margin: 0; }
+.share-dialog .eyebrow { margin-bottom: 7px; }
+.share-status { display: block; color: #e5c68c; font-size: 13px; min-height: 1.4em; margin-top: 8px; }
+.share-note { margin: 3px 0 14px; color: #aebdb8; font-size: 12px; line-height: 1.6; }
+#share-poster { display: block; width: min(100%, 360px); height: auto; margin: 0 auto; border: 1px solid #8e7959; border-radius: 6px; background: #101920; box-shadow: 0 12px 40px #0007; }
+.share-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+.share-actions .btn { flex: 1 1 120px; min-height: 42px; gap: 8px; }
+.share-link-label { display: block; margin: 15px 0 6px; color: #c6d0c8; font-size: 12px; }
+input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px solid #40514f; border-radius: 4px; background: #0b141b; color: #e4d7bd; font-size: 12px; }
+.social-confirm-dialog { width: min(430px, calc(100vw - 28px)); }
+.social-confirm-dialog h2 { margin: 0; font-size: 21px; }
+.social-confirm-dialog p { line-height: 1.7; }
+@media (max-width: 560px) {
+  .share-dialog { padding: 18px; }
+  .share-dialog .eyebrow { font-size: 9px; letter-spacing: .1em; }
+  #share-poster { max-width: 300px; }
+  .share-actions .btn { flex-basis: 45%; }
 }
 </style>
 </head>
@@ -895,7 +923,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         <section class="section how-section"><div class="how-copy"><p class="eyebrow">HOW IT WORKS <span class="slash">/</span> 考核方式</p><h2>练的是判断，<br>也是配合。</h2><p>单选、多选、判断和选择式填空。每题等权，多选需要全部选对。完成后立即查看分数与每题解析。</p><button class="text-action icon-action" type="button" data-action="start">进入考核 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div>
           <div class="steps"><div><span>01</span><div><strong>填写昵称</strong><p>输入你的昵称，无需注册。</p></div></div><div><span>02</span><div><strong>完成考题</strong><p>可分段答题，进度保存在当前浏览器。</p></div></div><div><span>03</span><div><strong>查看解析与排名</strong><p>排行榜保留每位玩家的最高成绩。</p></div></div></div>
         </section>
-        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><a class="link-button" href="#honor-board">趣味榜</a><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button icon-action" type="button" data-action="refresh-ranking"><svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg>刷新榜单</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>用时</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div>
+        <section class="section ranking-section" id="leaderboard"><div class="section-heading"><div><p class="eyebrow">LEADERBOARD <span class="slash">/</span> 团队榜单</p><h2>把默契写进排名</h2></div><div class="ranking-actions"><a class="link-button" href="#honor-board">趣味榜</a><button class="link-button" type="button" data-action="share-ranking">分享我的排名</button><button class="link-button" type="button" data-action="open-history">我的答题记录</button><button class="link-button icon-action" type="button" data-action="refresh-ranking"><svg class="icon" aria-hidden="true"><use href="#icon-refresh"/></svg>刷新榜单</button></div></div><div class="leaderboard-wrap"><div class="leaderboard-header"><span>排名 / 玩家</span><span>用时</span><span>最高分</span></div><div id="ranking-list" class="ranking-list" aria-live="polite"><p class="empty-state">正在读取榜单…</p></div></div>
           <nav class="ranking-pagination" id="ranking-pagination" aria-label="榜单分页" hidden><span id="ranking-page-status" aria-live="polite"></span><div class="ranking-page-controls"><button type="button" id="ranking-previous" data-action="ranking-previous">上一页</button><button type="button" id="ranking-next" data-action="ranking-next">下一页</button><form id="ranking-page-form"><label for="ranking-page-input">跳至</label><input id="ranking-page-input" type="number" min="1" inputmode="numeric" required><span>页</span><button type="submit">前往</button></form></div></nav>
           <p class="muted ranking-foot">每位玩家显示一条成绩，最多展示 3 枚勋章。同分按用时由短到长排列，未记录用时排在同分已计时成绩之后。新答卷仅计算答题页在前台的时间；旧成绩可能包含离开时间。用时由浏览器记录，仅供学习参考。</p>
           <div class="honor-heading" id="honor-board"><div><p class="eyebrow">HALL OF HONORS <span class="slash">/</span> 全站趣味榜</p><h3>各有各的拿手好戏</h3></div><p>首页每榜展示 5 人，同成绩按达到时间先后排列；点击查看全部。</p></div>
@@ -969,6 +997,14 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
     <output id="social-status" class="social-status" aria-live="polite"></output><button id="social-retry" class="link-button" type="button" data-action="social-retry" hidden>重新读取</button><ol id="social-list" class="social-list"></ol>
     <nav class="social-pages" aria-label="评价分页"><button id="social-prev" type="button" data-action="social-prev">上一页</button><span id="social-page"></span><button id="social-next" type="button" data-action="social-next">下一页</button></nav>
     <form id="social-form"><label for="social-input">写评价</label><textarea id="social-input" rows="2" maxlength="120" placeholder="说说这位队友吧" required></textarea><p id="social-form-note" class="muted small"></p><div class="social-form-actions"><button id="social-submit" class="btn btn-primary" type="submit">发表评价</button><button id="social-delete-own" class="btn btn-ghost" type="button" data-action="social-delete-own" hidden>删除我的评价</button></div></form>
+  </dialog>
+  <dialog id="social-confirm-dialog" class="social-confirm-dialog" aria-labelledby="social-confirm-title">
+    <form method="dialog"><div class="dialog-top"><h2 id="social-confirm-title"></h2><button class="close-button" type="submit" value="cancel" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p id="social-confirm-message" class="muted"></p><div class="dialog-actions"><button class="btn btn-ghost" type="submit" value="cancel">取消</button><button id="social-confirm-accept" class="btn btn-primary" type="submit" value="confirm">确认</button></div></form>
+  </dialog>
+  <dialog id="share-dialog" class="share-dialog" aria-labelledby="share-title">
+    <div class="dialog-top"><div><p class="eyebrow">SHARE THE MOMENT <span class="slash">/</span> 分享时刻</p><h2 id="share-title">分享我的记录</h2></div><button id="share-close" class="close-button" type="button" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div>
+    <output id="share-status" class="share-status" aria-live="polite"></output>
+    <div id="share-content" hidden><p class="share-note">这是分享时的记录，之后的排名或勋章可能发生变化。</p><canvas id="share-poster" width="1080" height="1350" role="img"></canvas><div class="share-actions"><button id="share-download" class="btn btn-primary" type="button">下载图片</button><button id="share-image" class="btn btn-ghost" type="button" hidden>分享图片</button><button id="share-copy" class="btn btn-ghost" type="button">复制链接</button></div><label class="share-link-label" for="share-link">分享链接</label><input id="share-link" class="share-link" readonly></div>
   </dialog>
   <dialog id="restart-dialog" aria-labelledby="restart-title"><div class="dialog-top"><div><p class="eyebrow">A FRESH START</p><h2 id="restart-title">重新开始这一轮？</h2></div><button class="close-button" type="button" data-action="cancel-restart" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted restart-description">本轮未交卷的答案将清空，题目和选项会重新打乱，计时归零。已提交的成绩和勋章会保留。</p><div class="dialog-actions"><button class="btn btn-primary" type="button" data-action="confirm-restart">重新考核</button><button class="btn btn-ghost" type="button" data-action="cancel-restart">继续答题</button></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -4730,7 +4766,9 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
   const dialog = $('social-dialog');
   const form = $('social-form');
   const input = $('social-input');
-  let number = 0, page = 1, sort = 'hot', data = null, busy = false, requestId = 0, resume = false, resumePicker = false, pickerOpen = false;
+  let number = 0, page = 1, sort = 'hot', data = null, busy = false, loading = false, confirming = false;
+  let requestId = 0, resume = false, resumePicker = false, resumeDraft = null, pickerOpen = false, cooldownTimer;
+  const cooldowns = {reaction:0, like:0, comment:0};
 
   function summary(entry) {
     const social = entry.social;
@@ -4747,104 +4785,198 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
     return profile && !profile.localOnly && activeIdentity() ? {...getIdentity()} : {};
   }
   function status(message) { $('social-status').textContent = message; }
+  function normalizedInput() { return input.value.normalize('NFKC').trim().replace(/\s+/gu, ' '); }
+  function remaining(action) { return Math.max(0, cooldowns[action] - Date.now()); }
+  function syncControls() {
+    const locked = busy || loading || confirming;
+    const content = normalizedInput();
+    const length = [...content].length;
+    const unchanged = Boolean(data?.ownComment && content === data.ownComment.content);
+    dialog.setAttribute('aria-busy', String(busy || loading));
+    $('social-add-reaction').disabled = locked;
+    $('social-sort-hot').disabled = $('social-sort-new').disabled = locked;
+    $('social-prev').disabled = locked || !data || data.page <= 1;
+    $('social-next').disabled = locked || !data || data.page >= data.pages;
+    $('social-retry').disabled = locked;
+    $('social-delete-own').disabled = locked;
+    $('social-submit').disabled = locked || !data || data.isTarget || length < 1 || length > 60 || unchanged || remaining('comment') > 0;
+    input.disabled = busy;
+    $('social-reactions').querySelectorAll('button').forEach(button => { button.disabled = locked || data?.isTarget || remaining('reaction') > 0; });
+    $('social-list').querySelectorAll('button').forEach(button => {
+      button.disabled = locked || (button.dataset.action === 'social-like' && remaining('like') > 0);
+    });
+    const hint = data?.ownComment ? '每人可留一条评价；修改内容后，原有点赞会清零。' : '每人可留一条评价，最多 60 个字。';
+    const wait = remaining('comment');
+    $('social-form-note').textContent = `${hint} ${length}/60${wait ? ` · ${Math.ceil(wait / 1000)} 秒后可再次保存` : ''}`;
+    clearTimeout(cooldownTimer);
+    const waits = Object.keys(cooldowns).map(remaining).filter(value => value > 0);
+    if (waits.length) cooldownTimer = setTimeout(syncControls, Math.min(1000, ...waits));
+  }
+  function markCooldown(action) {
+    const delay = {reaction:1000, like:500, comment:30000}[action] || 0;
+    if (delay) cooldowns[action] = Date.now() + delay;
+  }
+  function confirmSocial(title, message, accept) {
+    if (confirming) return Promise.resolve(false);
+    confirming = true; syncControls();
+    const modal = $('social-confirm-dialog');
+    $('social-confirm-title').textContent = title;
+    $('social-confirm-message').textContent = message;
+    $('social-confirm-accept').textContent = accept;
+    modal.returnValue = '';
+    return new Promise(resolve => {
+      modal.addEventListener('close', () => {
+        confirming = false; syncControls(); resolve(modal.returnValue === 'confirm');
+      }, {once:true});
+      modal.showModal();
+    });
+  }
   function showPicker(open) {
     pickerOpen = open;
     $('social-reactions').hidden = !open;
     $('social-reaction-hint').hidden = !open || Boolean(data?.isTarget);
     $('social-add-reaction').setAttribute('aria-expanded', String(open));
   }
+  function renderReactions(counts) {
+    const container = $('social-reactions');
+    if (!container.childElementCount) {
+      container.innerHTML = groups.map(([name, ids]) => `<div class="social-reaction-group"><span>${name}</span><div>${ids.map(id => `<button type="button" data-action="social-reaction" data-reaction="${id}">${emojis[id]} <span>0</span></button>`).join('')}</div></div>`).join('');
+    }
+    container.querySelectorAll('[data-reaction]').forEach(button => {
+      const id = button.dataset.reaction, count = counts.get(id) || 0;
+      button.querySelector('span').textContent = count;
+      button.setAttribute('aria-label', `${labels[id]}，${count} 次`);
+      button.setAttribute('aria-pressed', String(data.myReaction === id));
+    });
+  }
+  function renderComments() {
+    const list = $('social-list');
+    const existing = new Map([...list.querySelectorAll('[data-comment-id]')].map(item => [item.dataset.commentId, item]));
+    if (!data.comments.length) {
+      if (!list.querySelector('.social-empty')) list.innerHTML = '<li class="social-empty">还没有公开评价，来写第一条吧。</li>';
+    } else {
+      list.querySelector('.social-empty')?.remove();
+      data.comments.forEach((comment, index) => {
+        const key = String(comment.id), signature = JSON.stringify(comment);
+        const item = existing.get(key) || document.createElement('li');
+        existing.delete(key);
+        if (item.dataset.signature !== signature) {
+          const numberLabel = formatPlayerNumber(comment.playerNumber);
+          const like = comment.own || comment.hidden ? '' : `<button type="button" data-action="social-like" data-id="${comment.id}" data-liked="${String(comment.liked)}" aria-pressed="${String(comment.liked)}">👍 ${comment.likes}</button>`;
+          const own = comment.own ? `<button type="button" data-action="social-delete" data-id="${comment.id}">删除</button>` : '';
+          const hide = comment.canHide ? `<button type="button" data-action="social-hide" data-id="${comment.id}" data-hidden="${String(comment.hidden)}">${comment.hidden ? '恢复展示' : '隐藏'}</button>` : '';
+          const date = new Date(comment.createdAt).toLocaleDateString('zh-CN');
+          item.className = `social-comment${comment.hidden ? ' is-hidden' : ''}`;
+          item.dataset.commentId = key; item.dataset.signature = signature;
+          item.innerHTML = `<div class="social-comment-head"><strong>${escape(comment.nickname)}</strong><small>${escape(numberLabel)} · ${escape(date)}${comment.hidden ? ' · 已隐藏' : ''}</small></div><p>${escape(comment.content)}</p><div class="social-comment-actions">${like}${own}${hide}</div>`;
+        }
+        if (list.children[index] !== item) list.insertBefore(item, list.children[index] || null);
+      });
+    }
+    for (const item of existing.values()) item.remove();
+  }
   function render(resetForm) {
     $('social-title').textContent = `${data.player.nickname} 的互动`;
     $('social-player-number').textContent = formatPlayerNumber(data.player.number);
     const counts = new Map(data.reactions.filter(item => Object.hasOwn(emojis, item.id)).map(item => [item.id, Number(item.count) || 0]));
     const received = [...counts].filter(([, count]) => count > 0).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 3);
-    $('social-reaction-summary').innerHTML = received.length ? received.map(([id, count]) => `<span aria-label="${labels[id]} ${count} 次">${emojis[id]} ${count}</span>`).join('') : '<span>还没有表情</span>';
+    const summary = received.length ? received.map(([id, count]) => `<span aria-label="${labels[id]} ${count} 次">${emojis[id]} ${count}</span>`).join('') : '<span>还没有表情</span>';
+    if ($('social-reaction-summary').innerHTML !== summary) $('social-reaction-summary').innerHTML = summary;
     $('social-add-reaction').hidden = false;
     $('social-add-reaction').textContent = data.isTarget ? '查看全部表情' : data.myReaction ? '修改表情' : '＋ 添加表情';
     $('social-my-reaction').hidden = !data.myReaction || !emojis[data.myReaction];
     $('social-my-reaction').textContent = data.myReaction && emojis[data.myReaction] ? `你贴了 ${emojis[data.myReaction]}` : '';
-    $('social-reactions').innerHTML = groups.map(([name, ids]) => `<div class="social-reaction-group"><span>${name}</span><div>${ids.filter(id => counts.has(id)).map(id => `<button type="button" data-action="social-reaction" data-reaction="${id}" aria-label="${labels[id]}，${counts.get(id)} 次" aria-pressed="${String(data.myReaction === id)}" ${data.isTarget ? 'disabled' : ''}>${emojis[id]} <span>${counts.get(id)}</span></button>`).join('')}</div></div>`).join('');
+    renderReactions(counts);
     showPicker(pickerOpen);
     $('social-count').textContent = `公开评价 ${data.commentCount} 条`;
     $('social-sort-hot').setAttribute('aria-pressed', String(sort === 'hot'));
     $('social-sort-new').setAttribute('aria-pressed', String(sort === 'new'));
-    $('social-list').innerHTML = data.comments.length ? data.comments.map(comment => {
-      const numberLabel = formatPlayerNumber(comment.playerNumber);
-      const like = comment.own || comment.hidden ? '' : `<button type="button" data-action="social-like" data-id="${comment.id}" data-liked="${String(comment.liked)}" aria-pressed="${String(comment.liked)}">👍 ${comment.likes}</button>`;
-      const own = comment.own ? `<button type="button" data-action="social-delete" data-id="${comment.id}">删除</button>` : '';
-      const hide = comment.canHide ? `<button type="button" data-action="social-hide" data-id="${comment.id}" data-hidden="${String(comment.hidden)}">${comment.hidden ? '恢复展示' : '隐藏'}</button>` : '';
-      const date = new Date(comment.createdAt).toLocaleDateString('zh-CN');
-      return `<li class="social-comment${comment.hidden ? ' is-hidden' : ''}"><div class="social-comment-head"><strong>${escape(comment.nickname)}</strong><small>${escape(numberLabel)} · ${escape(date)}${comment.hidden ? ' · 已隐藏' : ''}</small></div><p>${escape(comment.content)}</p><div class="social-comment-actions">${like}${own}${hide}</div></li>`;
-    }).join('') : '<li class="social-empty">还没有公开评价，来写第一条吧。</li>';
+    renderComments();
     $('social-page').textContent = `第 ${data.page} / ${data.pages} 页`;
-    $('social-prev').disabled = data.page <= 1;
-    $('social-next').disabled = data.page >= data.pages;
     form.hidden = data.isTarget;
     if (resetForm) input.value = data.ownComment?.content || '';
     $('social-submit').textContent = data.ownComment ? '保存修改' : '发表评价';
     $('social-delete-own').hidden = !data.ownComment;
-    $('social-form-note').textContent = data.ownComment ? '每人可留一条评价；修改内容后，原有点赞会清零。' : '每人可留一条评价，最多 60 个字。';
+    syncControls();
   }
-  async function load(resetForm = false) {
+  async function load(resetForm = false, message = '正在读取互动…') {
     const current = ++requestId;
+    loading = true; syncControls();
     $('social-retry').hidden = true;
-    status('正在读取互动…');
+    status(message);
     try {
       const result = await request('/api/social/view', {playerNumber:number, page, sort, ...authBody()});
       if (current !== requestId || !dialog.open || result.player.number !== number) return;
-      data = result; page = result.page; render(resetForm); status('');
+      data = result; page = result.page; sort = result.sort; render(resetForm); status('');
+      return true;
     } catch (error) {
-      if (current === requestId && dialog.open) { status(error.message); $('social-retry').hidden = false; }
+      if (current === requestId && dialog.open) {
+        if (data) { page = data.page; sort = data.sort; render(false); }
+        status(error.message); $('social-retry').hidden = false;
+      }
+      return false;
+    } finally {
+      if (current === requestId) { loading = false; syncControls(); }
     }
   }
-  function open(playerNumber, expandPicker = false) {
+  function open(playerNumber, expandPicker = false, restoredDraft = null) {
     if (!Number.isSafeInteger(playerNumber) || playerNumber < 1) return;
     number = playerNumber; page = 1; sort = 'hot'; data = null;
-    input.value = ''; form.hidden = true; $('social-list').replaceChildren(); $('social-reactions').replaceChildren();
+    input.value = restoredDraft ?? ''; form.hidden = true; $('social-list').replaceChildren(); $('social-reactions').replaceChildren();
     $('social-reaction-summary').textContent = ''; $('social-add-reaction').hidden = true; $('social-my-reaction').hidden = true; showPicker(false);
     pickerOpen = expandPicker;
     $('social-count').textContent = '公开评价'; $('social-page').textContent = '';
     $('social-prev').disabled = true; $('social-next').disabled = true;
     $('social-title').textContent = '玩家互动'; $('social-player-number').textContent = '';
     if (!dialog.open) dialog.showModal();
-    void load(true);
+    void load(restoredDraft === null);
   }
   function needIdentity(action) {
     if (getProfile() && !getProfile().localOnly && activeIdentity()) return false;
     if (getProfile()?.localOnly) { status('请先连接成绩服务，再参与互动。'); return true; }
     if (getProfile() && !activeIdentity()) { status('本机身份已在其他页面切换，请刷新后继续。'); return true; }
-    resume = true; resumePicker = action === 'reaction'; dialog.close(); showProfile(); return true;
+    resume = true; resumePicker = action === 'reaction'; resumeDraft = action === 'comment' ? input.value : null;
+    dialog.close(); showProfile(); return true;
   }
   async function mutate(action, payload, resetForm = false) {
-    if (busy || needIdentity(action)) return;
-    busy = true;
+    if (busy || loading || confirming || remaining(action) || needIdentity(action)) return;
+    busy = true; syncControls();
     const participant = {...getIdentity()};
-    const selectedNumber = number;
+    const selectedNumber = number, generation = requestId;
     status('正在保存…');
     try {
       await request(`/api/social/${action}`, {...participant, ...payload});
-      if (!activeIdentity(participant)) { status('本机身份已切换，请重新打开互动。'); return; }
-      if (!dialog.open || number !== selectedNumber) { void refreshRanking(); return; }
+      markCooldown(action);
+      if (!activeIdentity(participant)) {
+        if (dialog.open && requestId === generation) status('本机身份已切换，请重新打开互动。');
+        return;
+      }
+      if (!dialog.open || number !== selectedNumber || requestId !== generation) { void refreshRanking(); return; }
       if (action === 'reaction') showPicker(false);
-      await load(resetForm);
+      const updated = await load(resetForm, '正在更新互动…');
+      if (updated === false && dialog.open && number === selectedNumber) status('已保存，但互动内容刷新失败，请点击重新读取。');
       void refreshRanking();
-    } catch (error) { status(error.message); }
-    finally { busy = false; }
+    } catch (error) {
+      if (dialog.open && requestId === generation) status(error.message);
+    } finally { busy = false; syncControls(); }
   }
-  form.addEventListener('submit', event => {
+  input.addEventListener('input', syncControls);
+  form.addEventListener('submit', async event => {
     event.preventDefault();
-    if (!data || data.isTarget) return;
-    const content = input.value.trim();
+    if (!data || data.isTarget || $('social-submit').disabled) return;
+    const content = normalizedInput(), generation = requestId;
     if ([...content].length < 1 || [...content].length > 60) { status('评价请填写 1 至 60 个字。'); return; }
-    if (data.ownComment && content !== data.ownComment.content && !confirm('修改评价会清空原有点赞，确定保存吗？')) return;
+    if (data.ownComment && !await confirmSocial('修改评价？', '修改评价后，这条评价原有的点赞会清零。', '确认修改')) return;
+    if (generation !== requestId || !dialog.open || content !== normalizedInput()) return;
     void mutate('comment', {playerNumber:number, content}, true);
   });
-  document.addEventListener('click', event => {
+  document.addEventListener('click', async event => {
     const target = event.target.closest('[data-action^="social-"]');
     if (!target) return;
     const action = target.dataset.action;
     if (action === 'social-open') { open(Number(target.dataset.number), target.dataset.picker === 'true'); return; }
     if (action === 'social-close') { dialog.close(); return; }
+    if (busy || loading || confirming || target.disabled) return;
     if (action === 'social-retry' && dialog.open) { void load(!data); return; }
     if (!dialog.open || !data) return;
     if (action === 'social-toggle-picker') {
@@ -4853,22 +4985,226 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
       void mutate('reaction', {playerNumber:number, reaction:data.myReaction === target.dataset.reaction ? null : target.dataset.reaction});
     } else if (action === 'social-like') {
       void mutate('like', {commentId:Number(target.dataset.id), liked:target.dataset.liked !== 'true'});
-    } else if (action === 'social-delete') {
-      if (confirm('确定删除你的这条评价吗？')) void mutate('delete', {commentId:Number(target.dataset.id)}, true);
-    } else if (action === 'social-delete-own') {
-      if (data.ownComment && confirm('确定删除你的这条评价吗？')) void mutate('delete', {commentId:data.ownComment.id}, true);
+    } else if (action === 'social-delete' || action === 'social-delete-own') {
+      const commentId = action === 'social-delete' ? Number(target.dataset.id) : data.ownComment?.id;
+      const generation = requestId;
+      if (commentId && await confirmSocial('删除这条评价？', '删除后，评价和收到的点赞都会移除。', '确认删除')) {
+        if (generation === requestId && dialog.open) void mutate('delete', {commentId}, true);
+      }
     } else if (action === 'social-hide') {
       void mutate('hide', {commentId:Number(target.dataset.id), hidden:target.dataset.hidden !== 'true'});
     } else if (action === 'social-sort') {
+      if (sort === target.dataset.sort) return;
       sort = target.dataset.sort; page = 1; void load();
     } else if (action === 'social-prev' && page > 1) { page--; void load(); }
     else if (action === 'social-next' && page < data.pages) { page++; void load(); }
   });
-  dialog.addEventListener('close', () => { if (!dialog.open) ++requestId; });
+  dialog.addEventListener('close', () => { if (!dialog.open) { ++requestId; loading = false; syncControls(); } });
   $('profile-dialog').addEventListener('close', () => {
-    if (resume) { resume = false; if (getProfile()) open(number, resumePicker); resumePicker = false; }
+    if (resume) {
+      resume = false;
+      open(number, resumePicker, resumeDraft);
+      resumePicker = false;
+      resumeDraft = null;
+    }
   });
   return {summary};
+}
+
+function createShareUI({request, getProfile, getIdentity, activeIdentity, showProfile, toast, formatDuration, formatPlayerNumber}) {
+  const $ = id => document.getElementById(id);
+  const dialog = $('share-dialog');
+  const canvas = $('share-poster');
+  const context = canvas.getContext('2d');
+  let current = null, requestId = 0, working = false;
+
+  function shareUrl(id) {
+    const url = new URL(location.href);
+    const localApi = ['localhost', '127.0.0.1'].includes(url.hostname) && url.searchParams.get('api') === 'local';
+    const port = url.searchParams.get('api-port');
+    url.search = '';
+    url.hash = '';
+    if (localApi) {
+      url.searchParams.set('api', 'local');
+      if (port && /^\d{1,5}$/.test(port)) url.searchParams.set('api-port', port);
+    }
+    url.searchParams.set('share', id);
+    return url.href;
+  }
+
+  function wrappedText(text, x, y, maxWidth, lineHeight, maxLines) {
+    const characters = Array.from(String(text));
+    const lines = [];
+    let line = '';
+    for (const character of characters) {
+      if (context.measureText(line + character).width > maxWidth && line) {
+        lines.push(line);
+        line = character;
+      } else line += character;
+    }
+    if (line) lines.push(line);
+    if (lines.length > maxLines) {
+      lines.length = maxLines;
+      let last = lines[maxLines - 1];
+      while (last && context.measureText(last + '…').width > maxWidth) last = Array.from(last).slice(0, -1).join('');
+      lines[maxLines - 1] = last + '…';
+    }
+    lines.forEach((value, index) => context.fillText(value, x, y + index * lineHeight));
+  }
+
+  function drawFrame() {
+    const background = context.createLinearGradient(0, 0, 1080, 1350);
+    background.addColorStop(0, '#263739'); background.addColorStop(.52, '#101c26'); background.addColorStop(1, '#0b111a');
+    context.fillStyle = background; context.fillRect(0, 0, 1080, 1350);
+    const glow = context.createRadialGradient(540, 430, 20, 540, 430, 470);
+    glow.addColorStop(0, 'rgba(218,177,105,.20)'); glow.addColorStop(1, 'rgba(218,177,105,0)');
+    context.fillStyle = glow; context.fillRect(0, 0, 1080, 1000);
+    context.strokeStyle = 'rgba(226,199,151,.5)'; context.lineWidth = 2; context.strokeRect(55, 55, 970, 1240);
+    context.strokeStyle = 'rgba(226,199,151,.14)'; context.strokeRect(70, 70, 940, 1210);
+    context.beginPath(); context.arc(540, 430, 200, 0, Math.PI * 2); context.stroke();
+    context.beginPath(); context.arc(540, 430, 224, 0, Math.PI * 2); context.stroke();
+    context.textAlign = 'center'; context.fillStyle = '#e4c691';
+    context.font = '700 26px sans-serif'; context.fillText('螺旋寺院  ·  团本机制考核', 540, 132);
+    context.font = '500 19px sans-serif'; context.fillStyle = '#9aa9a3'; context.fillText('RAID HONORS  /  SHARE THE MOMENT', 540, 172);
+  }
+
+  async function emblemImage(snapshot) {
+    if (!snapshot.badge) return null;
+    const svg = drawBadgeArtwork(snapshot.badge).replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" ');
+    const img = new Image();
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+    await img.decode();
+    return img;
+  }
+  function drawEmblem(image) {
+    if (!image) {
+      context.fillStyle = '#d6b77d'; context.font = '700 164px Georgia, serif'; context.fillText('#', 540, 490);
+      return;
+    }
+    context.drawImage(image, 380, 270, 320, 320);
+  }
+
+  function posterText(snapshot) {
+    const isBadge = snapshot.kind === 'badge';
+    const isRanking = snapshot.kind === 'ranking';
+    const label = isBadge ? '我的勋章' : isRanking ? '综合排行榜' : '趣味排行榜';
+    const title = isBadge ? snapshot.badge.name : `第 ${snapshot.rank} 名`;
+    let detail = snapshot.badge?.description || '';
+    if (isRanking) detail = `${snapshot.score} 分  ·  用时 ${formatDuration(snapshot.elapsedSeconds)}`;
+    if (snapshot.kind === 'honor') detail = `${snapshot.badge.name}  ·  ${snapshot.valueType === 'time' ? formatDuration(snapshot.value) : `${snapshot.value} 次`}`;
+    context.textAlign = 'center';
+    context.fillStyle = '#d5b77f'; context.font = '700 25px sans-serif'; context.fillText(label, 540, 670);
+    context.fillStyle = '#f7eedc'; context.font = '700 72px "Microsoft YaHei", sans-serif'; wrappedText(title, 540, 770, 850, 84, 1);
+    context.fillStyle = '#bdccc3'; context.font = '400 31px "Microsoft YaHei", sans-serif'; wrappedText(detail, 540, 844, 800, 48, 2);
+    context.fillStyle = '#f2dcc0'; context.font = '700 38px "Microsoft YaHei", sans-serif'; wrappedText(snapshot.nickname, 540, 1035, 770, 46, 1);
+    context.fillStyle = '#9caea5'; context.font = '400 24px sans-serif'; context.fillText(formatPlayerNumber(snapshot.playerNumber), 540, 1080);
+    const date = new Date(snapshot.createdAt).toLocaleDateString('zh-CN', {year:'numeric', month:'2-digit', day:'2-digit'});
+    context.fillStyle = '#c7b798'; context.font = '400 23px "Microsoft YaHei", sans-serif'; context.fillText(`记录于 ${date}  ·  分享时的记录`, 540, 1195);
+    context.fillStyle = '#7e938d'; context.font = '500 20px sans-serif'; context.fillText('螺旋寺院 · 一起练习，一起进步', 540, 1237);
+    canvas.setAttribute('aria-label', `${snapshot.nickname}，${label}，${title}。${detail}。记录于 ${date}。`);
+  }
+
+  async function display(result, id) {
+    if (!result || !/^[a-f0-9]{32}$/.test(result.id || '') || !result.snapshot ||
+        !['badge', 'ranking', 'honor'].includes(result.snapshot.kind)) throw new Error('分享内容无法识别。');
+    const snapshot = result.snapshot;
+    const image = await emblemImage(snapshot);
+    if (id !== requestId || !dialog.open) return;
+    drawFrame();
+    drawEmblem(image);
+    posterText(snapshot);
+    current = result;
+    $('share-link').value = shareUrl(result.id);
+    $('share-content').hidden = false;
+    $('share-status').textContent = '';
+    let canShare = false;
+    try {
+      canShare = typeof navigator.share === 'function' && typeof navigator.canShare === 'function' &&
+        typeof File === 'function' && navigator.canShare({files:[new File([], 'share.png', {type:'image/png'})]});
+    } catch { /* Download remains available when native sharing is unavailable. */ }
+    $('share-image').hidden = !canShare;
+  }
+
+  function begin() {
+    const id = ++requestId;
+    current = null;
+    $('share-content').hidden = true;
+    $('share-status').textContent = '正在准备分享卡片…';
+    if (!dialog.open) dialog.showModal();
+    return id;
+  }
+
+  async function start(kind, badgeId) {
+    const profile = getProfile();
+    if (!profile) { toast('请先保存昵称并上传成绩。'); showProfile(); return; }
+    if (profile.localOnly || !activeIdentity()) { toast('请先连接成绩服务并恢复当前身份。'); return; }
+    const id = begin();
+    const owner = {...getIdentity()};
+    try {
+      const result = await request('/api/shares', {...owner, kind, badgeId});
+      if (!activeIdentity(owner)) throw new Error('本机身份已切换，请重新分享。');
+      if (id === requestId) await display(result, id);
+    } catch (error) {
+      if (id === requestId && dialog.open) $('share-status').textContent = error.message;
+    }
+  }
+
+  async function openFromUrl() {
+    const share = new URL(location.href).searchParams.get('share');
+    if (share === null) return;
+    const id = begin();
+    if (!/^[a-f0-9]{32}$/.test(share)) {
+      $('share-status').textContent = '分享链接无效或已失效。';
+      return;
+    }
+    try {
+      const result = await request('/api/shares/' + encodeURIComponent(share));
+      if (id === requestId) await display(result, id);
+    } catch (error) {
+      if (id === requestId && dialog.open) $('share-status').textContent = error.message;
+    }
+  }
+
+  function imageBlob() {
+    return new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('图片生成失败，请重试。')), 'image/png'));
+  }
+  async function imageAction(share) {
+    if (!current || working) return;
+    working = true;
+    $('share-download').disabled = $('share-image').disabled = true;
+    try {
+      const blob = await imageBlob();
+      if (share) {
+        await navigator.share({files:[new File([blob], '螺旋寺院分享.png', {type:'image/png'})], title:'螺旋寺院分享'});
+      } else {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a'); link.href = url; link.download = '螺旋寺院分享.png';
+        document.body.append(link); link.click(); link.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        $('share-status').textContent = '图片已准备下载。';
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') $('share-status').textContent = error.message || '图片分享失败，请重试。';
+    } finally {
+      working = false;
+      $('share-download').disabled = $('share-image').disabled = false;
+    }
+  }
+  $('share-close').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => { ++requestId; current = null; });
+  $('share-download').addEventListener('click', () => void imageAction(false));
+  $('share-image').addEventListener('click', () => void imageAction(true));
+  $('share-copy').addEventListener('click', async () => {
+    if (!current || working) return;
+    try {
+      await navigator.clipboard.writeText($('share-link').value);
+      $('share-status').textContent = '链接已复制，发给朋友即可查看。';
+    } catch {
+      $('share-link').focus(); $('share-link').select();
+      $('share-status').textContent = '请选择上方链接并复制。';
+    }
+  });
+  return {start, openFromUrl};
 }
 
 (() => {
@@ -5421,7 +5757,8 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
         const rows = entries.map(entry => `<li><span class="honor-rank">${entry.rank}</span><span class="honor-player"><b>${escape(entry.nickname)}</b><small>${formatPlayerNumber(entry.playerNumber)}</small></span><strong>${board.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`}</strong></li>`).join('');
         const holders = board.holderCount > 1 ? `${board.holderCount} 人并列第一` : '榜首可获得勋章';
         const more = entries.length ? `<button type="button" data-action="honor-show" data-badge="${escape(badge.id)}">查看全部 <span aria-hidden="true">→</span></button>` : '';
-        return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders"><span>${entries.length ? holders : '等待首位上榜玩家'}</span>${more}</div></article>`;
+        const share = entries.length ? `<button type="button" data-action="share-honor" data-badge="${escape(badge.id)}">分享我的名次</button>` : '';
+        return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders"><span>${entries.length ? holders : '等待首位上榜玩家'}</span><div class="honor-actions">${more}${share}</div></div></article>`;
       }).join('');
     } catch (error) {
       if (requestId === honorRequest) {
@@ -5629,15 +5966,17 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
   }
   function renderBadges() {
     const grid = $('badges-grid');
-    const existing = new Map([...grid.children].map(button => [button.dataset.badge, button]));
+    const existing = new Map([...grid.children].map(shell => [shell.dataset.badge, shell]));
     const earned = badgeData.badges.filter(badge => badge.earned).length;
     const fastest = Number.isSafeInteger(badgeData.fastestSeconds) ? formatDuration(badgeData.fastestSeconds) : '暂无';
     $('badges-status').textContent = `已获得 ${earned} / ${badgeData.badges.length} 枚 · 已选 ${selectedBadges.length} / ${badgeData.maxShown} 枚 · 全站最快 ${fastest}${badgesDirty ? ' · 更改后请保存' : ''}`;
     $('badges-save').textContent = `保存展示（${selectedBadges.length}/${badgeData.maxShown}）`;
     badgeData.badges.forEach((badge, index) => {
       const selected = selectedBadges.includes(badge.id);
-      const button = existing.get(badge.id) || document.createElement('button');
+      const shell = existing.get(badge.id) || document.createElement('div');
       existing.delete(badge.id);
+      shell.className = 'badge-shell'; shell.dataset.badge = badge.id;
+      const button = shell.querySelector('.badge-card') || document.createElement('button');
       button.type = 'button';
       button.dataset.action = 'toggle-badge';
       button.dataset.badge = badge.id;
@@ -5652,7 +5991,15 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
         button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span><span class="badge-people">${escape(count)}</span></span>`;
         button.dataset.signature = signature;
       }
-      if (grid.children[index] !== button) grid.insertBefore(button, grid.children[index] || null);
+      if (!button.parentElement) shell.append(button);
+      let share = shell.querySelector('.badge-share');
+      if (badge.earned && !share) {
+        share = document.createElement('button'); share.type = 'button'; share.className = 'badge-share';
+        share.dataset.action = 'share-badge'; share.dataset.badge = badge.id;
+        share.textContent = '分享'; share.setAttribute('aria-label', `分享${badge.name}勋章`);
+        shell.append(share);
+      } else if (!badge.earned && share) share.remove();
+      if (grid.children[index] !== shell) grid.insertBefore(shell, grid.children[index] || null);
     });
     for (const button of existing.values()) button.remove();
   }
@@ -6111,6 +6458,9 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
   const socialUI = typeof createSocialUI === 'function'
     ? createSocialUI({request, getProfile:() => profile, getIdentity:() => identity, activeIdentity, showProfile, refreshRanking, escape, formatPlayerNumber})
     : {summary:() => ''};
+  const shareUI = typeof createShareUI === 'function'
+    ? createShareUI({request, getProfile:() => profile, getIdentity:() => identity, activeIdentity, showProfile, toast, formatDuration, formatPlayerNumber})
+    : {start:() => {}, openFromUrl:() => {}};
   const featureActions = new Map([
     ['open-badges', () => openBadges()],
     ['close-badges', () => closeBadges()],
@@ -6118,6 +6468,9 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
     ['reload-badges', () => { void loadBadges(); }],
     ['toggle-badge', target => toggleBadge(target.dataset.badge)],
     ['save-badges', () => { void saveBadges(); }],
+    ['share-badge', target => { void shareUI.start('badge', target.dataset.badge); }],
+    ['share-ranking', () => { void shareUI.start('ranking'); }],
+    ['share-honor', target => { void shareUI.start('honor', target.dataset.badge); }],
     ['honor-show', target => showHonorDetail(target.dataset.badge)],
     ['close-honor-detail', () => { ++honorDetailRequest; $('honor-dialog').close(); }],
     ['honor-mode', target => {
@@ -6199,6 +6552,7 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
   if (document.querySelectorAll) initializeSequences(document);
   readGuideHash();
   $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); initializeTransfer(); void refreshRanking();
+  void shareUI.openFromUrl();
   if (profile?.localOnly) setConnectionUnavailable(true);
   if(nextPendingAttempt() && profile) uploadPending();
 })();
