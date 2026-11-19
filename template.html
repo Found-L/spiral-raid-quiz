@@ -40,6 +40,7 @@
     <symbol id="badge-orb" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M7 5c2-1.5 6-2 9 0M4 12c0-3 1-5 3-7m13 7c0 3-1.5 6-4 7M8 19c-2-1-3-2-4-4M8.5 12h7M12 8.5v7"/><circle cx="19" cy="5" r="1"/></symbol>
   </svg>
   <div class="site-shell">
+    <div class="ambient-world" aria-hidden="true"><span></span><span></span><span></span></div>
     <header class="topbar">
       <a href="#home" class="brand" aria-label="螺旋寺院机制考核首页"><span class="brand-mark">旋</span><span><strong>螺旋寺院</strong><small>团队机制考核</small></span></a>
       <nav class="nav-links" aria-label="主导航"><a href="#guide">机制图解</a><button type="button" data-action="show-leaderboard">排行榜</button><button type="button" data-action="open-history">我的记录</button><button type="button" data-action="open-badges">我的勋章</button></nav>
@@ -67,27 +68,12 @@
             <p class="hero-note">免注册 · 自动评分 · 支持中途继续。答题页在前台时计时，离开或切到后台自动暂停。</p>
           </div>
           <div class="hero-art" aria-hidden="true">
-            <svg viewBox="0 0 540 460" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <radialGradient id="hero-sun"><stop stop-color="#e8c783" stop-opacity=".48"/><stop offset=".5" stop-color="#b4824d" stop-opacity=".13"/><stop offset="1" stop-color="#b4824d" stop-opacity="0"/></radialGradient>
-                <linearGradient id="hero-roof" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#d4ae73"/><stop offset=".45" stop-color="#775b43"/><stop offset="1" stop-color="#322b27"/></linearGradient>
-                <linearGradient id="hero-wall" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#35403d"/><stop offset="1" stop-color="#101a1f"/></linearGradient>
-                <linearGradient id="hero-door" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f0ce8a" stop-opacity=".8"/><stop offset="1" stop-color="#e4a965" stop-opacity=".08"/></linearGradient>
-              </defs>
-              <circle class="hero-aura" cx="280" cy="204" r="195" fill="url(#hero-sun)"/>
-              <path d="M42 328 137 253l31 18 82-89 68 62 34-24 139 108Z" fill="#1c2b2f" opacity=".48"/>
-              <path d="M27 345 132 288l49 30 46-34 45 43 73-52 150 70Z" fill="#132126" opacity=".8"/>
-              <path d="M150 340h260l-14 15H164Z" fill="#75654c" opacity=".45"/>
-              <path d="M183 327h194l-11-118H194Z" fill="url(#hero-wall)" stroke="#b79a69" stroke-opacity=".7" stroke-width="2"/>
-              <path d="M161 223 280 154 399 223l-24 9-95-49-95 49Z" fill="url(#hero-roof)" stroke="#c5a374" stroke-width="2"/>
-              <path d="M193 181 280 127 367 181l-19 7-68-36-68 36Z" fill="url(#hero-roof)" stroke="#c5a374" stroke-width="2"/>
-              <path d="M223 139 280 102 337 139l-15 6-42-23-42 23Z" fill="url(#hero-roof)" stroke="#c5a374" stroke-width="2"/>
-              <path d="M280 102V81" stroke="#d6bd8e" stroke-width="2"/><circle cx="280" cy="78" r="4" fill="#edcb8d"/>
-              <path class="hero-door-glow" d="M263 327v-55c0-12 7-20 17-20s17 8 17 20v55Z" fill="url(#hero-door)" stroke="#e9c68d" stroke-width="2"/>
-              <path d="M214 263h13v45h-13zM333 263h13v45h-13z" fill="#e5c083" opacity=".36" class="hero-window"/>
-              <path d="M98 360 Q280 372 462 360" stroke="#ad9369" stroke-opacity=".34" stroke-width="2"/>
-              <g class="hero-embers" fill="#f6d99e"><circle cx="162" cy="224" r="2"/><circle cx="395" cy="196" r="2.5"/><circle cx="333" cy="92" r="1.8"/></g>
-            </svg>
+            <div class="hero-scene">
+              <img class="hero-landscape" src="__HERO_IMAGE__" alt="" decoding="async" fetchpriority="high">
+              <span class="hero-radiance"></span>
+              <span class="hero-mist hero-mist-near"></span><span class="hero-mist hero-mist-far"></span>
+              <span class="hero-embers"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+            </div>
             <span class="art-caption">THE SPIRAL TEMPLE <i></i> TEAM STUDY</span>
           </div>
           <div class="hero-index" aria-hidden="true">01 <span></span> 03</div>

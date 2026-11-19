@@ -149,6 +149,10 @@ one('witch','远点位',933,'黑风魔女后期震荡波即将到达时，远点
 # Peak-server walkthrough: the boss lifts the tank before the healing sequence.
 one('twins','治疗位',164,'双剑球花阶段，首领抓起本侧主 T 并连续攻击时，治疗位应怎样配合？','将治疗珠的绿色指示对准本侧主 T，按团队安排接续抬血',['对准另一侧首领并等待换边','停止治疗，只观察自己的输出','把治疗珠留在地上，等四刀结束再拾取'],'首领抓起主 T 后，治疗位应瞄准本侧主 T，关注血量与刀数，按团队安排衔接治疗。')
 
+# Two post-release walkthroughs both emphasize sustained orb coverage and tank buffs.
+one('twins','挡球位',338,'双剑挡球阶段，如果同一侧连续漏掉太多来球，团队可能遇到什么风险？','本侧首领可能狂暴，影响团队生存',['所有治疗珠会自动变多','首领会立即停止攻击并换边','队员会自动进入灵魂隔离'],'两侧都要按分工持续处理来球。漏球过多可能导致首领狂暴，挡球位要及时沟通并补位。')
+one('twins','主 T',107,'双剑主 T 已有三层同色状态，但发现剩余时间不足以维持到被抓阶段，应怎么做？','按团队安排续同色球，确保被抓前仍有三层同色状态',['等待状态自然消失再进入被抓阶段','随意挡异色球替换当前状态','停止关注状态时间，只看输出'],'主 T 的同色状态有持续时间，应按分工续球并确认被抓前仍有三层。')
+
 assert len(questions) >= 70
 assert all(q['options'] and len(q['answer']) >= 1 for q in questions)
 assert {q['section'] for q in questions} == set(sections)
@@ -162,7 +166,7 @@ for path in sorted((root/'domestic-backend'/'banks').glob('*.json')):
     migrations[old['version']] = sorted(qid for qid in old_questions.keys() | current_questions.keys()
                                       if old_questions.get(qid) != current_questions.get(qid))
 assert 'peak-spiral-2026-11-18-v4' in migrations
-data = {'version':'peak-spiral-2026-11-18-v9','title':'剑灵巅峰服螺旋寺院机制考核',
+data = {'version':'peak-spiral-2026-11-18-v10','title':'剑灵巅峰服螺旋寺院机制考核',
         'draft_migrations': migrations, 'questions':questions}
 payload = json.dumps(data,ensure_ascii=False,indent=2) + '\n'
 (root/'questions.json').write_text(payload,encoding='utf-8')

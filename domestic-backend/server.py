@@ -72,7 +72,7 @@ BADGES = [
 ]
 BADGE_BY_ID = {badge['id']: badge for badge in BADGES}
 # These option IDs apply only to the explicitly checked answer keys.
-MISTAKE_VERSIONS = {'peak-spiral-2026-11-18-v5', 'peak-spiral-2026-11-18-v6', 'peak-spiral-2026-11-18-v7', 'peak-spiral-2026-11-18-v8', 'peak-spiral-2026-11-18-v9'}
+MISTAKE_VERSIONS = {'peak-spiral-2026-11-18-v5', 'peak-spiral-2026-11-18-v6', 'peak-spiral-2026-11-18-v7', 'peak-spiral-2026-11-18-v8', 'peak-spiral-2026-11-18-v9', 'peak-spiral-2026-11-18-v10'}
 MISTAKE_RULES = {
     'demolition': {'q036': {'b', 'd'}, 'q042': {'a'}, 'q047': {'a'}, 'q050': {'d'},
                    'q066': {'a', 'c'}, 'q089': {'a', 'c'}, 'q090': {'a'}, 'q091': {'b'}},

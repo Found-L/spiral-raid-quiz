@@ -30,7 +30,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
     'witch-line': [['red-line', '不祥气息'], ['teal', '队员'], ...(!test ? [['teal-arrow', '带位路线示意']] : [])],
     'witch-charge': [['gold', '首领'], ['teal', '队员'], ['gold-arrow', '面向']],
     'witch-bomb': [['red', '被标记'], ['red-line', '不祥气息'], ['teal', '其他队员'], ...(!test ? [['red-arrow', '撤离示意']] : [])],
-    'witch-spiders': [['gold', '大蜘蛛 / 首领'], ['red', '小蜘蛛'], ...(!test ? [['teal-arrow', '聚怪'], ['red-arrow', '转向首领']] : [])],
+    'witch-spiders': [['gold', test ? '大蜘蛛' : '大蜘蛛 / 首领'], ['red', '小蜘蛛'], ...(!test ? [['teal-arrow', '聚怪'], ['red-arrow', '转向首领']] : [])],
     'witch-wave': [['gold', '震荡范围示意'], ['teal', '队员'], ...(!test ? [['gold-arrow', '点名方向示意']] : [])],
   };
   let art;
@@ -119,11 +119,21 @@ function drawRaidDiagram(key, caption, questionId = null) {
           + label(280, 171, '大蜘蛛') + label(430, 185, '小蜘蛛') + label(146, 83, '小蜘蛛');
         break;
       }
+      if (test) {
+        // This question can describe either airborne or later ground phases.
+        // Show a direction, not a boss standing on the floor during flight.
+        art = arena() + spider(364, 178) + swarm(399, 191) + spider(195, 150) + swarm(160, 172)
+          + spider(279, 49) + swarm(312, 51) + label(417, 162, '小蜘蛛')
+          + label(379, 231, '处理区 A') + label(176, 222, '处理区 B') + label(223, 40, '处理区 C');
+        if (['q071','q094'].includes(questionId)) {
+          art += arrow(349, 166, 306, 140, 'map-red-line', false) + label(270, 119, '首领方向', 'map-gold-text');
+        }
+        break;
+      }
       art = [arena(), boss(280, 125, '首领'), spider(364, 178), swarm(399, 191),
         spider(195, 150), swarm(160, 172), spider(279, 49), swarm(312, 51),
         label(417, 162, '小蜘蛛'), label(379, 231, '处理区 A'), label(176, 222, '处理区 B'), label(223, 40, '处理区 C')].join('');
       if (!test) art += arrow(412, 204, 385, 186, 'map-ally-line') + arrow(349, 166, 306, 140, 'map-red-line', false) + label(440, 86, '大蜘蛛转向首领');
-      if (questionId === 'q071') art += arrow(349, 166, 306, 140, 'map-red-line');
       break;
     case 'witch-wave':
       art = [arena(260, 135, 98), boss(260, 135, '首领'), token(203, 189, '队'), token(251, 202, '队'),
