@@ -286,7 +286,6 @@
   .hero-copy h1 { animation-delay: .07s; }
   .hero-description { animation-delay: .13s; }
   .hero-actions, .hero-note { animation-delay: .2s; }
-  .hero-art svg { animation: hero-float 8s ease-in-out infinite; }
   .map-route-glow { animation: route-flow 2.8s linear infinite; }
   .ranking-row { animation: motion-arrive .45s backwards; }
   .ranking-row:nth-child(2) { animation-delay: .045s; }
@@ -298,7 +297,6 @@
   .result-honors:not([hidden]) { animation: motion-arrive .5s both; }
 }
 @keyframes motion-arrive { from { opacity: .65; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes hero-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 @keyframes route-flow { to { stroke-dashoffset: -22; } }
 @keyframes badge-select { 0% { transform: scale(.98); } 55% { transform: scale(1.015); } 100% { transform: scale(1); } }
 
@@ -538,7 +536,7 @@
 .sequence-svg .scene-wave { fill: none; stroke: #f3d197; stroke-width: 4; stroke-linecap: round; }
 .sequence-svg .scene-cue { opacity: 0; pointer-events: none; transition: opacity .35s ease; }
 .sequence-svg .scene-cue.active { opacity: 1; }
-.sequence-svg .scene-actor { transition: transform .85s cubic-bezier(.2,.7,.2,1); }
+.sequence-svg .scene-actor { transition: transform 1.35s cubic-bezier(.2,.7,.2,1), opacity .3s ease; }
 .motion-paused .scene-actor, .motion-paused .scene-cue, .sequence-resetting .scene-actor, .sequence-resetting .scene-cue { transition: none; }
 .sequence-readout { min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 11px 13px; background: #182c2e; color: #edf2e8; line-height: 1.55; font-size: 13px; }
 .sequence-count { flex: none; color: #ebc98e; font: 13px Georgia, serif; letter-spacing: .06em; }
@@ -595,6 +593,77 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .sequence-svg .scene-actor, .sequence-svg .scene-cue { transition: none; }
+}
+
+/* Illustrated chapter covers are distinct from the annotated tactical maps. */
+.chapter-art { margin-top: 17px; overflow: hidden; border-radius: 8px; background: linear-gradient(145deg,#16252a,#101a20 75%); }
+.chapter-art svg { width: 100%; height: auto; display: block; }
+.chapter-art-note { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 15px; background: #0c161bb3; }
+.chapter-art-note span { color: #8c9e99; font: 9px Georgia,serif; letter-spacing: .12em; }
+.chapter-art-note strong { color: #d6d0bd; font-size: 11px; letter-spacing: .04em; font-weight: 500; }
+.chapter-blade { stroke-width: 1.7; }
+.fire-blade { fill: #8f5447; stroke: #e8a48c; }
+.ice-blade { fill: #386e72; stroke: #a8e0d7; }
+.chapter-sword { fill: none; stroke-width: 3; stroke-linecap: round; }
+.fire-sword { stroke: #e8a48c; } .ice-sword { stroke: #a8e0d7; }
+.chapter-link { fill: none; stroke: #d7c09a; stroke-opacity: .42; stroke-width: 1.5; }
+.chapter-heal-flow { fill: none; stroke: #a3e3c5; stroke-width: 3; stroke-dasharray: 5 5; filter: drop-shadow(0 0 4px #80d9b6); }
+.chapter-healer { fill: #47877e; stroke: #a2dfcd; stroke-width: 2; }
+.chapter-tank { fill: #443e33; stroke: #ebd1a4; stroke-width: 1.5; }
+.chapter-tank-text { fill: #fff2d5; text-anchor: middle; font: bold 13px var(--sans); }
+.chapter-pulse { fill: #f5d497; filter: drop-shadow(0 0 6px #e9ba77); }
+.chapter-label { fill: #b6c4ba; font: 14px var(--sans); text-anchor: middle; letter-spacing: .12em; }
+.chapter-shrine { fill: #3b3930; fill-opacity: .65; stroke: #c9ae79; stroke-width: 2; }
+.chapter-shrine-inner { fill: #e8c88e; fill-opacity: .2; stroke: #e8c88e; stroke-opacity: .7; stroke-width: 2; }
+.chapter-lamp-beam { fill: #efd398; fill-opacity: .19; stroke: #e6c78e; stroke-opacity: .35; }
+.chapter-lights circle { fill: #e4c38a; filter: drop-shadow(0 0 5px #d3ac6a); }
+.chapter-arena { fill: #17313a; fill-opacity: .45; stroke: #80b1aa; stroke-opacity: .55; stroke-width: 2; }
+.chapter-core { fill: #2c4546; stroke: #98c2b4; stroke-opacity: .55; stroke-width: 1.5; }
+.chapter-danger { fill: none; stroke: #f49180; stroke-linecap: round; stroke-width: 5; filter: drop-shadow(0 0 6px #ef887a); }
+.chapter-web { fill: none; stroke: #8bc0b1; stroke-opacity: .3; stroke-width: 2; }
+.chapter-escape { fill: none; stroke: #91d4c5; stroke-opacity: .38; stroke-width: 2; }
+.chapter-runner { fill: #a8e4d5; filter: drop-shadow(0 0 5px #83d6bd); }
+.sequence-svg .scene-river { stroke: #b5c8bf; stroke-opacity: .42; stroke-width: 4; stroke-linecap: round; }
+.sequence-svg .scene-heal-beam { fill: none; stroke: #a8f1ca; stroke-width: 5; stroke-linecap: round; stroke-dasharray: 6 6; filter: drop-shadow(0 0 5px #5de2ab); }
+.sequence-svg .scene-hits circle { fill: #e9c994; opacity: .5; }
+.sequence-svg .scene-transition-ring { fill: none; stroke: #b9e3d6; stroke-width: 2; opacity: .5; transform-box: fill-box; transform-origin: center; }
+.sequence-svg .scene-actor.scene-hidden { opacity: 0; pointer-events: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .chapter-glow { transform-origin: center; animation: chapter-breathe 5s ease-in-out infinite; }
+  .chapter-delay { animation-delay: -2.5s; }
+  .chapter-pulse, .chapter-danger, .hero-window { animation: chapter-light 3s ease-in-out infinite; }
+  .chapter-heal-flow { animation: heal-flow 1.2s linear infinite; }
+  .chapter-lamp-beam { animation: chapter-light 3s ease-in-out infinite; }
+  .chapter-runner { animation: chapter-evade 3.8s ease-in-out infinite alternate; }
+  .chapter-lights circle { animation: chapter-light 4.2s ease-in-out infinite; }
+  .chapter-lights circle:nth-child(even) { animation-delay: -2s; }
+  .hero-embers { animation: embers-drift 7s ease-in-out infinite alternate; }
+  .scene-cue.active .scene-heal-beam { animation: heal-flow 1s linear infinite; }
+  .scene-cue.active .scene-hits circle { animation: scene-hit 4s linear infinite; }
+  .scene-cue.active .scene-hits circle:nth-child(2) { animation-delay: -3s; }
+  .scene-cue.active .scene-hits circle:nth-child(3) { animation-delay: -2s; }
+  .scene-cue.active .scene-hits circle:nth-child(4) { animation-delay: -1s; }
+  .scene-cue.active .scene-transition-ring { animation: transition-pulse 1.8s ease-out infinite; }
+}
+@keyframes chapter-breathe { 0%,100% { opacity: .58; } 50% { opacity: 1; } }
+@keyframes chapter-light { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+@keyframes embers-drift { from { transform: translateY(4px); opacity: .35; } to { transform: translateY(-6px); opacity: .9; } }
+@keyframes heal-flow { to { stroke-dashoffset: -24; } }
+@keyframes chapter-evade { to { transform: translate(38px, 1px); } }
+@keyframes scene-hit { 0%,20%,100% { opacity: .4; } 5%,12% { opacity: 1; filter: drop-shadow(0 0 4px #f7cc88); } }
+@keyframes transition-pulse { 0% { transform: scale(.86); opacity: .8; } 100% { transform: scale(1.25); opacity: 0; } }
+@media (max-width: 560px) {
+  .chapter-art-note { padding: 10px 12px; }
+  .chapter-art-note span { font-size: 8px; }
+  .sequence-svg .scene-label { font-size: 20px; }
+  .sequence-svg .scene-piece-text { font-size: 20px; }
+  .sequence-readout { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 4px 10px; font-size: 13px; }
+  .sequence-count { grid-column: 1; }
+  .sequence-readout [data-step-text] { grid-column: 1; }
+  .sequence-controls { grid-column: 2; grid-row: 1 / span 2; }
+  .diagram-dialog-content .sequence-diagram { min-width: 0; }
+  .diagram-dialog-content .sequence-diagram .diagram-canvas { overflow-x: auto; overscroll-behavior-x: contain; }
+  .diagram-dialog-content .sequence-diagram .sequence-svg { min-width: 560px; }
 }
 
 .honor-holders { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; }

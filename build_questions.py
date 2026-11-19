@@ -146,6 +146,9 @@ one('witch','普通输出',317,'黑风魔女蜘蛛阶段，团队已安排聚怪
 one('witch','远点位',986,'黑风魔女第二次飞天结束后的常规阶段，哪名玩家应特别留意震荡波点名？','距离首领最远的玩家',['距离首领最近的玩家','只有主 T 会被点名','仅正在治疗的玩家'],'后期震荡波可能锁定距离首领最远的玩家，远点位要留意出招预兆。')
 one('witch','远点位',933,'黑风魔女后期震荡波即将到达时，远点位应如何处理？','观察波纹到达时机并起跳躲避',['站在原地等待波纹经过','冲到炸弹位身边共同承受','不看出招，贴着危险线继续输出'],'观察首领出招与波纹到达时机，使用跳跃规避，并留意附近危险线。')
 
+# Peak-server walkthrough: the boss lifts the tank before the healing sequence.
+one('twins','治疗位',164,'双剑球花阶段，首领抓起本侧主 T 并连续攻击时，治疗位应怎样配合？','将治疗珠的绿色指示对准本侧主 T，按团队安排接续抬血',['对准另一侧首领并等待换边','停止治疗，只观察自己的输出','把治疗珠留在地上，等四刀结束再拾取'],'首领抓起主 T 后，治疗位应瞄准本侧主 T，关注血量与刀数，按团队安排衔接治疗。')
+
 assert len(questions) >= 70
 assert all(q['options'] and len(q['answer']) >= 1 for q in questions)
 assert {q['section'] for q in questions} == set(sections)
@@ -159,7 +162,7 @@ for path in sorted((root/'domestic-backend'/'banks').glob('*.json')):
     migrations[old['version']] = sorted(qid for qid in old_questions.keys() | current_questions.keys()
                                       if old_questions.get(qid) != current_questions.get(qid))
 assert 'peak-spiral-2026-11-18-v4' in migrations
-data = {'version':'peak-spiral-2026-11-18-v8','title':'剑灵巅峰服螺旋寺院机制考核',
+data = {'version':'peak-spiral-2026-11-18-v9','title':'剑灵巅峰服螺旋寺院机制考核',
         'draft_migrations': migrations, 'questions':questions}
 payload = json.dumps(data,ensure_ascii=False,indent=2) + '\n'
 (root/'questions.json').write_text(payload,encoding='utf-8')
