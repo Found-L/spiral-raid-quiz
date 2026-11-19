@@ -46,10 +46,14 @@
     <div class="ambient-world" aria-hidden="true"><span></span><span></span><span></span></div>
     <header class="topbar">
       <a href="#home" class="brand" aria-label="螺旋寺院机制考核首页"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><circle class="brand-ring" cx="24" cy="24" r="17"/><path d="M13 23 24 15l11 8M15 26l9-6 9 6M17 28v8h14v-8M21 36v-6h6v6M14 39h20"/><circle class="brand-star" cx="24" cy="11" r="1.5"/></svg></span><span class="brand-copy"><strong>螺旋寺院</strong><small>团队机制考核</small></span></a>
+      <div class="header-dock">
       <nav id="main-nav" class="nav-links" aria-label="主导航"><a href="#guide"><svg class="icon" aria-hidden="true"><use href="#badge-book"/></svg><span>机制图解</span></a><button type="button" data-action="show-leaderboard"><svg class="icon" aria-hidden="true"><use href="#badge-crown"/></svg><span>排行榜</span></button><button type="button" data-action="open-history"><svg class="icon" aria-hidden="true"><use href="#icon-clock"/></svg><span>我的记录</span></button><button type="button" data-action="open-badges"><svg class="icon" aria-hidden="true"><use href="#badge-spark"/></svg><span>我的勋章</span></button></nav>
+      <div class="header-actions">
       <details id="site-switch" class="site-switch"><summary aria-label="切换访问站点" title="切换国内／国外站点"><svg class="icon" aria-hidden="true"><use href="#icon-globe"/></svg><span id="site-current" hidden>站点</span></summary><div class="site-switch-panel"><p class="site-switch-heading">选择访问站点</p><button id="site-domestic" type="button" data-action="switch-site" data-site="domestic"><span><strong>国内站</strong><small>国内访问推荐</small></span><span class="site-current-tag" hidden>当前</span></button><button id="site-overseas" type="button" data-action="switch-site" data-site="overseas"><span><strong>国外站</strong><small>国外访问推荐</small></span><span class="site-current-tag" hidden>当前</span></button><p class="site-switch-note">排行榜共用，切换时可带上本机进度。</p><button class="site-backup" type="button" data-action="download-transfer">备份本机资料</button></div></details>
       <button id="header-profile-button" class="profile-trigger" type="button" data-action="profile" aria-haspopup="dialog" aria-label="设置我的资料"><span class="avatar" aria-hidden="true"><svg class="icon"><use href="#icon-user"/></svg></span><span id="header-profile">设置我的资料</span></button>
       <button id="nav-toggle" class="nav-toggle" type="button" data-action="toggle-navigation" aria-label="打开导航菜单" aria-controls="main-nav" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#icon-menu"/></svg><span>菜单</span></button>
+      </div>
+      </div>
     </header>
 
     <div id="connection-notice" class="connection-notice" role="status" hidden>
