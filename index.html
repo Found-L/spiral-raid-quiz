@@ -1029,7 +1029,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
 .profile-emblem { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border: 1px solid #d7c18a85; border-radius: 15px; color: #e5cb99; background: #263d37; box-shadow: inset 0 0 18px #d2b2791a; }
 .profile-emblem .icon { width: 23px; height: 23px; }
 .profile-dialog .close-button { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 8px; color: #aabdb2; }
-.profile-dialog .close-button:hover { color: #f5dfb6; background: #ffffff10; }
+.profile-dialog .close-button:hover { color: #f5dfb6; background: #263b38; }
 .profile-intro { margin: 20px 0 16px; color: #aebeb5; font-size: 13px; }
 .profile-identity { padding: 16px; border: 1px solid #9db9a62e; border-radius: 10px; background: #0d191e99; }
 .profile-dialog .profile-identity label { margin: 0; color: #e6dcc7; }
@@ -1077,7 +1077,7 @@ input.share-link { display: block; width: 100%; padding: 10px 12px; border: 1px 
 .history-entry-tag { padding: 2px 8px; border: 1px solid #7ca38c4f; border-radius: 99px; color: #b6d4c3; background: #28473b75; font-size: 11px; white-space: nowrap; }
 .history-list li.history-entry small { margin-top: 7px; color: #9eafa8; font-size: 12px; }
 .history-list li.history-entry strong { color: #e9c78d; font: 600 20px Georgia, var(--serif); white-space: nowrap; }
-.badge-people { justify-self: start; padding: 2px 7px; border: 1px solid #85a89a2e; border-radius: 5px; color: #b7c8bd; background: #7292800d; }
+.badge-people { justify-self: start; padding: 2px 7px; border: 1px solid #85a89a2e; border-radius: 5px; color: #b7c8bd; background: #162724; }
 .badges-note { max-width: 960px; color: #a5b7ae; line-height: 1.8; }
 
 @media (max-width: 560px) {
@@ -6350,7 +6350,8 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     } else time.textContent = '本机记录';
     const tag = document.createElement('span');
     tag.className = 'history-entry-tag';
-    tag.textContent = entry.pending ? '待上传' : entry.currentVersion ? '当前题库' : '旧题库';
+    tag.textContent = entry.currentVersion ? '当前题库' : '旧题库';
+    if (entry.pending) tag.textContent = '待上传';
     const heading = document.createElement('div');
     heading.className = 'history-entry-heading';
     heading.append(time, tag);
@@ -6403,7 +6404,8 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
     const number = formatPlayerNumber(profile.playerNumber);
     $('history-player').textContent = [profile.nickname, number].filter(Boolean).join(' · ');
     const hasPrevious = sameOwner && (list.childElementCount > 0 || !$('history-summary').hidden);
-    status.textContent = hasPrevious ? (append ? '正在读取更多记录…' : '正在刷新记录…') : '正在读取答题记录…';
+    status.textContent = hasPrevious ? '正在刷新记录…' : '正在读取答题记录…';
+    if (hasPrevious && append) status.textContent = '正在读取更多记录…';
     historyLoadingOwner = owner;
     refresh.disabled = true;
     more.disabled = true;
@@ -6492,7 +6494,9 @@ function createShareUI({request, getProfile, getIdentity, activeIdentity, showPr
         button.setAttribute('aria-pressed', String(selected));
         const state = badge.earned ? (selected ? '✓ 展示中' : '＋ 已获得 · 可展示') : '未获得';
         const stats = badge.stats || {};
-        const count = stats.masked ? '人数暂不可用' : Number.isSafeInteger(stats.historyCount) ? `历史 ${stats.historyCount} 人` : Number.isSafeInteger(stats.count) ? `${stats.count} 人获得` : '人数暂不可用';
+        let count = '人数暂不可用';
+        if (Number.isSafeInteger(stats.historyCount)) count = `历史 ${stats.historyCount} 人`;
+        else if (Number.isSafeInteger(stats.count)) count = `${stats.count} 人获得`;
         button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span><span class="badge-people">${escape(count)}</span></span>`;
         button.dataset.signature = signature;
       }

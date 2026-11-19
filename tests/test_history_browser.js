@@ -1,11 +1,11 @@
 // Exercise profile and history with synthetic identities and an isolated local database.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
-const {spawn, spawnSync} = require('node:child_process');
+const {spawnSync} = require('node:child_process');
 const {chromium} = require('playwright');
+const {startScoreService} = require('./browser_fixture');
 
 const root = path.resolve(__dirname, '..');
 const python = process.env.PYTHON_BIN || 'python';
@@ -18,29 +18,15 @@ const origin = 'https://www.lysue.com';
 const identity = {deviceId:'a'.repeat(32),secret:'1'.repeat(64)};
 const key = 'spiral-temple-quiz-v1';
 
-async function freePort() {
-  return new Promise((resolve, reject) => {
-    const server = net.createServer(); server.once('error', reject);
-    server.listen(0, '127.0.0.1', () => { const port=server.address().port; server.close(() => resolve(port)); });
-  });
-}
-async function ready(url) {
-  for (let i=0; i<80; i++) {
-    try { if ((await fetch(url)).ok) return; } catch {}
-    await new Promise(resolve => setTimeout(resolve,100));
-  }
-  throw new Error('Test score service did not start');
-}
-
 (async () => {
   let browser, server;
   try {
     const seed = `import sys\nsys.path.insert(0,'domestic-backend')\nimport server\nserver.initialize()\ndb=server.database()\nplayer={'deviceId':'a'*32,'secret':'1'*64}\nserver.profile(db,{**player,'nickname':'流云见月'})\nfor i in range(24):\n ident=f'{i+1:032x}'\n version=server.VERSION if i!=4 else 'older-bank'\n correct=[98,103,101,105,94,99][i%6]\n db.execute('INSERT INTO attempts VALUES (?, ?, ?, ?, ?, ?)',(ident,player['deviceId'],version,correct,105,1794931200000+i*3600000))\n if i!=4: db.execute('INSERT INTO attempt_timings VALUES (?, ?)',(ident,720+i*37))\ndb.execute('INSERT INTO attempt_mistake_badges VALUES (?, ?)',(f'{1:032x}','demolition'))\ndb.close()`;
     const seeded = spawnSync(python, ['-c',seed], {cwd:root,env:{...process.env,QUIZ_DATABASE:database},encoding:'utf8',windowsHide:true});
     assert.equal(seeded.status,0,seeded.stderr);
-    const port=await freePort();
-    server=spawn(python,['domestic-backend/server.py'],{cwd:root,env:{...process.env,QUIZ_DATABASE:database,QUIZ_PORT:String(port)},stdio:'ignore',windowsHide:true});
-    await ready(`http://127.0.0.1:${port}/api/leaderboard`);
+    const fixture=await startScoreService({python,root,database});
+    server=fixture.server;
+    const port=fixture.port;
     browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN || 'C:/Program Files/Google/Chrome/Application/chrome.exe'});
     const context=await browser.newContext({viewport:{width:1440,height:900},reducedMotion:'reduce'});
     await context.addInitScript(({identity,key}) => {

@@ -1,11 +1,11 @@
 // Exercise navigation, both origins, and the score service with an isolated database.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const net = require('node:net');
 const os = require('node:os');
 const path = require('node:path');
-const {spawn, spawnSync} = require('node:child_process');
+const {spawnSync} = require('node:child_process');
 const {chromium} = require('playwright');
+const {startScoreService} = require('./browser_fixture');
 
 const root = path.resolve(__dirname, '..');
 const python = process.env.PYTHON_BIN || 'python';
@@ -22,29 +22,15 @@ const key = 'spiral-temple-quiz-v1';
 const a = {deviceId:'a'.repeat(32),secret:'1'.repeat(64)};
 const b = {deviceId:'b'.repeat(32),secret:'2'.repeat(64)};
 
-function freePort() {
-  return new Promise((resolve, reject) => {
-    const server = net.createServer(); server.once('error', reject);
-    server.listen(0, '127.0.0.1', () => { const port=server.address().port; server.close(() => resolve(port)); });
-  });
-}
-async function ready(url) {
-  for (let i=0;i<80;i++) {
-    try { if ((await fetch(url)).ok) return; } catch {}
-    await new Promise(resolve => setTimeout(resolve,100));
-  }
-  throw new Error('Test score service did not start');
-}
-
 (async () => {
   let browser, server;
   try {
     const seed = `import sys\nsys.path.insert(0,'domestic-backend')\nimport server\nserver.initialize()\ndb=server.database()\nfor c,s,n in [('a','1','国内玩家'),('b','2','国外玩家')]:\n server.profile(db,{'deviceId':c*32,'secret':s*64,'nickname':n})\ndb.close()`;
     const seeded = spawnSync(python,['-c',seed],{cwd:root,env:{...process.env,QUIZ_DATABASE:database},encoding:'utf8',windowsHide:true});
     assert.equal(seeded.status,0,seeded.stderr);
-    const port=await freePort();
-    server=spawn(python,['domestic-backend/server.py'],{cwd:root,env:{...process.env,QUIZ_DATABASE:database,QUIZ_PORT:String(port)},stdio:'ignore',windowsHide:true});
-    await ready(`http://127.0.0.1:${port}/api/leaderboard`);
+    const fixture=await startScoreService({python,root,database});
+    server=fixture.server;
+    const port=fixture.port;
     browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN || 'C:/Program Files/Google/Chrome/Application/chrome.exe'});
 
     async function setup(states, viewport={width:1280,height:900}) {

@@ -691,7 +691,8 @@
     } else time.textContent = '本机记录';
     const tag = document.createElement('span');
     tag.className = 'history-entry-tag';
-    tag.textContent = entry.pending ? '待上传' : entry.currentVersion ? '当前题库' : '旧题库';
+    tag.textContent = entry.currentVersion ? '当前题库' : '旧题库';
+    if (entry.pending) tag.textContent = '待上传';
     const heading = document.createElement('div');
     heading.className = 'history-entry-heading';
     heading.append(time, tag);
@@ -744,7 +745,8 @@
     const number = formatPlayerNumber(profile.playerNumber);
     $('history-player').textContent = [profile.nickname, number].filter(Boolean).join(' · ');
     const hasPrevious = sameOwner && (list.childElementCount > 0 || !$('history-summary').hidden);
-    status.textContent = hasPrevious ? (append ? '正在读取更多记录…' : '正在刷新记录…') : '正在读取答题记录…';
+    status.textContent = hasPrevious ? '正在刷新记录…' : '正在读取答题记录…';
+    if (hasPrevious && append) status.textContent = '正在读取更多记录…';
     historyLoadingOwner = owner;
     refresh.disabled = true;
     more.disabled = true;
@@ -833,7 +835,9 @@
         button.setAttribute('aria-pressed', String(selected));
         const state = badge.earned ? (selected ? '✓ 展示中' : '＋ 已获得 · 可展示') : '未获得';
         const stats = badge.stats || {};
-        const count = stats.masked ? '人数暂不可用' : Number.isSafeInteger(stats.historyCount) ? `历史 ${stats.historyCount} 人` : Number.isSafeInteger(stats.count) ? `${stats.count} 人获得` : '人数暂不可用';
+        let count = '人数暂不可用';
+        if (Number.isSafeInteger(stats.historyCount)) count = `历史 ${stats.historyCount} 人`;
+        else if (Number.isSafeInteger(stats.count)) count = `${stats.count} 人获得`;
         button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span><span class="badge-people">${escape(count)}</span></span>`;
         button.dataset.signature = signature;
       }

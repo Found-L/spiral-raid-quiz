@@ -68,7 +68,7 @@ def _history(db, categories):
     return achieved
 
 
-def counts(db, badges, mistakes, badge_states, honor_boards, categories):
+def counts(db, badges, _mistakes, badge_states, honor_boards, categories):
     path = db.execute('PRAGMA database_list').fetchone()[2]
     now = time.monotonic()
     with _lock:
