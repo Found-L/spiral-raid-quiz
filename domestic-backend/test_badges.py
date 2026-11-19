@@ -108,6 +108,87 @@ class BadgeTest(unittest.TestCase):
         self.assertNotIn('quickest', self.earned(player))
         self.assertNotIn('perfect_fast', self.earned(player))
 
+    def test_mistake_rules_always_point_to_wrong_options_in_supported_banks(self):
+        for version in server.MISTAKE_VERSIONS:
+            questions = {q['id']: q for q in server.BANKS[version]['questions']}
+            for badge, rules in server.MISTAKE_RULES.items():
+                for question_id, choices in rules.items():
+                    if question_id not in questions:
+                        continue
+                    question = questions[question_id]
+                    with self.subTest(version=version, badge=badge, question=question_id):
+                        self.assertLessEqual(choices, {item['id'] for item in question['options']})
+                        self.assertFalse(choices.intersection(question['answer']))
+
+    def test_mistake_badges_use_actual_choices_and_require_opt_in_to_display(self):
+        player = self.player('a')
+        answers = {q['id']: list(q['answer']) for q in server.BANK['questions']}
+        answers['q089'] = ['a']  # The player carries the wave bomb into the group.
+        payload = {**player, 'version': server.VERSION, 'attemptId': 'b' * 32,
+                   'answers': answers, 'elapsedSeconds': 600}
+        first = server.submit(self.db, payload)
+        self.assertEqual(first['correctCount'], len(answers) - 1)
+        self.assertEqual([item['id'] for item in first['triggeredBadges']], ['demolition'])
+        self.assertEqual(server.submit(self.db, payload), first)
+        self.assertIn('demolition', self.earned(player))
+        self.assertNotIn('demolition', server.badges(self.db, player)['selected'])
+        self.assertNotIn('demolition', [item['id'] for item in server.leaderboard(self.db, latest=True)['entries'][0]['badges']])
+        server.select_badges(self.db, {**player, 'selected': ['demolition']})
+        self.assertEqual([item['id'] for item in server.leaderboard(self.db, latest=True)['entries'][0]['badges']], ['demolition'])
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM attempt_mistake_badges').fetchone()[0], 1)
+        server.delete_profile(self.db, player)
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM attempt_mistake_badges').fetchone()[0], 0)
+
+    def test_each_mechanic_badge_can_be_unlocked_by_its_actual_choice(self):
+        for index, (badge_id, rules) in enumerate(server.MISTAKE_RULES.items(), start=1):
+            with self.subTest(badge=badge_id):
+                player = self.player(format(index, 'x'))
+                answers = {q['id']: list(q['answer']) for q in server.BANK['questions']}
+                question_id, choices = next(iter(rules.items()))
+                answers[question_id] = [next(iter(choices))]
+                result = server.submit(self.db, {**player, 'version': server.VERSION,
+                    'attemptId': f'{index:032x}', 'answers': answers})
+                self.assertIn(badge_id, {item['id'] for item in result['triggeredBadges']})
+                self.assertIn(badge_id, self.earned(player))
+
+    def test_newly_uploaded_v5_answers_can_trigger_but_saved_old_scores_cannot_be_guessed(self):
+        player = self.player('a')
+        version = 'peak-spiral-2026-11-18-v5'
+        answers = {q['id']: list(q['answer']) for q in server.BANKS[version]['questions']}
+        answers['q036'] = ['d']
+        # Previously uploaded attempts contain scores, not the original choices.
+        self.attempt(player, len(answers) - 1)
+        self.assertNotIn('demolition', self.earned(player))
+        payload = {**player, 'version': version, 'attemptId': 'c' * 32, 'answers': answers}
+        server.submit(self.db, payload)
+        self.assertIn('demolition', self.earned(player))
+
+    def test_retrying_a_preexisting_score_does_not_invent_original_choices(self):
+        player = self.player('a')
+        version = 'peak-spiral-2026-11-18-v5'
+        answers = {q['id']: list(q['answer']) for q in server.BANKS[version]['questions']}
+        answers['q036'] = ['d']
+        result = server.grade(answers, version)
+        attempt_id = 'b' * 32
+        self.db.execute('INSERT INTO attempts VALUES (?, ?, ?, ?, ?, ?)',
+                        (attempt_id, player['deviceId'], version, result['correctCount'], result['totalCount'], 1))
+        retried = server.submit(self.db, {**player, 'version': version, 'attemptId': attempt_id, 'answers': answers})
+        self.assertEqual(retried['triggeredBadges'], [])
+        self.assertNotIn('demolition', self.earned(player))
+
+    def test_unrelated_wrong_choice_and_old_bank_do_not_unlock_demolition(self):
+        player = self.player('a')
+        answers = {q['id']: list(q['answer']) for q in server.BANK['questions']}
+        answers['q036'] = ['c']  # Continuing to attack is wrong, but not the crowd-bomb joke.
+        server.submit(self.db, {**player, 'version': server.VERSION, 'attemptId': 'd' * 32, 'answers': answers})
+        self.assertNotIn('demolition', self.earned(player))
+        version = 'peak-spiral-2026-11-18-v4'
+        old_answers = {q['id']: list(q['answer']) for q in server.BANKS[version]['questions']}
+        question = next(q for q in server.BANKS[version]['questions'] if q['id'] == 'q036')
+        old_answers['q036'] = [next(o['id'] for o in question['options'] if o['id'] not in question['answer'])]
+        server.submit(self.db, {**player, 'version': version, 'attemptId': 'e' * 32, 'answers': old_answers})
+        self.assertNotIn('demolition', self.earned(player))
+
 
 if __name__ == '__main__':
     unittest.main()

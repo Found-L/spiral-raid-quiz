@@ -87,7 +87,7 @@
   let lastUploadError = '';
   let examTimer = null;
   const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame']);
+  const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame','bomb','spider','laser','lantern','heart','compass']);
   const badgeTones = new Set(['gold','teal','red','violet']);
   const badgeTone = badge => badgeTones.has(badge.tone) ? badge.tone : 'gold';
   const badgeIcon = badge => `<svg class="icon" aria-hidden="true"><use href="#badge-${badgeIcons.has(badge.icon) ? badge.icon : 'spark'}"/></svg>`;
@@ -337,6 +337,11 @@
         if (result?.attemptId === attempt.attemptId && (data.correctCount !== result.correctCount || data.totalCount !== result.totalCount)) {
           throw new Error('成绩核对失败，请刷新后联系团长。');
         }
+        if (result?.attemptId === attempt.attemptId && Array.isArray(data.triggeredBadges)) {
+          result.triggeredBadges = data.triggeredBadges;
+          save(':last-result', result);
+          renderResultBadges();
+        }
         const remaining = pendingAttempts().filter(item => item.attemptId !== attempt.attemptId);
         if (remaining.length && !save(':pending', remaining)) throw new Error('浏览器无法保存上传进度，请检查存储设置。');
         if (!remaining.length) remove(':pending');
@@ -386,6 +391,7 @@
     $('result-name').textContent=profile?profile.nickname:'';
     $('result-score').textContent=formatScore(result.score);
     $('result-detail').textContent=`答对 ${result.correctCount} / ${result.totalCount} 题 · 用时 ${formatDuration(result.elapsedSeconds)} · 多选题全部选对才计分`;
+    renderResultBadges();
     $('review-toggle').textContent=onlyWrong?'查看全部题目':'只看错题';
     const list=$('review-list'); list.replaceChildren();
     qs.forEach((q,i)=>{
@@ -396,6 +402,12 @@
       article.innerHTML=`<div class="review-meta">${String(i+1).padStart(2,'0')} / ${escape(sectionOf(q.section).short)} · ${escape(q.role)} · ${correct?'回答正确':'回答有误'}</div><h3>${escape(q.question)}</h3>${questionDiagram(q)}<p>你的选择：${escape(chosen)}</p><p>正确答案：${escape(expected)}</p><p class="explanation">解析：${escape(q.explanation)}</p>`; list.append(article);
     });
     if(!list.children.length){const p=document.createElement('p');p.className='empty-state';p.textContent='这一轮没有错题。';list.append(p);}
+  }
+  function renderResultBadges() {
+    const items = (result?.triggeredBadges || []).filter(badge => badge && typeof badge.name === 'string');
+    const container = $('result-honors');
+    container.hidden = !items.length;
+    container.innerHTML = items.length ? `<span>本轮触发的趣味勋章</span><div>${items.map(badgeChip).join('')}</div><small>可以在“我的勋章”中选择是否展示。</small>` : '';
   }
   function rankingRow(entry) {
     const row=document.createElement('div'); row.className='ranking-row';
@@ -535,7 +547,7 @@
       button.disabled = !badge.earned;
       button.setAttribute('aria-pressed', String(selected));
       let state = '未获得';
-      if (badge.earned) state = selected ? '已选择展示' : '已获得';
+      if (badge.earned) state = selected ? '✓ 展示中' : '＋ 已获得 · 可展示';
       button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span></span>`;
       grid.append(button);
     }

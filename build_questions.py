@@ -125,9 +125,20 @@ judge(s,'后期全员',333,'第二次飞天之后，魔女与蜘蛛不可能同�
 fill(s,'主 T',253,'选择填空：黑风魔女被击倒后，主 T 应根据首领动作判断冲锋____，并留意不祥气息。','方向',['治疗量','业火层数','球体颜色'],'击倒后留意首领动作和面向，判断前冲或后冲，并预留安全落点。')
 fill(s,'蜘蛛控制位',324,'选择填空：大蜘蛛面向首领准备回血时，可按指挥使用眩晕或____打断。','击倒',['治疗珠','业火','摘除装备'],'大蜘蛛面向首领准备回血时，可以通过眩晕或击倒打断。')
 
+# Keep the original question IDs stable so that earlier drafts and answer keys remain usable.
+one('twins','加血位',408,'双剑换边后，治疗位准备使用治疗珠时，应先确认什么？','确认本侧主 T 的位置，让绿色指示对准主 T',['把治疗珠瞄准最远的队友，主 T 自求多福','对着首领治疗，顺便帮首领回血','不管队友位置，朝场外使用'],'治疗珠的绿色指示应对准本侧承担仇恨的主 T。')
+one('spirit','波动位',60,'超魔灵波动炸弹倒计时中，隔离区已有队友，被点名者应怎么做？','及时远离队友和隔离区，让爆炸避开人群',['带着烟花冲进隔离区，给队友一个惊喜','紧贴主 T，一起迎接爆炸','等炸完再离开人群'],'波动炸弹会威胁附近队友，点名后应在爆炸前远离人群。')
+one('spirit','外场位',150,'超魔灵主 T 正在引导染灯，外场队员发现自己位于引导路线上，应怎么做？','避开主 T 的引导方向，留出安全路线',['追着主 T 一起逛灯会，站在路线正前方','带着炸弹跑到主 T 身边','全员集中到主 T 脚下'],'外场人员应避开主 T 的染灯方向和行进路线。')
+one('spirit','外场位',130,'超魔灵击倒切换时，不带业火且按分工留在外场，应该如何面向首领？','背对首领',['面向首领抢入隔离，主打一个热情参与','面向首领并紧跟业火位','无视面向，带着炸弹靠近队友'],'需要留在外场且没有业火的队员应背对首领。')
+one('witch','聚怪位',317,'黑风魔女蜘蛛阶段，小蜘蛛刷新后，聚怪位应如何配合团队？','先聚拢小蜘蛛，再按分工带到大蜘蛛附近集中处理',['放生小蜘蛛，让它们在场地里自由散步','带着小蜘蛛去炸弹位旁边集合','把小蜘蛛分别引向不同方向'],'聚怪位应将小蜘蛛集中，再配合团队处理大蜘蛛和小蜘蛛。')
+one('witch','主 T',585,'黑风魔女第一次蜘蛛处理结束后准备落地，主 T 发现附近有不祥气息，应如何带位？','观察落点并避开不祥气息，避免首领碰线',['带首领穿过危险线，尝试一键加速','把首领停在危险线上等它经过','先不看落点，只追求输出'],'首领落地时应留意附近不祥气息，避免首领碰线狂暴。')
+one('witch','蜘蛛控制位',324,'黑风魔女蜘蛛阶段，大蜘蛛面向首领准备回血，控制位应如何应对？','按指挥使用眩晕或击倒，打断回血',['目送蜘蛛把首领奶满，祝老板生意兴隆','等它回血结束再准备控制','停止观察大蜘蛛，全部追着首领跑'],'大蜘蛛面向首领准备回血时，按团队指挥及时控制并打断。')
+
 assert len(questions) >= 70
 assert all(q['options'] and len(q['answer']) >= 1 for q in questions)
 assert {q['section'] for q in questions} == set(sections)
+# Present each chapter together while leaving question IDs unchanged.
+questions.sort(key=lambda question: sections.index(question['section']))
 current_questions = {q['id']: q for q in questions}
 migrations = {}
 for path in sorted((root/'domestic-backend'/'banks').glob('*.json')):
@@ -136,7 +147,7 @@ for path in sorted((root/'domestic-backend'/'banks').glob('*.json')):
     migrations[old['version']] = sorted(qid for qid in old_questions.keys() | current_questions.keys()
                                       if old_questions.get(qid) != current_questions.get(qid))
 assert 'peak-spiral-2026-11-18-v4' in migrations
-data = {'version':'peak-spiral-2026-11-18-v5','title':'剑灵巅峰服螺旋寺院机制考核',
+data = {'version':'peak-spiral-2026-11-18-v6','title':'剑灵巅峰服螺旋寺院机制考核',
         'draft_migrations': migrations, 'questions':questions}
 payload = json.dumps(data,ensure_ascii=False,indent=2) + '\n'
 (root/'questions.json').write_text(payload,encoding='utf-8')

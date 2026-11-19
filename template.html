@@ -31,6 +31,12 @@
     <symbol id="badge-shield" viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 5-3 7.5-7 10-4-2.5-7-5-7-10V6zM9 12l2 2 4-4"/></symbol>
     <symbol id="badge-spark" viewBox="0 0 24 24"><path d="M12 3c.8 5 2 7.2 7 9-5 1.8-6.2 4-7 9-.8-5-2-7.2-7-9 5-1.8 6.2-4 7-9ZM19 3v4m-2-2h4"/></symbol>
     <symbol id="badge-flame" viewBox="0 0 24 24"><path d="M12 3c.8 4-3 5.5-3 8-1.4-.5-2-1.5-2-3-2.5 2.1-3.5 4-3.5 6.5a8.5 8.5 0 0 0 17 0c0-3-2-5.5-4-7.5 0 2.5-.7 3.5-2 4 .2-3.5-1-6-2.5-8Z"/></symbol>
+    <symbol id="badge-bomb" viewBox="0 0 24 24"><circle cx="10" cy="14" r="7"/><path d="m13.7 8.2 1.5-2.7 2 1.3-1.7 2.6M16 5c.8-1.8 2.1-2.6 4-2.1M19 5l1.7.4M19.7 1.3l.4 1.6M7.2 12.5h.1m5.3 0h.1M7.5 16q2.5 2.2 5 0"/></symbol>
+    <symbol id="badge-spider" viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="4.5" ry="5.5"/><circle cx="12" cy="7.2" r="2.3"/><path d="M8 11 5 8 2.5 9M7.5 14H3l-1.5 2M8 17l-3 3-2 .3M16 11l3-3 2.5 1M16.5 14H21l1.5 2M16 17l3 3 2 .3M10.5 13h.1m2.8 0h.1"/></symbol>
+    <symbol id="badge-laser" viewBox="0 0 24 24"><path d="M3 19 19 3M3.5 15.5l5 5M15.5 3.5l5 5M11 4l1 2M4 11l2 1M17.5 14l2 1M14 17.5l1 2"/><path d="m11 10 1.5 1.5L11 13l1.5 1.5"/></symbol>
+    <symbol id="badge-lantern" viewBox="0 0 24 24"><path d="M12 2.5v3M9 5.5h6M8 7h8c2.5 3 2.5 8 0 10H8c-2.5-2-2.5-7 0-10ZM9 18h6M12 18v3M10 9c-1 2-1 5 0 6m4-6c1 2 1 5 0 6"/></symbol>
+    <symbol id="badge-heart" viewBox="0 0 24 24"><path d="M12 20S3.5 15 3.5 9.6c0-4 5.1-5.8 8.5-2.2 3.4-3.6 8.5-1.8 8.5 2.2C20.5 15 12 20 12 20Z"/><path d="M12 9v6m-3-3h6"/></symbol>
+    <symbol id="badge-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m15.8 8.2-2.1 5.5-5.5 2.1 2.1-5.5zM12 1.5v2M12 20.5v2M1.5 12h2M20.5 12h2"/></symbol>
   </svg>
   <div class="site-shell">
     <header class="topbar">
@@ -139,7 +145,7 @@
         <output id="badges-status" class="badges-status" aria-live="polite"></output>
         <div class="badges-actions"><button id="badges-save" class="btn btn-primary" type="button" data-action="save-badges" hidden>保存展示</button><button id="badges-reload" class="btn btn-ghost" type="button" data-action="reload-badges" hidden>刷新勋章</button><button id="badges-profile" class="btn btn-primary" type="button" data-action="badges-profile" hidden>设置昵称或恢复身份</button></div>
         <div id="badges-grid" class="badges-grid"></div>
-        <p class="badges-note">勋章根据已上传的答题记录计算。未记录用时的成绩不参与用时勋章；答题用时由浏览器记录，仅供趣味展示。</p>
+        <p class="badges-note">成绩勋章根据已上传的记录计算；趣味错题勋章从本次功能上线后的交卷开始解锁，默认不会公开。未记录用时的成绩不参与用时勋章。</p>
       </section>
 
       <section id="exam-view" class="exam-view hidden" aria-label="机制考核">
@@ -150,7 +156,7 @@
         </div>
       </section>
 
-      <section id="result-view" class="result-view hidden" aria-label="考核结果"><div class="result-head"><p class="eyebrow">ASSESSMENT COMPLETE <span class="slash">/</span> 考核完成</p><h2>这一轮，辛苦了。</h2><p id="result-name" class="muted"></p><div class="score-display"><strong id="result-score">0</strong><span> / 100</span></div><p id="result-detail"></p><p id="sync-status" class="sync-status" aria-live="polite"></p><div class="result-actions"><button class="btn btn-primary" type="button" data-action="retry-upload" id="retry-upload" hidden>重新上传成绩</button><button class="btn btn-secondary" type="button" data-action="restart">再练一次</button><button class="btn btn-ghost" type="button" data-action="open-history">我的答题记录</button><button class="btn btn-ghost" type="button" data-action="open-badges">我的勋章</button><button class="btn btn-ghost" type="button" data-action="results-home">查看排行榜 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div></div><div class="review-head"><div><p class="eyebrow">ANSWER REVIEW</p><h2>答案与解析</h2></div><button id="review-toggle" class="link-button" type="button" data-action="toggle-review">只看错题</button></div><div id="review-list" class="review-list"></div></section>
+      <section id="result-view" class="result-view hidden" aria-label="考核结果"><div class="result-head"><p class="eyebrow">ASSESSMENT COMPLETE <span class="slash">/</span> 考核完成</p><h2>这一轮，辛苦了。</h2><p id="result-name" class="muted"></p><div class="score-display"><strong id="result-score">0</strong><span> / 100</span></div><p id="result-detail"></p><p id="sync-status" class="sync-status" aria-live="polite"></p><div id="result-honors" class="result-honors" aria-live="polite" hidden></div><div class="result-actions"><button class="btn btn-primary" type="button" data-action="retry-upload" id="retry-upload" hidden>重新上传成绩</button><button class="btn btn-secondary" type="button" data-action="restart">再练一次</button><button class="btn btn-ghost" type="button" data-action="open-history">我的答题记录</button><button class="btn btn-ghost" type="button" data-action="open-badges">我的勋章</button><button class="btn btn-ghost" type="button" data-action="results-home">查看排行榜 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div></div><div class="review-head"><div><p class="eyebrow">ANSWER REVIEW</p><h2>答案与解析</h2></div><button id="review-toggle" class="link-button" type="button" data-action="toggle-review">只看错题</button></div><div id="review-list" class="review-list"></div></section>
     </main>
     <footer><div class="footer-brand">螺旋寺院 <span>·</span> 团队机制考核</div><p>用于团队训练，请结合当前版本实战确认。</p><span>BUILT FOR THE RAID</span></footer>
   </div>

@@ -48,9 +48,28 @@ BADGES = [
     {'id': 'comeback', 'name': '咸鱼翻身', 'description': '曾有一轮低于 60 分，之后又有一轮达到 90 分。', 'icon': 'spark', 'tone': 'gold'},
     {'id': 'zero', 'name': '反向满分', 'description': '任意一轮 0 题答对。', 'icon': 'target', 'tone': 'violet'},
     {'id': 'brave', 'name': '胆大先开怪', 'description': '任意一轮低于 60 分，开荒勇气可嘉。', 'icon': 'flame', 'tone': 'red'},
+    {'id': 'demolition', 'name': '爆破鬼才', 'description': '选过带着炸弹靠近队友的危险选项。烟花虽好，请远离人群。', 'icon': 'bomb', 'tone': 'red'},
+    {'id': 'spider_keeper', 'name': '蜘蛛饲养员', 'description': '选过放任或乱带小蜘蛛的选项。蜘蛛还是要按分工聚好。', 'icon': 'spider', 'tone': 'violet'},
+    {'id': 'laser_runner', 'name': '危险线竞速', 'description': '选过让首领横穿或碰到危险线的选项。过线可不是加速。', 'icon': 'laser', 'tone': 'red'},
+    {'id': 'lamp_tourist', 'name': '灯会跟团游', 'description': '选过追着主 T 挡染灯路线的选项。赏灯请给主 T 让路。', 'icon': 'lantern', 'tone': 'gold'},
+    {'id': 'doctor', 'name': '妙手回错春', 'description': '选过把治疗珠瞄错目标的选项。绿色指示要对准本侧主 T。', 'icon': 'heart', 'tone': 'teal'},
+    {'id': 'direction', 'name': '方向感大师', 'description': '选过外场位面向首领抢入隔离的选项。留在外场要背对首领。', 'icon': 'compass', 'tone': 'violet'},
+    {'id': 'boss_healer', 'name': '首领慈善家', 'description': '选过放任大蜘蛛给首领回血的选项。记得及时打断。', 'icon': 'heart', 'tone': 'red'},
     {'id': 'first', 'name': '初入寺院', 'description': '完成第一轮考核。', 'icon': 'temple', 'tone': 'teal'},
 ]
 BADGE_BY_ID = {badge['id']: badge for badge in BADGES}
+# These option IDs apply only to these two explicitly checked answer keys.
+MISTAKE_VERSIONS = {'peak-spiral-2026-11-18-v5', 'peak-spiral-2026-11-18-v6'}
+MISTAKE_RULES = {
+    'demolition': {'q036': {'b', 'd'}, 'q042': {'a'}, 'q047': {'a'}, 'q050': {'d'},
+                   'q066': {'a', 'c'}, 'q089': {'a', 'c'}, 'q090': {'a'}, 'q091': {'b'}},
+    'spider_keeper': {'q070': {'c', 'd'}, 'q092': {'b', 'c', 'd'}},
+    'laser_runner': {'q060': {'d'}, 'q075': {'c'}, 'q093': {'a', 'b'}},
+    'lamp_tourist': {'q047': {'c', 'd'}, 'q090': {'c', 'd'}},
+    'doctor': {'q014': {'b', 'c', 'd'}, 'q088': {'b', 'c', 'd'}},
+    'direction': {'q042': {'b'}, 'q091': {'a', 'c'}},
+    'boss_healer': {'q071': {'d'}, 'q094': {'a', 'b'}},
+}
 
 
 class ApiError(Exception):
@@ -95,6 +114,11 @@ def initialize():
                 participant_id TEXT PRIMARY KEY REFERENCES participants(id) ON DELETE CASCADE,
                 selections TEXT NOT NULL,
                 updated_at INTEGER NOT NULL
+            );
+            CREATE TABLE IF NOT EXISTS attempt_mistake_badges (
+                attempt_id TEXT NOT NULL REFERENCES attempts(id) ON DELETE CASCADE,
+                badge_id TEXT NOT NULL,
+                PRIMARY KEY (attempt_id, badge_id)
             );
             CREATE INDEX IF NOT EXISTS attempts_version_participant ON attempts(quiz_version, participant_id);
             CREATE INDEX IF NOT EXISTS attempts_participant_time ON attempts(participant_id, submitted_at, id);
@@ -153,6 +177,13 @@ def authenticated(db, device, secret_hash, message):
         raise ApiError(message, 403)
 
 
+def mistake_badges(answers, version):
+    if version not in MISTAKE_VERSIONS:
+        return set()
+    return {badge_id for badge_id, rules in MISTAKE_RULES.items()
+            if any(set(answers.get(question_id, [])) & options for question_id, options in rules.items())}
+
+
 def profile(db, body):
     device, secret_hash = credentials(body)
     nickname = validate_nickname(body.get('nickname'))
@@ -207,8 +238,13 @@ def submit(db, body):
                        (attempt_id, device, submitted_version, result['correctCount'], result['totalCount'], now))
             if elapsed is not None:
                 db.execute('INSERT INTO attempt_timings VALUES (?, ?)', (attempt_id, elapsed))
+            for badge_id in mistake_badges(body['answers'], submitted_version):
+                db.execute('INSERT INTO attempt_mistake_badges VALUES (?, ?)', (attempt_id, badge_id))
+        triggered = {row['badge_id'] for row in db.execute(
+            'SELECT badge_id FROM attempt_mistake_badges WHERE attempt_id = ?', (attempt_id,))}
         db.execute('COMMIT')
-        return {'ok': True, **result, 'submittedAt': now, 'elapsedSeconds': elapsed}
+        return {'ok': True, **result, 'submittedAt': now, 'elapsedSeconds': elapsed,
+                'triggeredBadges': [badge for badge in BADGES if badge['id'] in triggered]}
     except Exception:
         db.execute('ROLLBACK')
         raise
@@ -289,16 +325,23 @@ def badge_states(db, participant_ids):
     by_player = {participant_id: [] for participant_id in participant_ids}
     for attempt in attempts:
         by_player[attempt['participant_id']].append(attempt)
+    mistakes = {participant_id: set() for participant_id in participant_ids}
+    for row in db.execute('''SELECT DISTINCT a.participant_id, m.badge_id FROM attempts a
+                             JOIN attempt_mistake_badges m ON m.attempt_id = a.id
+                             WHERE a.participant_id IN (''' + placeholders + ')', participant_ids):
+        if row['badge_id'] in BADGE_BY_ID:
+            mistakes[row['participant_id']].add(row['badge_id'])
     saved = saved_badge_selections(db, participant_ids, placeholders)
     states = {}
     for participant_id, rows in by_player.items():
-        earned = earned_badges(rows, fastest)
+        earned = earned_badges(rows, fastest) | mistakes[participant_id]
         ordered = [badge['id'] for badge in BADGES if badge['id'] in earned]
         if participant_id in saved:
             selected = list(dict.fromkeys(item for item in saved[participant_id]
                                           if isinstance(item, str) and item in earned))[:MAX_SHOWN_BADGES]
         else:
-            selected = ordered[:MAX_SHOWN_BADGES]
+            # Wrong-answer honors are private unless their owner explicitly displays them.
+            selected = [item for item in ordered if item not in MISTAKE_RULES][:MAX_SHOWN_BADGES]
         states[participant_id] = {'earned': earned, 'selected': selected}
     return states, fastest
 

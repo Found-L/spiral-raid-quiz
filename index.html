@@ -259,24 +259,32 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .badges-view h1:focus { outline: none; }
 .badges-intro { max-width: 700px; margin: 0; color: var(--muted); }
 .badges-status { display: block; margin: 20px 0 14px; color: #e1c9a0; font-size: 13px; }
-.badges-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.badge-card { min-width: 0; min-height: 142px; display: flex; align-items: flex-start; gap: 14px; padding: 17px; text-align: left; color: var(--text); background: linear-gradient(135deg, #1a252c, #131c24); border: 1px solid #35413e; border-radius: 5px; transition: border-color .18s, background .18s, transform .18s; }
-.badge-card.earned:hover { border-color: var(--badge-color); transform: translateY(-2px); }
-.badge-card.selected { border-color: var(--badge-color); background: linear-gradient(135deg, #28302c, #172129); }
-.badge-card.locked { opacity: .63; cursor: default; }
+.badges-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.badge-card { position: relative; min-width: 0; min-height: 167px; display: flex; align-items: flex-start; gap: 15px; padding: 20px 17px; text-align: left; color: var(--text); background: linear-gradient(145deg, #1c2930, #131d25 80%); border: 1px solid #43605c; border-radius: 10px; transition: border-color .18s, background .18s, transform .18s, box-shadow .18s; }
+.badge-card.earned:hover { border-color: var(--badge-color); transform: translateY(-2px); box-shadow: 0 8px 25px #0003; }
+.badge-card.selected { border: 2px solid #e9c77f; padding: 19px 16px; background: linear-gradient(135deg, #3b3428, #202a2b 60%, #18232a); box-shadow: inset 0 0 22px #e8c27c12, 0 0 0 3px #e7c27415; }
+.badge-card.locked { border: 1px dashed #38444a; background: #111a21; cursor: default; }
 .tone-gold { --badge-color: #e5c488; }.tone-teal { --badge-color: #93cec4; }.tone-red { --badge-color: #e7a092; }.tone-violet { --badge-color: #c9b8e6; }
-.badge-crest { width: 50px; height: 50px; flex: none; display: grid; place-items: center; color: var(--badge-color); border: 1px solid currentColor; border-radius: 15px 15px 19px 19px; background: rgba(223,191,135,.07); box-shadow: inset 0 0 0 4px rgba(10,16,22,.55); }
-.badge-crest .icon { width: 24px; height: 24px; }
-.badge-info { display: grid; gap: 5px; min-width: 0; }
-.badge-title { color: var(--badge-color); font-weight: 700; font-size: 15px; }
-.badge-description { color: #c1c9c3; font-size: 12px; line-height: 1.6; }
-.badge-state { color: #aab2aa; font-size: 11px; }
-.badge-card.selected .badge-state { color: var(--badge-color); }
+.badge-crest { width: 58px; height: 64px; flex: none; display: grid; place-items: center; color: var(--badge-color); border: 1px solid currentColor; border-radius: 20px 20px 25px 25px; background: radial-gradient(circle at 50% 22%, color-mix(in srgb, var(--badge-color) 25%, transparent), transparent 70%), #172128; box-shadow: inset 0 0 0 4px #0a1016aa, 0 5px 12px #0004; }
+.badge-crest .icon { width: 29px; height: 29px; stroke-width: 1.65; }
+.badge-info { display: grid; align-content: start; gap: 7px; min-width: 0; }
+.badge-title { color: var(--badge-color); font-weight: 750; font-size: 16px; }
+.badge-description { color: #cbd2cc; font-size: 12px; line-height: 1.65; }
+.badge-state { justify-self: start; display: inline-flex; align-items: center; margin-top: 3px; padding: 3px 9px; border: 1px solid #668f80; border-radius: 999px; color: #bce4d3; background: #234239; font-size: 11px; font-weight: 700; line-height: 1.4; }
+.badge-card.selected .badge-state { color: #251d10; border-color: #f2d99f; background: #f1d49a; }
+.badge-card.locked .badge-crest { color: #76838a; filter: grayscale(1); background: #182127; box-shadow: inset 0 0 0 4px #0a1016aa; }
+.badge-card.locked .badge-title { color: #9ba7aa; }
+.badge-card.locked .badge-description { color: #9ca8a8; }
+.badge-card.locked .badge-state { color: #a8b1b3; border-color: #48565a; background: #263137; }
 .badges-actions { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; flex-wrap: wrap; margin: 0 0 15px; padding: 8px 0; background: rgba(11,16,23,.96); }
 .badges-note { margin: 18px 0 0; color: var(--muted); font-size: 12px; line-height: 1.8; }
 .rank-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
 .badge-chip { display: inline-flex; align-items: center; gap: 3px; max-width: 100%; padding: 2px 6px; border: 1px solid color-mix(in srgb, var(--badge-color) 45%, transparent); border-radius: 3px; color: var(--badge-color); background: rgba(224,196,151,.04); font-size: 10px; line-height: 1.4; white-space: nowrap; }
 .badge-chip .icon { width: 12px; height: 12px; stroke-width: 1.8; }
+.result-honors { display: inline-grid; gap: 7px; margin-top: 15px; padding: 13px 18px; border: 1px solid #826b4b; border-radius: 8px; background: #271f1a; text-align: left; }
+.result-honors > span { color: #f0d19d; font-size: 13px; font-weight: 700; }
+.result-honors > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.result-honors small { color: #c9c2b4; }
 #profile-badges { margin-left: 16px; }
 
 @media (max-width: 900px) { .badges-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -311,6 +319,12 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
     <symbol id="badge-shield" viewBox="0 0 24 24"><path d="M12 3 19 6v5c0 5-3 7.5-7 10-4-2.5-7-5-7-10V6zM9 12l2 2 4-4"/></symbol>
     <symbol id="badge-spark" viewBox="0 0 24 24"><path d="M12 3c.8 5 2 7.2 7 9-5 1.8-6.2 4-7 9-.8-5-2-7.2-7-9 5-1.8 6.2-4 7-9ZM19 3v4m-2-2h4"/></symbol>
     <symbol id="badge-flame" viewBox="0 0 24 24"><path d="M12 3c.8 4-3 5.5-3 8-1.4-.5-2-1.5-2-3-2.5 2.1-3.5 4-3.5 6.5a8.5 8.5 0 0 0 17 0c0-3-2-5.5-4-7.5 0 2.5-.7 3.5-2 4 .2-3.5-1-6-2.5-8Z"/></symbol>
+    <symbol id="badge-bomb" viewBox="0 0 24 24"><circle cx="10" cy="14" r="7"/><path d="m13.7 8.2 1.5-2.7 2 1.3-1.7 2.6M16 5c.8-1.8 2.1-2.6 4-2.1M19 5l1.7.4M19.7 1.3l.4 1.6M7.2 12.5h.1m5.3 0h.1M7.5 16q2.5 2.2 5 0"/></symbol>
+    <symbol id="badge-spider" viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="4.5" ry="5.5"/><circle cx="12" cy="7.2" r="2.3"/><path d="M8 11 5 8 2.5 9M7.5 14H3l-1.5 2M8 17l-3 3-2 .3M16 11l3-3 2.5 1M16.5 14H21l1.5 2M16 17l3 3 2 .3M10.5 13h.1m2.8 0h.1"/></symbol>
+    <symbol id="badge-laser" viewBox="0 0 24 24"><path d="M3 19 19 3M3.5 15.5l5 5M15.5 3.5l5 5M11 4l1 2M4 11l2 1M17.5 14l2 1M14 17.5l1 2"/><path d="m11 10 1.5 1.5L11 13l1.5 1.5"/></symbol>
+    <symbol id="badge-lantern" viewBox="0 0 24 24"><path d="M12 2.5v3M9 5.5h6M8 7h8c2.5 3 2.5 8 0 10H8c-2.5-2-2.5-7 0-10ZM9 18h6M12 18v3M10 9c-1 2-1 5 0 6m4-6c1 2 1 5 0 6"/></symbol>
+    <symbol id="badge-heart" viewBox="0 0 24 24"><path d="M12 20S3.5 15 3.5 9.6c0-4 5.1-5.8 8.5-2.2 3.4-3.6 8.5-1.8 8.5 2.2C20.5 15 12 20 12 20Z"/><path d="M12 9v6m-3-3h6"/></symbol>
+    <symbol id="badge-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="m15.8 8.2-2.1 5.5-5.5 2.1 2.1-5.5zM12 1.5v2M12 20.5v2M1.5 12h2M20.5 12h2"/></symbol>
   </svg>
   <div class="site-shell">
     <header class="topbar">
@@ -419,7 +433,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         <output id="badges-status" class="badges-status" aria-live="polite"></output>
         <div class="badges-actions"><button id="badges-save" class="btn btn-primary" type="button" data-action="save-badges" hidden>保存展示</button><button id="badges-reload" class="btn btn-ghost" type="button" data-action="reload-badges" hidden>刷新勋章</button><button id="badges-profile" class="btn btn-primary" type="button" data-action="badges-profile" hidden>设置昵称或恢复身份</button></div>
         <div id="badges-grid" class="badges-grid"></div>
-        <p class="badges-note">勋章根据已上传的答题记录计算。未记录用时的成绩不参与用时勋章；答题用时由浏览器记录，仅供趣味展示。</p>
+        <p class="badges-note">成绩勋章根据已上传的记录计算；趣味错题勋章从本次功能上线后的交卷开始解锁，默认不会公开。未记录用时的成绩不参与用时勋章。</p>
       </section>
 
       <section id="exam-view" class="exam-view hidden" aria-label="机制考核">
@@ -430,7 +444,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         </div>
       </section>
 
-      <section id="result-view" class="result-view hidden" aria-label="考核结果"><div class="result-head"><p class="eyebrow">ASSESSMENT COMPLETE <span class="slash">/</span> 考核完成</p><h2>这一轮，辛苦了。</h2><p id="result-name" class="muted"></p><div class="score-display"><strong id="result-score">0</strong><span> / 100</span></div><p id="result-detail"></p><p id="sync-status" class="sync-status" aria-live="polite"></p><div class="result-actions"><button class="btn btn-primary" type="button" data-action="retry-upload" id="retry-upload" hidden>重新上传成绩</button><button class="btn btn-secondary" type="button" data-action="restart">再练一次</button><button class="btn btn-ghost" type="button" data-action="open-history">我的答题记录</button><button class="btn btn-ghost" type="button" data-action="open-badges">我的勋章</button><button class="btn btn-ghost" type="button" data-action="results-home">查看排行榜 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div></div><div class="review-head"><div><p class="eyebrow">ANSWER REVIEW</p><h2>答案与解析</h2></div><button id="review-toggle" class="link-button" type="button" data-action="toggle-review">只看错题</button></div><div id="review-list" class="review-list"></div></section>
+      <section id="result-view" class="result-view hidden" aria-label="考核结果"><div class="result-head"><p class="eyebrow">ASSESSMENT COMPLETE <span class="slash">/</span> 考核完成</p><h2>这一轮，辛苦了。</h2><p id="result-name" class="muted"></p><div class="score-display"><strong id="result-score">0</strong><span> / 100</span></div><p id="result-detail"></p><p id="sync-status" class="sync-status" aria-live="polite"></p><div id="result-honors" class="result-honors" aria-live="polite" hidden></div><div class="result-actions"><button class="btn btn-primary" type="button" data-action="retry-upload" id="retry-upload" hidden>重新上传成绩</button><button class="btn btn-secondary" type="button" data-action="restart">再练一次</button><button class="btn btn-ghost" type="button" data-action="open-history">我的答题记录</button><button class="btn btn-ghost" type="button" data-action="open-badges">我的勋章</button><button class="btn btn-ghost" type="button" data-action="results-home">查看排行榜 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div></div><div class="review-head"><div><p class="eyebrow">ANSWER REVIEW</p><h2>答案与解析</h2></div><button id="review-toggle" class="link-button" type="button" data-action="toggle-review">只看错题</button></div><div id="review-list" class="review-list"></div></section>
     </main>
     <footer><div class="footer-brand">螺旋寺院 <span>·</span> 团队机制考核</div><p>用于团队训练，请结合当前版本实战确认。</p><span>BUILT FOR THE RAID</span></footer>
   </div>
@@ -440,7 +454,7 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
   <dialog id="diagram-dialog" class="diagram-dialog" aria-labelledby="diagram-dialog-title"><div class="dialog-top"><div><p class="eyebrow">TACTICAL MAP</p><h2 id="diagram-dialog-title">放大查看示意图</h2></div><button class="close-button" type="button" data-action="close-diagram" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="diagram-dialog-hint">手机可左右滑动查看完整图解。</p><div id="diagram-dialog-content" class="diagram-dialog-content"></div></dialog>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <script id="question-bank" type="application/json">{
-  "version": "peak-spiral-2026-11-18-v5",
+  "version": "peak-spiral-2026-11-18-v6",
   "title": "剑灵巅峰服螺旋寺院机制考核",
   "draft_migrations": {
     "peak-spiral-2026-11-18-v2": [
@@ -530,7 +544,14 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "q084",
       "q085",
       "q086",
-      "q087"
+      "q087",
+      "q088",
+      "q089",
+      "q090",
+      "q091",
+      "q092",
+      "q093",
+      "q094"
     ],
     "peak-spiral-2026-11-18-v3": [
       "q009",
@@ -550,11 +571,34 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "q058",
       "q072",
       "q082",
-      "q086"
+      "q086",
+      "q088",
+      "q089",
+      "q090",
+      "q091",
+      "q092",
+      "q093",
+      "q094"
     ],
     "peak-spiral-2026-11-18-v4": [
       "q018",
-      "q045"
+      "q045",
+      "q088",
+      "q089",
+      "q090",
+      "q091",
+      "q092",
+      "q093",
+      "q094"
+    ],
+    "peak-spiral-2026-11-18-v5": [
+      "q088",
+      "q089",
+      "q090",
+      "q091",
+      "q092",
+      "q093",
+      "q094"
     ]
   },
   "questions": [
@@ -1423,6 +1467,35 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
       "explanation": "异色治疗位应先等吸人结束，过早移动可能被吸回。"
     },
     {
+      "id": "q088",
+      "section": "twins",
+      "role": "加血位",
+      "type": "single",
+      "question": "双剑换边后，治疗位准备使用治疗珠时，应先确认什么？",
+      "options": [
+        {
+          "id": "a",
+          "text": "确认本侧主 T 的位置，让绿色指示对准主 T"
+        },
+        {
+          "id": "b",
+          "text": "把治疗珠瞄准最远的队友，主 T 自求多福"
+        },
+        {
+          "id": "c",
+          "text": "不管队友位置，朝场外使用"
+        },
+        {
+          "id": "d",
+          "text": "对着首领治疗，顺便帮首领回血"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "治疗珠的绿色指示应对准本侧承担仇恨的主 T。"
+    },
+    {
       "id": "q031",
       "section": "spirit",
       "role": "业火位",
@@ -2113,6 +2186,93 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         "c"
       ],
       "explanation": "击倒切换时，带业火进入隔离的玩家应面向首领。"
+    },
+    {
+      "id": "q089",
+      "section": "spirit",
+      "role": "波动位",
+      "type": "single",
+      "question": "超魔灵波动炸弹倒计时中，隔离区已有队友，被点名者应怎么做？",
+      "options": [
+        {
+          "id": "a",
+          "text": "带着烟花冲进隔离区，给队友一个惊喜"
+        },
+        {
+          "id": "b",
+          "text": "及时远离队友和隔离区，让爆炸避开人群"
+        },
+        {
+          "id": "c",
+          "text": "紧贴主 T，一起迎接爆炸"
+        },
+        {
+          "id": "d",
+          "text": "等炸完再离开人群"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "波动炸弹会威胁附近队友，点名后应在爆炸前远离人群。"
+    },
+    {
+      "id": "q090",
+      "section": "spirit",
+      "role": "外场位",
+      "type": "single",
+      "question": "超魔灵主 T 正在引导染灯，外场队员发现自己位于引导路线上，应怎么做？",
+      "options": [
+        {
+          "id": "a",
+          "text": "带着炸弹跑到主 T 身边"
+        },
+        {
+          "id": "b",
+          "text": "避开主 T 的引导方向，留出安全路线"
+        },
+        {
+          "id": "c",
+          "text": "追着主 T 一起逛灯会，站在路线正前方"
+        },
+        {
+          "id": "d",
+          "text": "全员集中到主 T 脚下"
+        }
+      ],
+      "answer": [
+        "b"
+      ],
+      "explanation": "外场人员应避开主 T 的染灯方向和行进路线。"
+    },
+    {
+      "id": "q091",
+      "section": "spirit",
+      "role": "外场位",
+      "type": "single",
+      "question": "超魔灵击倒切换时，不带业火且按分工留在外场，应该如何面向首领？",
+      "options": [
+        {
+          "id": "a",
+          "text": "面向首领并紧跟业火位"
+        },
+        {
+          "id": "b",
+          "text": "无视面向，带着炸弹靠近队友"
+        },
+        {
+          "id": "c",
+          "text": "面向首领抢入隔离，主打一个热情参与"
+        },
+        {
+          "id": "d",
+          "text": "背对首领"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "需要留在外场且没有业火的队员应背对首领。"
     },
     {
       "id": "q055",
@@ -3062,6 +3222,93 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
         "b"
       ],
       "explanation": "大蜘蛛面向首领准备回血时，可以通过眩晕或击倒打断。"
+    },
+    {
+      "id": "q092",
+      "section": "witch",
+      "role": "聚怪位",
+      "type": "single",
+      "question": "黑风魔女蜘蛛阶段，小蜘蛛刷新后，聚怪位应如何配合团队？",
+      "options": [
+        {
+          "id": "a",
+          "text": "先聚拢小蜘蛛，再按分工带到大蜘蛛附近集中处理"
+        },
+        {
+          "id": "b",
+          "text": "带着小蜘蛛去炸弹位旁边集合"
+        },
+        {
+          "id": "c",
+          "text": "把小蜘蛛分别引向不同方向"
+        },
+        {
+          "id": "d",
+          "text": "放生小蜘蛛，让它们在场地里自由散步"
+        }
+      ],
+      "answer": [
+        "a"
+      ],
+      "explanation": "聚怪位应将小蜘蛛集中，再配合团队处理大蜘蛛和小蜘蛛。"
+    },
+    {
+      "id": "q093",
+      "section": "witch",
+      "role": "主 T",
+      "type": "single",
+      "question": "黑风魔女第一次蜘蛛处理结束后准备落地，主 T 发现附近有不祥气息，应如何带位？",
+      "options": [
+        {
+          "id": "a",
+          "text": "带首领穿过危险线，尝试一键加速"
+        },
+        {
+          "id": "b",
+          "text": "把首领停在危险线上等它经过"
+        },
+        {
+          "id": "c",
+          "text": "先不看落点，只追求输出"
+        },
+        {
+          "id": "d",
+          "text": "观察落点并避开不祥气息，避免首领碰线"
+        }
+      ],
+      "answer": [
+        "d"
+      ],
+      "explanation": "首领落地时应留意附近不祥气息，避免首领碰线狂暴。"
+    },
+    {
+      "id": "q094",
+      "section": "witch",
+      "role": "蜘蛛控制位",
+      "type": "single",
+      "question": "黑风魔女蜘蛛阶段，大蜘蛛面向首领准备回血，控制位应如何应对？",
+      "options": [
+        {
+          "id": "a",
+          "text": "目送蜘蛛把首领奶满，祝老板生意兴隆"
+        },
+        {
+          "id": "b",
+          "text": "等它回血结束再准备控制"
+        },
+        {
+          "id": "c",
+          "text": "按指挥使用眩晕或击倒，打断回血"
+        },
+        {
+          "id": "d",
+          "text": "停止观察大蜘蛛，全部追着首领跑"
+        }
+      ],
+      "answer": [
+        "c"
+      ],
+      "explanation": "大蜘蛛面向首领准备回血时，按团队指挥及时控制并打断。"
     }
   ]
 }
@@ -3217,6 +3464,10 @@ const QUESTION_DIAGRAMS = {
   q070: ['witch-spiders', '图中标出了本处理区的大蜘蛛和分散的小蜘蛛。'],
   q071: ['witch-spiders', '大蜘蛛转头面对场地中央的首领。'],
   q076: ['witch-line', '近战站在首领附近，附近有不祥气息。'],
+  q089: ['spirit-select', '图中标出了波动炸弹和队友的位置。'],
+  q092: ['witch-spiders', '图中标出了大蜘蛛和分散的小蜘蛛。'],
+  q093: ['witch-line', '红线是不祥气息，移动方向以场内为准。'],
+  q094: ['witch-spiders', '大蜘蛛转头面对场地中央的首领。'],
 };
 
 function drawRaidDiagram(key, caption, questionId = null) {
@@ -3441,7 +3692,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
   let lastUploadError = '';
   let examTimer = null;
   const escape = (s) => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame']);
+  const badgeIcons = new Set(['bolt','crown','target','book','hourglass','wing','temple','flag','refresh','shield','spark','flame','bomb','spider','laser','lantern','heart','compass']);
   const badgeTones = new Set(['gold','teal','red','violet']);
   const badgeTone = badge => badgeTones.has(badge.tone) ? badge.tone : 'gold';
   const badgeIcon = badge => `<svg class="icon" aria-hidden="true"><use href="#badge-${badgeIcons.has(badge.icon) ? badge.icon : 'spark'}"/></svg>`;
@@ -3691,6 +3942,11 @@ function drawRaidDiagram(key, caption, questionId = null) {
         if (result?.attemptId === attempt.attemptId && (data.correctCount !== result.correctCount || data.totalCount !== result.totalCount)) {
           throw new Error('成绩核对失败，请刷新后联系团长。');
         }
+        if (result?.attemptId === attempt.attemptId && Array.isArray(data.triggeredBadges)) {
+          result.triggeredBadges = data.triggeredBadges;
+          save(':last-result', result);
+          renderResultBadges();
+        }
         const remaining = pendingAttempts().filter(item => item.attemptId !== attempt.attemptId);
         if (remaining.length && !save(':pending', remaining)) throw new Error('浏览器无法保存上传进度，请检查存储设置。');
         if (!remaining.length) remove(':pending');
@@ -3740,6 +3996,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
     $('result-name').textContent=profile?profile.nickname:'';
     $('result-score').textContent=formatScore(result.score);
     $('result-detail').textContent=`答对 ${result.correctCount} / ${result.totalCount} 题 · 用时 ${formatDuration(result.elapsedSeconds)} · 多选题全部选对才计分`;
+    renderResultBadges();
     $('review-toggle').textContent=onlyWrong?'查看全部题目':'只看错题';
     const list=$('review-list'); list.replaceChildren();
     qs.forEach((q,i)=>{
@@ -3750,6 +4007,12 @@ function drawRaidDiagram(key, caption, questionId = null) {
       article.innerHTML=`<div class="review-meta">${String(i+1).padStart(2,'0')} / ${escape(sectionOf(q.section).short)} · ${escape(q.role)} · ${correct?'回答正确':'回答有误'}</div><h3>${escape(q.question)}</h3>${questionDiagram(q)}<p>你的选择：${escape(chosen)}</p><p>正确答案：${escape(expected)}</p><p class="explanation">解析：${escape(q.explanation)}</p>`; list.append(article);
     });
     if(!list.children.length){const p=document.createElement('p');p.className='empty-state';p.textContent='这一轮没有错题。';list.append(p);}
+  }
+  function renderResultBadges() {
+    const items = (result?.triggeredBadges || []).filter(badge => badge && typeof badge.name === 'string');
+    const container = $('result-honors');
+    container.hidden = !items.length;
+    container.innerHTML = items.length ? `<span>本轮触发的趣味勋章</span><div>${items.map(badgeChip).join('')}</div><small>可以在“我的勋章”中选择是否展示。</small>` : '';
   }
   function rankingRow(entry) {
     const row=document.createElement('div'); row.className='ranking-row';
@@ -3889,7 +4152,7 @@ function drawRaidDiagram(key, caption, questionId = null) {
       button.disabled = !badge.earned;
       button.setAttribute('aria-pressed', String(selected));
       let state = '未获得';
-      if (badge.earned) state = selected ? '已选择展示' : '已获得';
+      if (badge.earned) state = selected ? '✓ 展示中' : '＋ 已获得 · 可展示';
       button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span></span>`;
       grid.append(button);
     }
