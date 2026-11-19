@@ -179,7 +179,7 @@ const RAID_SEQUENCES = {
     ],
   },
   'overview-spirit': {
-    background: sceneCircle(280,130,100) + sceneLabel(280,252,'同一场地 · 示意','gold'),
+    background: sceneCircle(280,130,100),
     actors: [point('boss',280,130,'首领','boss',23),point('tank',308,166,'T','ally',15),
       point('a',98,68,'火','ally',14),point('b',80,125,'火','ally',14),point('c',98,182,'火','ally',14),
       point('bomb',316,103,'弹','hazard',15),point('inside',224,158,'内','ally',14)],
@@ -197,14 +197,14 @@ const RAID_SEQUENCES = {
   },
   'overview-witch': {
     background: sceneCircle(280,130,104) + '<g class="overview-danger-ray">'+sceneLine('M280 130 L206 56','hazard')+'</g>'+
-      sceneLabel(104,52,'不祥气息','hazard')+sceneLabel(280,255,'路线仅作示意'),
-    actors: [point('boss',315,154,'首领','boss',24),point('tank',348,166,'T','ally',15),
+      sceneLabel(104,52,'不祥气息','hazard'),
+    actors: [point('boss',315,154,'首领','boss',24),point('tank',360,170,'T','ally',15),
       point('team',295,203,'队','ally',15),point('bomb',335,105,'弹','hazard',15)],
-    cues: sceneCue('withdraw',sceneLine('M348 115 L422 189 M410 184 L422 189 L418 176','hazard')+sceneLabel(443,220,'空处','gold')),
+    cues: sceneCue('withdraw',sceneLine('M348 115 L422 189 M410 184 L422 189 L418 176','hazard')+sceneLabel(443,245,'空处','gold')),
     steps: [
       {text:'主 T 留意不祥气息，带首领保持距离。'},
       {text:'炸弹被点名后避开队友，向约定空处撤离。',positions:{bomb:[424,192]},cues:['withdraw']},
-      {text:'带位与炸弹同时处理，落点和路线以现场为准。',positions:{bomb:[424,192],boss:[302,169],tank:[328,184]},cues:['withdraw']},
+      {text:'带位与炸弹同时处理，落点和路线以现场为准。',positions:{bomb:[424,192],boss:[302,169],tank:[347,187]},cues:['withdraw']},
     ],
   },
 };
@@ -219,19 +219,18 @@ function drawSequenceDiagram(key, caption) {
 }
 function drawOverviewSequence(key) {
   const overview = {
-    'twins-orbs': ['overview-twins','双剑 · 抬血'],
-    'spirit-select': ['overview-spirit','超魔灵 · 同步分工'],
-    'witch-bomb': ['overview-witch','黑风魔女 · 带位与炸弹'],
+    'twins-orbs': ['overview-twins','双剑 · 抬血','__ENCOUNTER_TWINS__'],
+    'spirit-select': ['overview-spirit','超魔灵 · 同步分工','__ENCOUNTER_SPIRIT__'],
+    'witch-bomb': ['overview-witch','黑风魔女 · 带位与炸弹','__ENCOUNTER_WITCH__'],
   }[key];
   if (!overview) return '';
-  const [id, title] = overview;
+  const [id, title, art] = overview;
   const scene = RAID_SEQUENCES[id];
   return `<div class="chapter-art" data-sequence="${id}" data-step="0" aria-label="${title}">
-    <div class="chapter-scene">${sequenceSvg(id)}<span class="chapter-scene-tag">动态示意</span></div>
-    <div class="chapter-status"><span class="chapter-counter" data-step-count>01 / ${String(scene.steps.length).padStart(2,'0')}</span>
-      <span class="chapter-status-text" data-step-text>${scene.steps[0].text}</span>
-      <div class="chapter-step-controls"><button type="button" class="diagram-pause" data-action="toggle-diagram-motion" aria-pressed="false">暂停</button><button type="button" data-action="sequence-prev" aria-label="${title}上一步">←</button><button type="button" data-action="sequence-next" aria-label="${title}下一步">→</button></div>
-    </div></div>`;
+    <div class="chapter-scene"><img class="chapter-scene-image" src="${art}" alt="" aria-hidden="true" decoding="async" loading="lazy">${sequenceSvg(id)}</div>
+    <div class="chapter-status"><span class="chapter-counter" data-step-count>01 / ${String(scene.steps.length).padStart(2,'0')}</span><span class="chapter-status-text" data-step-text>${scene.steps[0].text}</span></div>
+    <div class="chapter-playback"><div class="chapter-progress"><span>动态示意</span><i></i><i></i><i></i></div><div class="chapter-step-controls"><button type="button" class="diagram-pause" data-action="toggle-diagram-motion" aria-pressed="false">暂停</button><button type="button" data-action="sequence-prev" aria-label="${title}上一步">←</button><button type="button" data-action="sequence-next" aria-label="${title}下一步">→</button></div></div>
+  </div>`;
 }
 
 if (typeof module !== 'undefined' && module.exports) module.exports = {RAID_SEQUENCES};

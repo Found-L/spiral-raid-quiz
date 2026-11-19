@@ -27,16 +27,25 @@ async function waitReady(url) {
   try {
     await waitReady(url);
     browser = await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN || 'C:/Program Files/Google/Chrome/Application/chrome.exe'});
-    for (const width of [320,390,768,1440]) {
+    for (const width of [320,390,680,768,900,1050,1440]) {
       const page = await browser.newPage({viewport:{width,height:900}}), errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await page.goto(url, {waitUntil:'load'});
       assert.equal(await page.locator('.hero-landscape').evaluate(img => img.complete && img.naturalWidth > 0), true);
       assert.equal(await page.locator('.chapter-art[data-sequence]').count(), 3);
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `page overflow at ${width}`);
-      for (const button of await page.locator('.chapter-step-controls button').all()) {
-        const box = await button.boundingBox();
-        assert.ok(box && box.width >= 25 && box.x >= 0 && box.x + box.width <= width, `clipped control at ${width}`);
+      for (const card of await page.locator('.guide-card').all()) {
+        await card.scrollIntoViewIfNeeded();
+        const image = card.locator('.chapter-scene-image');
+        assert.equal(await image.evaluate(img => img.complete && img.naturalWidth > 0), true, `missing artwork at ${width}`);
+        const cardBox = await card.boundingBox(), heading = await card.locator('.chapter-heading').boundingBox();
+        const scene = await card.locator('.sequence-svg').boundingBox();
+        assert.ok(heading.y + heading.height <= scene.y + 1, `heading overlaps diagram at ${width}`);
+        for (const button of await card.locator('.chapter-step-controls button').all()) {
+          const box = await button.boundingBox();
+          assert.ok(box && box.width >= 30 && box.x >= cardBox.x && box.x + box.width <= cardBox.x + cardBox.width,
+            `card clips a control at ${width}`);
+        }
       }
       assert.deepEqual(errors, []);
       await page.close();
@@ -81,6 +90,19 @@ async function waitReady(url) {
     await scene.locator('[data-action="toggle-diagram-motion"]').click();
     assert.equal(await scene.locator('[data-action="toggle-diagram-motion"]').getAttribute('aria-pressed'), 'false');
     await page.close();
+
+    const choreography = await browser.newPage({viewport:{width:390,height:844}});
+    await choreography.goto(url);
+    for (const [id, actor] of [['twins','ft'], ['spirit','bomb'], ['witch','bomb']]) {
+      const overview = choreography.locator(`[data-sequence="overview-${id}"]`);
+      const beforePosition = await overview.locator(`[data-actor="${actor}"]`).getAttribute('style');
+      const beforeText = await overview.locator('[data-step-text]').textContent();
+      await overview.locator('[data-action="sequence-next"]').click();
+      assert.notEqual(await overview.locator(`[data-actor="${actor}"]`).getAttribute('style'), beforePosition, `${id} actor should move`);
+      assert.notEqual(await overview.locator('[data-step-text]').textContent(), beforeText, `${id} explanation should advance`);
+      assert.equal(await overview.locator('[data-action="toggle-diagram-motion"]').getAttribute('aria-pressed'), 'true');
+    }
+    await choreography.close();
 
     const reduced = await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
     await reduced.goto(url);
