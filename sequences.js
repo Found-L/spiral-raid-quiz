@@ -205,3 +205,5 @@ function drawOverviewSequence(key) {
   const notes = {'twins-orbs':'挡球 · 踩花 · 抬血','spirit-select':'业火 · 隔离 · 染灯','witch-bomb':'带位 · 炸弹 · 蜘蛛'};
   return `<div class="chapter-art" aria-label="${notes[key]}">${art}<div class="chapter-art-note"><span>MECHANIC OVERVIEW</span><strong>${notes[key]}</strong></div></div>`;
 }
+
+if (typeof module !== 'undefined' && module.exports) module.exports = {RAID_SEQUENCES};

@@ -2,10 +2,8 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const vm = require('node:vm');
 const root = path.resolve(__dirname, '..');
-const code = fs.readFileSync(path.join(root, 'sequences.js'), 'utf8');
-const scenes = vm.runInNewContext(code + '\nRAID_SEQUENCES');
+const {RAID_SEQUENCES: scenes} = require('../sequences.js');
 
 for (const [name, scene] of Object.entries(scenes)) {
   const actors = new Set(scene.actors.map(a => a.id));

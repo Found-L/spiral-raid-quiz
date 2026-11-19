@@ -286,7 +286,6 @@
   .hero-copy h1 { animation-delay: .07s; }
   .hero-description { animation-delay: .13s; }
   .hero-actions, .hero-note { animation-delay: .2s; }
-  .hero-art svg { animation: hero-float 8s ease-in-out infinite; }
   .map-route-glow { animation: route-flow 2.8s linear infinite; }
   .ranking-row { animation: motion-arrive .45s backwards; }
   .ranking-row:nth-child(2) { animation-delay: .045s; }
@@ -298,7 +297,6 @@
   .result-honors:not([hidden]) { animation: motion-arrive .5s both; }
 }
 @keyframes motion-arrive { from { opacity: .65; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes hero-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 @keyframes route-flow { to { stroke-dashoffset: -22; } }
 @keyframes badge-select { 0% { transform: scale(.98); } 55% { transform: scale(1.015); } 100% { transform: scale(1); } }
 
@@ -538,7 +536,7 @@
 .sequence-svg .scene-wave { fill: none; stroke: #f3d197; stroke-width: 4; stroke-linecap: round; }
 .sequence-svg .scene-cue { opacity: 0; pointer-events: none; transition: opacity .35s ease; }
 .sequence-svg .scene-cue.active { opacity: 1; }
-.sequence-svg .scene-actor { transition: transform .85s cubic-bezier(.2,.7,.2,1); }
+.sequence-svg .scene-actor { transition: transform 1.35s cubic-bezier(.2,.7,.2,1), opacity .3s ease; }
 .motion-paused .scene-actor, .motion-paused .scene-cue, .sequence-resetting .scene-actor, .sequence-resetting .scene-cue { transition: none; }
 .sequence-readout { min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 11px 13px; background: #182c2e; color: #edf2e8; line-height: 1.55; font-size: 13px; }
 .sequence-count { flex: none; color: #ebc98e; font: 13px Georgia, serif; letter-spacing: .06em; }
@@ -598,7 +596,6 @@
 }
 
 /* Illustrated chapter covers are distinct from the annotated tactical maps. */
-.hero-art svg { animation: none !important; }
 .chapter-art { margin-top: 17px; overflow: hidden; border-radius: 8px; background: linear-gradient(145deg,#16252a,#101a20 75%); }
 .chapter-art svg { width: 100%; height: auto; display: block; }
 .chapter-art-note { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 12px 15px; background: #0c161bb3; }
@@ -631,8 +628,6 @@
 .sequence-svg .scene-hits circle { fill: #e9c994; opacity: .5; }
 .sequence-svg .scene-transition-ring { fill: none; stroke: #b9e3d6; stroke-width: 2; opacity: .5; transform-box: fill-box; transform-origin: center; }
 .sequence-svg .scene-actor.scene-hidden { opacity: 0; pointer-events: none; }
-.sequence-svg .scene-actor { transition: transform 1.35s cubic-bezier(.2,.7,.2,1), opacity .3s ease; }
-.motion-paused .scene-heal-beam { animation-play-state: paused !important; }
 @media (prefers-reduced-motion: no-preference) {
   .chapter-glow { transform-origin: center; animation: chapter-breathe 5s ease-in-out infinite; }
   .chapter-delay { animation-delay: -2.5s; }
@@ -669,9 +664,6 @@
   .diagram-dialog-content .sequence-diagram { min-width: 0; }
   .diagram-dialog-content .sequence-diagram .diagram-canvas { overflow-x: auto; overscroll-behavior-x: contain; }
   .diagram-dialog-content .sequence-diagram .sequence-svg { min-width: 560px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .sequence-svg .scene-actor, .sequence-svg .scene-cue { transition: none; }
 }
 
 .honor-holders { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; }
