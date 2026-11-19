@@ -3,7 +3,13 @@
   const localPreview = ['localhost','127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).get('api')==='local';
   const previewPort = new URLSearchParams(location.search).get('api-port');
   const localApiPort = /^\d{1,5}$/.test(previewPort || '') ? previewPort : '8787';
-  const API = localPreview ? `http://127.0.0.1:${localApiPort}` : 'https://www.lysue.com/spiral-raid-quiz';
+  const GITHUB_ORIGIN = 'https://found-l.github.io';
+  const DOMESTIC_ORIGIN = 'https://www.lysue.com';
+  const DOMESTIC_URL = `${DOMESTIC_ORIGIN}/spiral-raid-quiz/`;
+  const OVERSEAS_URL = `${GITHUB_ORIGIN}/spiral-raid-quiz/`;
+  const OVERSEAS_API = 'https://spiral-raid-quiz-api.foundliny.chatgpt.site';
+  const productionApi = location.origin === GITHUB_ORIGIN ? OVERSEAS_API : `${DOMESTIC_ORIGIN}/spiral-raid-quiz`;
+  const API = localPreview ? `http://127.0.0.1:${localApiPort}` : productionApi;
   const bank = JSON.parse(document.getElementById('question-bank').textContent);
   const bankQuestions = bank.questions;
   let qs = bankQuestions;
@@ -16,9 +22,6 @@
   const KEY = 'spiral-temple-quiz-v1';
   const transferStorageKeys = [':identity', ':profile', ':pending', ':draft', ':last-result', ':local-profiles'];
   const transferTransactionKey = KEY + ':transfer-transaction';
-  const GITHUB_ORIGIN = 'https://found-l.github.io';
-  const DOMESTIC_ORIGIN = 'https://www.lysue.com';
-  const DOMESTIC_URL = `${DOMESTIC_ORIGIN}/spiral-raid-quiz/`;
   const $ = (id) => document.getElementById(id);
   function recoverTransferTransaction() {
     try {
@@ -1000,6 +1003,7 @@
   let transferWindow = null;
   let incomingTransfer = null;
   let transferSender = null;
+  let transferSenderOrigin = null;
   const transferHash = '#import-github';
   const transferPrefix = 'spiral-quiz-transfer-v1';
   const transferLimit = 5 * 1024 * 1024;
@@ -1012,12 +1016,12 @@
     if (!value || typeof value !== 'object' || value.schema !== 1 || !value.identity ||
         !/^[a-f0-9]{32}$/.test(value.identity.deviceId || '') ||
         !/^[a-f0-9]{64}$/.test(value.identity.secret || '') ||
-        !value.profile || typeof value.profile.nickname !== 'string' ||
+        (value.profile !== null && (!value.profile || typeof value.profile.nickname !== 'string')) ||
         !Array.isArray(value.pending) || !value.draft || typeof value.draft !== 'object' ||
         !value.draft.answers || typeof value.draft.answers !== 'object' || Array.isArray(value.draft.answers)) {
       throw new Error('迁移资料格式不正确，请在原网址重新发起转移。');
     }
-    validNickname(value.profile.nickname);
+    if (value.profile) validNickname(value.profile.nickname);
     for (const item of value.pending) {
       if (!item || !/^[a-f0-9]{32}$/.test(item.attemptId || '') ||
           typeof item.version !== 'string' || !item.answers || typeof item.answers !== 'object' || Array.isArray(item.answers)) {
@@ -1104,31 +1108,34 @@
     return {next:{...imported, pending, draft:incomingHasDraft ? imported.draft : current.draft,
       lastResult:imported.lastResult || current.lastResult}, archives};
   }
-  function presentTransfer(value, sender = null) {
+  function presentTransfer(value, sender = null, senderOrigin = null) {
     try {
       const data = validateSnapshot(value);
-      incomingTransfer = data; transferSender = sender;
+      incomingTransfer = data; transferSender = sender; transferSenderOrigin = senderOrigin;
       const differs = hasLocalWork(currentSnapshot()) && !sameIdentity(identity, data.identity);
-      $('transfer-description').textContent = `即将转移“${data.profile.nickname}”的资料和 ${data.pending.length} 条待上传成绩。`;
+      $('transfer-description').textContent = `即将转移“${data.profile?.nickname || '未设置昵称'}”的资料和 ${data.pending.length} 条待上传成绩。`;
       $('transfer-detail').textContent = differs
-        ? '此网址已有其他本机资料，将先保留；可在修改资料中切换。请先关闭国内网址的其他标签页。原网址的数据会保留。'
-        : '原网址的数据会保留。若两处都有不同的未交卷进度，会保留另一份供切换。请先关闭国内网址的其他标签页。';
+        ? '此网址已有其他本机资料，将先保留；可在修改资料中切换。请先关闭此网址的其他标签页。原网址的数据会保留。'
+        : '原网址的数据会保留。若两处都有不同的未交卷进度，会保留另一份供切换。请先关闭此网址的其他标签页。';
       $('transfer-error').textContent = ''; $('transfer-confirm').hidden = false;
+      $('transfer-confirm').textContent = data.profile ? '确认转移并同步' : '确认转移';
       if ($('profile-dialog').open) closeProfile();
       if (!$('transfer-dialog').open) $('transfer-dialog').showModal();
     } catch (error) {
-      incomingTransfer = null; $('transfer-confirm').hidden = true;
+      incomingTransfer = null; transferSender = null; transferSenderOrigin = null; $('transfer-confirm').hidden = true;
       $('transfer-error').textContent = error.message;
       if ($('profile-dialog').open) closeProfile();
       if (!$('transfer-dialog').open) $('transfer-dialog').showModal();
     }
   }
   function closeTransfer() {
-    $('transfer-dialog').close(); incomingTransfer = null; transferSender = null;
+    $('transfer-dialog').close(); incomingTransfer = null; transferSender = null; transferSenderOrigin = null;
     if (location.hash === transferHash) window.history.replaceState(null, '', location.pathname + location.search);
   }
   function syncTransferredProfile() {
-    setView('home'); openHistory();
+    setView('home');
+    if (!profile) return;
+    openHistory();
     void retryConnection().then(() => { if (view === 'history') void loadHistory(); })
       .catch(error => toast(error.message));
   }
@@ -1138,9 +1145,9 @@
     try {
       const {next, archives} = mergeForTransfer(incomingTransfer);
       persistSnapshot(next, archives);
-      if (transferSender) transferSender.postMessage({type:transferPrefix + ':done'}, GITHUB_ORIGIN);
+      if (transferSender && transferSenderOrigin) transferSender.postMessage({type:transferPrefix + ':done'}, transferSenderOrigin);
       closeTransfer(); syncTransferredProfile();
-      toast('资料已转移，正在同步成绩。');
+      toast(profile ? '资料已转移，正在同步成绩。' : '本机进度已转移，设置昵称后可同步成绩。');
     } catch (error) { resumeTimer(); $('transfer-error').textContent = error.message; }
   }
   function restoreLocalProfile(id) {
@@ -1160,19 +1167,32 @@
       if (profile) syncTransferredProfile(); else { setView('home'); toast('已切换到未设置昵称的本机资料。'); }
     } catch (error) { resumeTimer(); $('profile-error').textContent = error.message; }
   }
-  function startTransfer() {
-    if (!profile) { toast('请先在此网址设置昵称。'); return; }
-    transferWindow = window.open(DOMESTIC_URL + transferHash, '_blank');
+  function otherOrigin() {
+    if (location.origin === GITHUB_ORIGIN) return DOMESTIC_ORIGIN;
+    if (location.origin === DOMESTIC_ORIGIN) return GITHUB_ORIGIN;
+    return null;
+  }
+  function startTransfer(site = 'domestic') {
+    if (!['domestic', 'overseas'].includes(site)) return;
+    const url = site === 'domestic' ? DOMESTIC_URL : OVERSEAS_URL;
+    if (location.origin === new URL(url).origin) return;
+    $('site-switch').open = false;
+    if (!otherOrigin() || !hasLocalWork(currentSnapshot())) { location.assign(url); return; }
+    transferWindow = window.open(url + transferHash, '_blank');
     if (!transferWindow) toast('浏览器阻止了新页面，请允许弹窗或下载迁移文件。');
   }
   function downloadTransfer() {
-    if (!profile) { toast('请先在此网址设置昵称。'); return; }
-    if (!confirm('迁移文件包含可修改资料的身份信息，请妥善保管，不要发送给他人。继续下载？')) return;
+    $('site-switch').open = false;
+    if (!hasLocalWork(currentSnapshot())) { toast('当前没有需要备份的本机资料。'); return; }
+    $('backup-dialog').showModal();
+  }
+  function confirmDownloadTransfer() {
     try {
       const data = validateSnapshot(currentSnapshot());
       const url = URL.createObjectURL(new Blob([JSON.stringify(data)], {type:'application/json'}));
       const link = document.createElement('a'); link.href = url; link.download = '螺旋寺院-迁移资料.json'; link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
+      $('backup-dialog').close();
     } catch (error) { toast(error.message); }
   }
   async function readTransferFile(event) {
@@ -1187,32 +1207,44 @@
     }
   }
   window.addEventListener('message', event => {
-    if (location.origin === GITHUB_ORIGIN && event.origin === DOMESTIC_ORIGIN &&
-        transferWindow && event.source === transferWindow && event.data?.type === transferPrefix + ':ready') {
-      try { transferWindow.postMessage({type:transferPrefix + ':data', snapshot:validateSnapshot(currentSnapshot())}, DOMESTIC_ORIGIN); }
+    const peer = otherOrigin();
+    if (!peer || event.origin !== peer) return;
+    if (transferWindow && event.source === transferWindow && event.data?.type === transferPrefix + ':ready') {
+      try { transferWindow.postMessage({type:transferPrefix + ':data', snapshot:validateSnapshot(currentSnapshot())}, peer); }
       catch (error) { toast(error.message); }
-    } else if (location.origin === DOMESTIC_ORIGIN && location.hash === transferHash &&
-               event.origin === GITHUB_ORIGIN && window.opener && event.source === window.opener &&
+    } else if (location.hash === transferHash && window.opener && event.source === window.opener &&
                event.data?.type === transferPrefix + ':data') {
-      presentTransfer(event.data.snapshot, event.source);
-    } else if (location.origin === GITHUB_ORIGIN && event.origin === DOMESTIC_ORIGIN &&
-               transferWindow && event.source === transferWindow && event.data?.type === transferPrefix + ':done') {
-      toast('资料已转移，请在国内网址查看同步结果。');
+      presentTransfer(event.data.snapshot, event.source, event.origin);
+    } else if (transferWindow && event.source === transferWindow && event.data?.type === transferPrefix + ':done') {
+      toast('资料已转移，请在新网址查看同步结果。');
     }
   });
   function initializeTransfer() {
-    $('transfer-notice').hidden = location.origin !== GITHUB_ORIGIN;
-    $('file-import').hidden = location.origin !== DOMESTIC_ORIGIN;
+    const peer = otherOrigin();
+    let current = '';
+    if (location.origin === DOMESTIC_ORIGIN) current = 'domestic';
+    if (location.origin === GITHUB_ORIGIN) current = 'overseas';
+    const label = {domestic:'国内站', overseas:'国外站'}[current] || '站点';
+    $('site-current').textContent = label;
+    const summary = $('site-switch').querySelector('summary');
+    if (summary) summary.setAttribute('aria-label', current ? `当前${label}，切换访问站点` : '选择访问站点');
+    for (const name of ['domestic', 'overseas']) {
+      const button = $('site-' + name);
+      button.disabled = current === name;
+      const tag = button.querySelector('.site-current-tag');
+      if (tag) tag.hidden = current !== name;
+    }
+    $('file-import').hidden = !peer;
     $('transfer-file').addEventListener('change', readTransferFile);
-    if (location.origin !== DOMESTIC_ORIGIN || location.hash !== transferHash) return;
+    if (!peer || location.hash !== transferHash) return;
     $('transfer-description').textContent = '正在读取原网址的资料…';
     $('transfer-confirm').hidden = true;
     $('transfer-dialog').showModal();
     if (!window.opener) {
-      $('transfer-error').textContent = '请回到原 GitHub 页面，点击“转移到国内网址”；也可使用迁移文件导入。';
+      $('transfer-error').textContent = '请回到原网址，在站点菜单中重新切换；也可使用备份文件导入。';
       return;
     }
-    window.opener.postMessage({type:transferPrefix + ':ready'}, GITHUB_ORIGIN);
+    window.opener.postMessage({type:transferPrefix + ':ready'}, peer);
     setTimeout(() => {
       if (!incomingTransfer && $('transfer-dialog').open) $('transfer-error').textContent = '暂未收到资料，请回到原页面重试，或下载迁移文件后导入。';
     }, 10000);
@@ -1280,7 +1312,16 @@
     ['sequence-next', target => stepSequence(target, 1)],
     ['close-diagram', () => $('diagram-dialog').close()],
   ]);
+  let navigationOpen = false;
+  function setNavigation(open) {
+    navigationOpen = open;
+    $('main-nav').classList.toggle('is-open', open);
+    $('nav-toggle').setAttribute('aria-expanded', String(open));
+    $('nav-toggle').setAttribute('aria-label', open ? '关闭导航菜单' : '打开导航菜单');
+  }
   document.addEventListener('click',(e)=>{
+    if (!e.target.closest('#site-switch')) $('site-switch').open = false;
+    if (e.target.closest('#main-nav') || (navigationOpen && !e.target.closest('#nav-toggle'))) setNavigation(false);
     if (view !== 'home' && e.target.closest('a[href="#guide"], a[href="#home"]')) setView('home');
     const target=e.target.closest('[data-action]'); if(!target)return;
     const featureAction = featureActions.get(target.dataset.action);
@@ -1291,8 +1332,12 @@
       case 'close-profile': closeProfile();break;
       case 'copy-identity': copyIdentity();break;
       case 'import-identity': importIdentity();break;
-      case 'transfer-domestic': startTransfer();break;
+      case 'transfer-domestic': startTransfer('domestic');break;
+      case 'switch-site': startTransfer(target.dataset.site);break;
+      case 'toggle-navigation': $('site-switch').open = false; setNavigation(!navigationOpen);break;
       case 'download-transfer': downloadTransfer();break;
+      case 'confirm-download-transfer': confirmDownloadTransfer();break;
+      case 'close-backup': $('backup-dialog').close();break;
       case 'confirm-transfer': confirmTransfer();break;
       case 'close-transfer': closeTransfer();break;
       case 'restore-local-profile': restoreLocalProfile(target.dataset.archiveId);break;
@@ -1325,6 +1370,10 @@
         break;
       }
     }
+  });
+  $('site-switch').addEventListener('toggle', () => { if ($('site-switch').open) setNavigation(false); });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') { $('site-switch').open = false; setNavigation(false); }
   });
   $('profile-dialog').addEventListener('cancel',()=>{afterProfile=null;candidate=identity;});
   $('transfer-dialog').addEventListener('cancel', e=>{e.preventDefault();closeTransfer();});
