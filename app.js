@@ -81,12 +81,18 @@
   let badgesReturn = 'home';
   let badgesRequest = 0;
   let badgeData = null;
+  let badgeOwner = null;
   let selectedBadges = [];
   let badgesDirty = false;
   let uploading = false;
   let connecting = false;
   let rankingRequest = 0;
   let honorRequest = 0;
+  let honorDetailRequest = 0;
+  let honorDetailBadge = '';
+  let honorDetailMode = 'history';
+  let honorDetailPage = 1;
+  let honorDetailPages = 1;
   let rankingPage = 1;
   let rankingPages = 1;
   let lastUploadError = '';
@@ -307,6 +313,7 @@
     toast(localOnly ? '昵称已保存在本机，可以开始答题。' : number ? `资料已保存 · 榜单编号 ${number}` : '资料已保存');
     if(next==='start') beginExam();
     else if (next==='badges') openBadges();
+    else if (view === 'badges') void loadBadges();
     else if (view === 'history') loadHistory();
     else refreshRanking();
     if (!localOnly && nextPendingAttempt()) uploadPending();
@@ -432,7 +439,8 @@
       let attempt = nextPendingAttempt();
       while (attempt) {
         const data = await request('/api/submit', {...participant, attemptId:attempt.attemptId,
-          version:attempt.version, answers:attempt.answers, elapsedSeconds:attempt.elapsedSeconds ?? null});
+          version:attempt.version, answers:attempt.answers, elapsedSeconds:attempt.elapsedSeconds ?? null,
+          completedAt:attempt.localSubmittedAt ?? null});
         if (identity !== participant || !activeIdentity(participant)) return;
         if (result?.attemptId === attempt.attemptId && (data.correctCount !== result.correctCount || data.totalCount !== result.totalCount)) {
           throw new Error('成绩核对失败，请刷新后联系团长。');
@@ -518,7 +526,7 @@
     const numberLabel = number ? `<small aria-label="榜单编号 ${number}">${number}</small>` : '';
     const shownBadges = Array.isArray(entry.badges) ? entry.badges.filter(badge => badge && typeof badge.name === 'string').slice(0, 3) : [];
     const badgeList = shownBadges.length ? `<div class="rank-badges" aria-label="展示的勋章">${shownBadges.map(badgeChip).join('')}</div>` : '';
-    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><div class="ranking-stats"><span class="ranking-stat"><small>正确题数</small><b>${entry.correctCount} / ${entry.totalCount}</b></span><span class="ranking-stat"><small>用时</small><b>${formatDuration(entry.elapsedSeconds)}</b></span><span class="ranking-stat"><small>最高分</small><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong></span></div>`;
+    row.innerHTML=`<div class="ranking-player"><span class="rank-number">${String(entry.rank).padStart(2,'0')}</span><div class="player-text"><strong>${escape(entry.nickname)}</strong>${numberLabel}${badgeList}</div></div><div class="ranking-stats"><span class="ranking-stat"><small>用时</small><b>${formatDuration(entry.elapsedSeconds)}</b></span><span class="ranking-stat"><small>最高分</small><strong class="ranking-score">${Number(entry.score).toFixed(entry.score%1?2:0)}</strong></span></div>`;
     return row;
   }
   async function refreshHonors() {
@@ -534,11 +542,57 @@
         const entries = Array.isArray(board.entries) ? board.entries : [];
         const rows = entries.map(entry => `<li><span class="honor-rank">${entry.rank}</span><span class="honor-player"><b>${escape(entry.nickname)}</b><small>${formatPlayerNumber(entry.playerNumber)}</small></span><strong>${board.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`}</strong></li>`).join('');
         const holders = board.holderCount > 1 ? `${board.holderCount} 人并列第一` : '榜首可获得勋章';
-        return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders">${entries.length ? holders : '等待首位上榜玩家'}</div></article>`;
+        const more = entries.length ? `<button type="button" data-action="honor-show" data-badge="${escape(badge.id)}">查看全部 <span aria-hidden="true">→</span></button>` : '';
+        return `<article class="honor-card tone-${badgeTone(badge)}"><div class="honor-card-head"><span class="honor-emblem">${badgeIcon(badge)}</span><div><h4>${escape(badge.name)}</h4><p>${escape(badge.description)}</p></div></div><ol class="honor-list">${rows || '<li class="honor-empty">暂无符合条件的成绩</li>'}</ol><div class="honor-holders"><span>${entries.length ? holders : '等待首位上榜玩家'}</span>${more}</div></article>`;
       }).join('');
     } catch (error) {
       if (requestId === honorRequest) container.innerHTML = `<p class="empty-state">${escape(error.message)} 点击刷新榜单可重试。</p>`;
     }
+  }
+  async function loadHonorDetail(page = 1) {
+    const requestId = ++honorDetailRequest;
+    const badge = honorDetailBadge;
+    const mode = honorDetailMode;
+    $('honor-detail-status').textContent = '正在读取名单…';
+    $('honor-detail-prev').disabled = true;
+    $('honor-detail-next').disabled = true;
+    try {
+      const data = await request(`/api/honors?badge=${encodeURIComponent(badge)}&mode=${mode}&page=${page}&pageSize=20`);
+      if (requestId !== honorDetailRequest || !$('honor-dialog').open || badge !== honorDetailBadge || mode !== honorDetailMode) return;
+      if (!data.badge || !Array.isArray(data.entries) || !Number.isSafeInteger(data.page) || !Number.isSafeInteger(data.pages)) throw new TypeError('趣味榜返回的数据无法识别。');
+      honorDetailPage = data.page; honorDetailPages = data.pages;
+      $('honor-dialog-title').textContent = data.badge.name;
+      $('honor-detail-description').textContent = data.badge.description;
+      $('honor-detail-status').textContent = mode === 'history'
+        ? `共 ${data.total} 人曾达成 · 其中 ${data.holderCount} 人当前持有`
+        : `共 ${data.total} 人上榜 · ${data.holderCount} 人并列榜首；同成绩按达到时间先后排列`;
+      $('honor-detail-list').innerHTML = data.entries.length ? data.entries.map(entry => {
+        const number = formatPlayerNumber(entry.playerNumber);
+        const value = data.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`;
+        const rank = mode === 'current' ? `<span class="honor-detail-rank">${entry.rank}</span>` : '';
+        const status = mode === 'history' ? `<small class="${entry.current ? 'is-current' : ''}">${entry.current ? '当前持有' : '曾经获得'}</small>` : '';
+        const time = mode === 'history' ? `<span class="honor-achieved">${new Date(entry.achievedAt).toLocaleDateString('zh-CN')} 首次达成</span>` : '';
+        return `<li>${rank}<span class="honor-detail-person"><strong>${escape(entry.nickname)}</strong><small>${escape(number)}</small></span>${status}<span class="honor-detail-value"><strong>${mode === 'history' ? '当时 ' : ''}${escape(value)}</strong>${time}</span></li>`;
+      }).join('') : '<li class="honor-detail-empty">暂无符合条件的记录。</li>';
+      $('honor-detail-page').textContent = `第 ${honorDetailPage} / ${honorDetailPages} 页`;
+      $('honor-detail-prev').disabled = honorDetailPage <= 1;
+      $('honor-detail-next').disabled = honorDetailPage >= honorDetailPages;
+    } catch (error) {
+      if (requestId !== honorDetailRequest || !$('honor-dialog').open) return;
+      $('honor-detail-status').textContent = `${error.message} 请关闭后重试。`;
+    }
+  }
+  function showHonorDetail(badge) {
+    honorDetailBadge = badge;
+    honorDetailMode = 'history';
+    honorDetailPage = honorDetailPages = 1;
+    $('honor-detail-list').replaceChildren();
+    $('honor-detail-page').textContent = '';
+    $('honor-dialog-title').textContent = '趣味榜';
+    $('honor-detail-description').textContent = '';
+    $('honor-dialog').querySelectorAll('[data-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === honorDetailMode)));
+    $('honor-dialog').showModal();
+    void loadHonorDetail();
   }
   async function refreshRanking(page = rankingPage) {
     const requestId = ++rankingRequest;
@@ -664,41 +718,55 @@
   }
   function closeBadges() {
     ++badgesRequest;
+    $('badges-reload').disabled = false;
+    $('badges-save').disabled = false;
     setView(badgesReturn);
     if (badgesReturn === 'home') { void refreshRanking(); $('leaderboard').scrollIntoView(); }
   }
-  function renderBadges(enter = false) {
+  function renderBadges() {
     const grid = $('badges-grid');
-    grid.replaceChildren();
+    const existing = new Map([...grid.children].map(button => [button.dataset.badge, button]));
     const earned = badgeData.badges.filter(badge => badge.earned).length;
     const fastest = Number.isSafeInteger(badgeData.fastestSeconds) ? formatDuration(badgeData.fastestSeconds) : '暂无';
-    $('badges-status').textContent = `已获得 ${earned} / ${badgeData.badges.length} 枚 · 已选 ${selectedBadges.length} / ${badgeData.maxShown} 枚 · 全站最快 ${fastest}`;
+    $('badges-status').textContent = `已获得 ${earned} / ${badgeData.badges.length} 枚 · 已选 ${selectedBadges.length} / ${badgeData.maxShown} 枚 · 全站最快 ${fastest}${badgesDirty ? ' · 更改后请保存' : ''}`;
     $('badges-save').textContent = `保存展示（${selectedBadges.length}/${badgeData.maxShown}）`;
-    for (const badge of badgeData.badges) {
+    badgeData.badges.forEach((badge, index) => {
       const selected = selectedBadges.includes(badge.id);
-      const button = document.createElement('button');
+      const button = existing.get(badge.id) || document.createElement('button');
+      existing.delete(badge.id);
       button.type = 'button';
-      button.className = `badge-card tone-${badgeTone(badge)}${badge.earned ? ' earned' : ' locked'}${selected ? ' selected' : ''}`;
-      if (enter) button.classList.add('badge-enter');
       button.dataset.action = 'toggle-badge';
       button.dataset.badge = badge.id;
-      button.disabled = !badge.earned;
-      button.setAttribute('aria-pressed', String(selected));
-      let state = '未获得';
-      if (badge.earned) state = selected ? '✓ 展示中' : '＋ 已获得 · 可展示';
-      button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span></span>`;
-      grid.append(button);
-    }
+      const signature = JSON.stringify([badge, selected]);
+      if (button.dataset.signature !== signature) {
+        button.className = `badge-card tone-${badgeTone(badge)}${badge.earned ? ' earned' : ' locked'}${selected ? ' selected' : ''}`;
+        button.disabled = !badge.earned;
+        button.setAttribute('aria-pressed', String(selected));
+        const state = badge.earned ? (selected ? '✓ 展示中' : '＋ 已获得 · 可展示') : '未获得';
+        button.innerHTML = `<span class="badge-crest" aria-hidden="true">${badgeIcon(badge)}</span><span class="badge-info"><span class="badge-title">${escape(badge.name)}</span><span class="badge-description">${escape(badge.description)}</span><span class="badge-state">${state}</span></span>`;
+        button.dataset.signature = signature;
+      }
+      if (grid.children[index] !== button) grid.insertBefore(button, grid.children[index] || null);
+    });
+    for (const button of existing.values()) button.remove();
   }
   async function loadBadges() {
     const requestId = ++badgesRequest;
-    badgeData = null;
-    $('badges-grid').replaceChildren();
-    $('badges-save').hidden = true;
+    const sameOwner = profile && badgeOwner && badgeOwner.deviceId === identity.deviceId && badgeOwner.secret === identity.secret;
+    if (!sameOwner) {
+      badgeData = null;
+      badgeOwner = null;
+      selectedBadges = [];
+      badgesDirty = false;
+      $('badges-grid').replaceChildren();
+      $('badges-save').hidden = true;
+    }
     $('badges-reload').hidden = !profile;
     $('badges-profile').hidden = Boolean(profile);
-    if (!profile) { $('badges-status').textContent = '设置昵称或恢复原来的身份后，即可查看和展示勋章。'; return; }
-    $('badges-status').textContent = '正在读取勋章…';
+    if (!profile) { $('badges-reload').disabled = false; $('badges-status').textContent = '设置昵称或恢复原来的身份后，即可查看和展示勋章。'; return; }
+    $('badges-reload').disabled = true;
+    $('badges-save').disabled = true;
+    $('badges-status').textContent = badgeData ? '正在刷新勋章，当前选择会保留…' : '正在读取勋章…';
     const who = {...identity};
     try {
       const data = await request('/api/badges', who);
@@ -706,17 +774,26 @@
       if (!Array.isArray(data.badges) || !Array.isArray(data.selected) || !Number.isSafeInteger(data.maxShown)) {
         throw new TypeError('暂时无法读取勋章，请稍后刷新。');
       }
+      const wanted = badgesDirty ? selectedBadges.slice() : data.selected.slice();
+      const earnedIds = new Set(data.badges.filter(badge => badge.earned).map(badge => badge.id));
+      selectedBadges = wanted.filter(id => earnedIds.has(id)).slice(0, data.maxShown);
+      const removed = wanted.length !== selectedBadges.length;
       badgeData = data;
-      selectedBadges = data.selected.slice();
-      badgesDirty = false;
+      badgeOwner = who;
+      badgesDirty = badgesDirty || JSON.stringify(selectedBadges) !== JSON.stringify(data.selected);
       $('badges-save').hidden = false;
-      $('badges-save').disabled = false;
-      renderBadges(true);
+      renderBadges();
+      if (removed) toast('部分勋章的获得状态已变化，已从待展示选择中移除。');
     } catch (error) {
-      if (requestId !== badgesRequest || view !== 'badges') return;
-      $('badges-status').textContent = profile.localOnly && error.status === 403
-        ? '资料和成绩还没有上传，连接成功后即可查看勋章。' : error.message;
+      if (requestId !== badgesRequest || view !== 'badges' || !activeIdentity(who)) return;
+      const message = profile.localOnly && error.status === 403 ? '资料和成绩还没有上传，连接成功后即可查看勋章。' : error.message;
+      $('badges-status').textContent = badgeData ? `刷新失败，仍显示上次内容。${message}` : message;
       if (error.unavailable) setConnectionUnavailable(true);
+    } finally {
+      if (requestId === badgesRequest) {
+        $('badges-reload').disabled = false;
+        $('badges-save').disabled = false;
+      }
     }
   }
   function toggleBadge(id) {
@@ -726,7 +803,6 @@
     else { toast(`最多展示 ${badgeData.maxShown} 枚勋章。`); return; }
     badgesDirty = true;
     renderBadges();
-    $('badges-status').textContent += ' · 更改后请保存';
     const button = [...$('badges-grid').children].find(item => item.dataset.badge === id);
     if (button) { button.classList.add('badge-change'); button.focus({preventScroll:true}); }
   }
@@ -734,24 +810,77 @@
     if (!badgeData || !activeIdentity()) return;
     const requestId = ++badgesRequest;
     const who = {...identity};
+    const submitted = selectedBadges.slice();
     $('badges-save').disabled = true;
+    $('badges-reload').disabled = true;
     try {
-      const data = await request('/api/badges/select', {...who, selected:selectedBadges});
+      const data = await request('/api/badges/select', {...who, selected:submitted});
       if (requestId !== badgesRequest || view !== 'badges' || !activeIdentity(who)) return;
       badgeData = data;
-      selectedBadges = data.selected.slice();
-      badgesDirty = false;
+      badgeOwner = who;
+      const editedDuringSave = JSON.stringify(selectedBadges) !== JSON.stringify(submitted);
+      const earnedIds = new Set(data.badges.filter(badge => badge.earned).map(badge => badge.id));
+      selectedBadges = (editedDuringSave ? selectedBadges : data.selected).filter(id => earnedIds.has(id)).slice(0, data.maxShown);
+      badgesDirty = JSON.stringify(selectedBadges) !== JSON.stringify(data.selected);
       renderBadges();
       void refreshRanking();
-      toast('勋章展示已保存。');
+      toast(badgesDirty ? '已保存提交时的选择；之后的改动请再次保存。' : '勋章展示已保存。');
     } catch (error) {
       if (requestId !== badgesRequest || view !== 'badges') return;
       $('badges-status').textContent = error.message;
       if (error.unavailable) setConnectionUnavailable(true);
     } finally {
-      if (requestId === badgesRequest) $('badges-save').disabled = false;
+      if (requestId === badgesRequest) { $('badges-save').disabled = false; $('badges-reload').disabled = false; }
     }
   }
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)') || {matches:false};
+  function applySequence(container, index) {
+    const scene = RAID_SEQUENCES[container.dataset.sequence];
+    if (!scene) return;
+    const next = (index + scene.steps.length) % scene.steps.length;
+    const step = scene.steps[next];
+    const resetting = next === 0 && Number(container.dataset.step) === scene.steps.length - 1;
+    if (resetting) container.classList.add('sequence-resetting');
+    container.dataset.step = String(next);
+    for (const actor of scene.actors) {
+      const node = container.querySelector(`[data-actor="${actor.id}"]`);
+      const [x, y] = step.positions?.[actor.id] || [actor.x, actor.y];
+      if (node) node.style.transform = `translate(${x}px, ${y}px)`;
+    }
+    container.querySelectorAll('[data-cue]').forEach(node => {
+      node.classList.toggle('active', (step.cues || []).includes(node.dataset.cue));
+    });
+    container.querySelector('[data-step-text]').textContent = step.text;
+    container.querySelector('[data-step-count]').textContent = `${String(next + 1).padStart(2,'0')} / ${String(scene.steps.length).padStart(2,'0')}`;
+    if (resetting) requestAnimationFrame(() => requestAnimationFrame(() => container.classList.remove('sequence-resetting')));
+  }
+  function initializeSequences(root) {
+    root.querySelectorAll('[data-sequence]').forEach(container => {
+      if (reduceMotion.matches) container.classList.add('motion-paused');
+      const pause = container.querySelector('[data-action="toggle-diagram-motion"]');
+      if (pause && container.classList.contains('motion-paused')) {
+        pause.textContent = '播放'; pause.setAttribute('aria-pressed', 'true');
+      }
+      applySequence(container, Number(container.dataset.step) || 0);
+    });
+  }
+  function stepSequence(target, delta) {
+    const container = target.closest('[data-sequence]');
+    if (!container) return;
+    container.classList.add('motion-paused');
+    const pause = container.querySelector('[data-action="toggle-diagram-motion"]');
+    if (pause) { pause.textContent = '播放'; pause.setAttribute('aria-pressed', 'true'); }
+    applySequence(container, Number(container.dataset.step) + delta);
+  }
+  if (document.querySelectorAll) setInterval(() => {
+    if (document.hidden || reduceMotion.matches) return;
+    const dialog = $('diagram-dialog');
+    document.querySelectorAll('[data-sequence]').forEach(container => {
+      if (container.classList.contains('motion-paused') || (dialog.open && !dialog.contains(container))) return;
+      const rect = container.getBoundingClientRect();
+      if (rect.width && rect.bottom > 0 && rect.top < innerHeight) applySequence(container, Number(container.dataset.step) + 1);
+    });
+  }, 3500);
   function openDiagram(target) {
     const figure = target.closest('.raid-diagram');
     if (!figure) return;
@@ -759,7 +888,7 @@
     copy.querySelector('[data-action="zoom-diagram"]')?.remove();
     $('diagram-dialog-content').replaceChildren(copy);
     $('diagram-dialog').showModal();
-    if (copy.classList.contains('motion-paused')) copy.querySelector('svg[role="img"]')?.pauseAnimations?.();
+    if (copy.dataset.sequence) applySequence(copy, Number(copy.dataset.step) || 0);
   }
   function toggleDiagramMotion(target) {
     const figure = target.closest('.raid-diagram');
@@ -767,18 +896,38 @@
     const paused = figure.classList.toggle('motion-paused');
     target.textContent = paused ? '播放' : '暂停';
     target.setAttribute('aria-pressed', String(paused));
-    const svg = figure.querySelector('svg[role="img"]');
-    if (paused) svg?.pauseAnimations?.(); else svg?.unpauseAnimations?.();
+    if (paused && figure.dataset.sequence) applySequence(figure, Number(figure.dataset.step) || 0);
   }
+  function setCurrentGuideStage(index) {
+    $('guide-timeline').querySelectorAll('[data-stage]').forEach(button => {
+      if (Number(button.dataset.stage) === index) button.setAttribute('aria-current', 'step');
+      else button.removeAttribute('aria-current');
+    });
+  }
+  let stageScrollScheduled = false;
+  function updateCurrentGuideStage() {
+    stageScrollScheduled = false;
+    if (view !== 'guide') return;
+    const stages = [...$('guide-stages').children];
+    if (!stages.length) return;
+    const active = stages.reduce((best, stage, i) => stage.getBoundingClientRect().top <= 150 ? i : best, 0);
+    setCurrentGuideStage(active);
+  }
+  window.addEventListener('scroll', () => {
+    if (view !== 'guide' || stageScrollScheduled) return;
+    stageScrollScheduled = true;
+    requestAnimationFrame(updateCurrentGuideStage);
+  }, {passive:true});
   function renderGuide(chapterId) {
     const guide = RAID_GUIDE[chapterId];
     $('guide-title').textContent = guide.title;
     $('guide-intro').textContent = guide.intro;
-    $('guide-chapters').innerHTML = SECTIONS.map(chapter => {
+    const chapterNotes = {twins:'球 · 花 · 治疗',spirit:'业火 · 隔离 · 染灯',witch:'冲锋 · 炸弹 · 蜘蛛'};
+    $('guide-chapters').innerHTML = SECTIONS.map((chapter, i) => {
       const active = chapter.id === chapterId ? ' aria-current="page"' : '';
-      return `<a href="#guide-${chapter.id}"${active}>${escape(chapter.short)}</a>`;
+      return `<a href="#guide-${chapter.id}"${active}><span class="chapter-number">${String(i + 1).padStart(2,'0')}</span><span class="chapter-copy"><strong>${escape(chapter.short)}</strong><small>${chapterNotes[chapter.id]}</small></span></a>`;
     }).join('');
-    $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}">${escape(stage.timing)}</button>`).join('');
+    $('guide-timeline').innerHTML = guide.stages.map((stage, i) => `<button type="button" data-action="guide-stage" data-stage="${i}"${i === 0 ? ' aria-current="step"' : ''}><span class="timeline-number">${String(i + 1).padStart(2,'0')}</span><span>${escape(stage.timing)}</span></button>`).join('');
     $('guide-stages').innerHTML = guide.stages.map((stage, i) => `<article class="guide-stage" id="guide-stage-${i}">
       <p class="eyebrow">${escape(stage.timing)}</p>
       <h2 tabindex="-1">${escape(stage.title)}</h2>
@@ -788,6 +937,7 @@
       </div>
       ${stage.check ? `<p class="stage-check">${escape(stage.check)}</p>` : ''}
     </article>`).join('');
+    initializeSequences($('guide-stages'));
     setView('guide');
     $('guide-title').focus({preventScroll:true});
   }
@@ -1044,6 +1194,7 @@
       updateProfileLabel(); closeProfile();
       await refreshRanking();
       if(view==='history') await loadHistory();
+      if(view==='badges') await loadBadges();
       toast('线上资料与成绩已删除。');
     }
     catch(err){$('profile-error').textContent=err.message;}
@@ -1055,8 +1206,22 @@
     ['reload-badges', () => { void loadBadges(); }],
     ['toggle-badge', target => toggleBadge(target.dataset.badge)],
     ['save-badges', () => { void saveBadges(); }],
+    ['honor-show', target => showHonorDetail(target.dataset.badge)],
+    ['close-honor-detail', () => { ++honorDetailRequest; $('honor-dialog').close(); }],
+    ['honor-mode', target => {
+      const mode = target.dataset.mode;
+      if (!['history', 'current'].includes(mode) || mode === honorDetailMode) return;
+      honorDetailMode = mode;
+      $('honor-dialog').querySelectorAll('[data-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
+      $('honor-detail-list').replaceChildren();
+      void loadHonorDetail();
+    }],
+    ['honor-prev', () => { if (honorDetailPage > 1) void loadHonorDetail(honorDetailPage - 1); }],
+    ['honor-next', () => { if (honorDetailPage < honorDetailPages) void loadHonorDetail(honorDetailPage + 1); }],
     ['zoom-diagram', target => openDiagram(target)],
     ['toggle-diagram-motion', target => toggleDiagramMotion(target)],
+    ['sequence-prev', target => stepSequence(target, -1)],
+    ['sequence-next', target => stepSequence(target, 1)],
     ['close-diagram', () => $('diagram-dialog').close()],
   ]);
   document.addEventListener('click',(e)=>{
@@ -1098,6 +1263,7 @@
       case 'history-profile': showProfile();break;
       case 'guide-stage': {
         const stage = $('guide-stage-' + target.dataset.stage);
+        setCurrentGuideStage(Number(target.dataset.stage));
         stage.scrollIntoView({block:'start'});
         stage.querySelector('h2').focus({preventScroll:true});
         break;
@@ -1117,6 +1283,8 @@
   });
   window.addEventListener('pagehide', pauseTimer);
   window.addEventListener('pageshow', () => { resumeTimer(); if (view === 'exam') updateExamTimer(); });
+  document.querySelectorAll?.('[data-overview]').forEach(node => { node.innerHTML = drawOverviewSequence(node.dataset.overview); });
+  if (document.querySelectorAll) initializeSequences(document);
   readGuideHash();
   $('metric-count').textContent=String(qs.length); $('total-count').textContent=`/ ${qs.length}`; updateProfileLabel(); initializeTransfer(); void refreshRanking();
   if (profile?.localOnly) setConnectionUnavailable(true);

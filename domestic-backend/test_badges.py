@@ -131,6 +131,73 @@ class BadgeTest(unittest.TestCase):
         self.assertTrue(all(not board['entries'] and board['holderCount'] == 0 for board in boards['boards']))
         self.assertTrue(all(not holders for holders in winners.values()))
 
+    def test_history_preserves_previous_tied_holders_and_pages_all_current_entries(self):
+        players = [self.player(digit) for digit in '0123456789abcdef']
+        for player in players[:12]:
+            self.attempt(player, 87, elapsed=100)
+        for player in players[12:]:
+            self.attempt(player, 87, elapsed=150)
+        self.attempt(players[12], 87, elapsed=80)  # A new record supersedes twelve tied holders.
+        summary, _ = server.honor_boards(self.db)
+        quickest = summary['boards'][0]
+        self.assertEqual((len(quickest['entries']), quickest['holderCount'], quickest['total']), (5, 1, 16))
+        current = [server.honor_page(self.db, 'quickest', page, 5) for page in range(1, 5)]
+        self.assertEqual(sum(len(item['entries']) for item in current), 16)
+        self.assertEqual([entry['rank'] for entry in current[2]['entries'][:2]], [2, 2])
+        history = [server.honor_history_page(self.db, 'quickest', page, 5) for page in range(1, 4)]
+        entries = [entry for item in history for entry in item['entries']]
+        self.assertEqual(len(entries), 13)
+        self.assertEqual(sum(entry['current'] for entry in entries), 1)
+        self.assertEqual(entries[-1]['nickname'], 'c')
+        self.assertEqual({entry['nickname'] for entry in entries[:-1]}, set('0123456789ab'))
+        self.assertNotIn('quickest', self.earned(players[0]))
+        self.assertIn('quickest', self.earned(players[12]))
+        with self.assertRaises(server.ApiError):
+            server.honor_history_page(self.db, 'missing')
+        with self.assertRaises(server.ApiError):
+            server.honor_page(self.db, 'quickest', 0)
+
+    def test_history_does_not_guess_order_within_one_timestamp(self):
+        first, second = self.player('a'), self.player('b')
+        self.attempt(first, 87, elapsed=100)
+        self.attempt(second, 87, elapsed=50)
+        self.db.execute('UPDATE attempts SET submitted_at = 1234')
+        history = server.honor_history_page(self.db, 'quickest')
+        self.assertEqual([entry['nickname'] for entry in history['entries']], ['b'])
+
+    def test_tied_current_records_order_by_when_the_score_was_reached(self):
+        a, b, c = self.player('a'), self.player('b'), self.player('c')
+        self.attempt(a, 87, elapsed=100)
+        self.attempt(b, 87, elapsed=100)
+        self.attempt(c, 87, elapsed=100)
+        self.db.executemany('INSERT INTO attempt_completion_times VALUES (?, ?)', [
+            (f'{1:032x}', 300), (f'{2:032x}', 100), (f'{3:032x}', 100),
+        ])
+        quickest = server.honor_boards(self.db)[0]['boards'][0]
+        self.assertEqual([entry['nickname'] for entry in quickest['entries']], ['b', 'c', 'a'])
+        self.assertEqual([entry['rank'] for entry in quickest['entries']], [1, 1, 1])
+        self.assertEqual([entry['nickname'] for entry in server.honor_page(self.db, 'quickest', 2, 1)['entries']], ['c'])
+        self.attempt(a, 87, elapsed=120)
+        self.attempt(b, 87, elapsed=120)
+        self.attempt(c, 87, elapsed=120)
+        self.db.executemany('INSERT INTO attempt_completion_times VALUES (?, ?)', [
+            (f'{4:032x}', 500), (f'{5:032x}', 400), (f'{6:032x}', 400),
+        ])
+        for badge in ('site_rounds', 'site_perfects'):
+            self.assertEqual([entry['nickname'] for entry in server.honor_page(self.db, badge)['entries']], ['b', 'c', 'a'])
+        self.assertEqual([entry['nickname'] for entry in server.honor_page(self.db, 'site_perfect_fast')['entries']], ['b', 'c', 'a'])
+
+    def test_completion_time_is_saved_once_and_invalid_values_fall_back(self):
+        identity = self.player('a')
+        answers = {q['id']: q['answer'] for q in server.QUESTIONS}
+        payload = {**identity, 'attemptId': 'b' * 32, 'version': server.VERSION, 'answers': answers,
+                   'elapsedSeconds': 100, 'completedAt': 1700000000000}
+        server.submit(self.db, payload)
+        server.submit(self.db, {**payload, 'completedAt': 1800000000000})
+        self.assertEqual(self.db.execute('SELECT completed_at FROM attempt_completion_times').fetchone()[0], 1700000000000)
+        server.submit(self.db, {**payload, 'attemptId': 'c' * 32, 'completedAt': True})
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM attempt_completion_times').fetchone()[0], 1)
+
     def test_selection_is_authenticated_and_rejects_invalid_or_locked_badges(self):
         player = self.player('a')
         self.attempt(player, 1)
