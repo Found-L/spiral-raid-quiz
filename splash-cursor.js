@@ -28,7 +28,8 @@ SOFTWARE.
   const canvas = document.getElementById('splash-cursor');
   const hero = document.getElementById('home');
   const home = document.getElementById('home-view');
-  if (!canvas || !hero || !home || !window.matchMedia) return;
+  const shell = document.querySelector('.site-shell');
+  if (!canvas || !hero || !home || !shell || !window.matchMedia) return;
 
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = matchMedia('(pointer: fine)');
@@ -37,13 +38,13 @@ SOFTWARE.
   let pointer = null, touch = null, resizeFrame = 0;
 
   function visible() {
-    return !document.hidden && !motion.matches && !home.hidden &&
-      !home.classList.contains('hidden');
+    return !document.hidden && !motion.matches;
   }
-  function inside(event) {
-    if (!home.contains(event.target) || event.clientX < 0 || event.clientX > innerWidth ||
+  function inside(event, isPress = false) {
+    if (!shell.contains(event.target) || event.clientX < 0 || event.clientX > innerWidth ||
         event.clientY < 0 || event.clientY > innerHeight ||
-        event.target.closest?.('button, a, input, textarea, select, dialog, [contenteditable="true"]')) return null;
+        event.target.closest?.('input, textarea, select, dialog, [contenteditable]:not([contenteditable="false"])') ||
+        (!isPress && event.target.closest?.('button, a, summary'))) return null;
     return {x:event.clientX / innerWidth, y:1 - event.clientY / innerHeight};
   }
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -281,7 +282,7 @@ SOFTWARE.
     function splat(input) {
       const u = bind('splat');
       gl.uniform1f(u.aspect, canvas.width / canvas.height);
-      gl.uniform1f(u.radius, .0017 * Math.max(1, canvas.width / canvas.height));
+      gl.uniform1f(u.radius, .0017 * Math.max(1, canvas.width / canvas.height) * input.radius);
       gl.uniform2f(u.point, input.x, input.y);
       gl.uniform1i(u.target, texture(velocity.read, 0));
       gl.uniform3f(u.color, input.dx, input.dy, 0);
@@ -367,11 +368,11 @@ SOFTWARE.
     renderer.step(dt); renderer.render();
     frame = requestAnimationFrame(animate);
   }
-  function add(point, dx, dy, boost = 1) {
+  function add(point, dx, dy, boost = 1, radius = 1) {
     if (!renderer || !visible()) return;
     const phase = .5 + .5 * Math.sin(performance.now() / 2900);
     const color = [(.035 + .09 * phase) * boost, (.30 - .015 * phase) * boost, (.25 - .04 * phase) * boost];
-    inputs.push({x:point.x, y:point.y, dx:clamp(dx, -900, 900), dy:clamp(dy, -900, 900), color});
+    inputs.push({x:point.x, y:point.y, dx:clamp(dx, -900, 900), dy:clamp(dy, -900, 900), color, radius});
     if (inputs.length > 18) inputs.splice(0, inputs.length - 18);
     lastInput = performance.now();
     canvas.dataset.fluidActive = 'true';
@@ -391,11 +392,22 @@ SOFTWARE.
     pointer = {...point, time:now};
   }
   function burst(point) {
-    for (let i = 0; i < 5; i++) {
-      const angle = i * Math.PI * 2 / 5;
-      add({x:point.x + Math.cos(angle) * .01, y:point.y + Math.sin(angle) * .01},
-        Math.cos(angle) * 120, Math.sin(angle) * 120, .55);
+    const reach = clamp(Math.min(innerWidth, innerHeight) * .055, 22, 52);
+    const rotation = Math.random() * Math.PI * 2;
+    add(point, 0, 0, 9, .85);
+    for (let i = 0; i < 8; i++) {
+      const angle = rotation + i * Math.PI / 4;
+      const x = Math.cos(angle), y = Math.sin(angle);
+      const distance = reach * (i % 2 ? 1 : .72);
+      const speed = i % 2 ? 260 : 200;
+      add({x:point.x + x * distance / innerWidth, y:point.y + y * distance / innerHeight},
+        x * speed - y * 60, y * speed + x * 60, 3.25, .22);
     }
+  }
+
+  function attachCanvas() {
+    const parent = !home.hidden && !home.classList.contains('hidden') ? hero : shell;
+    if (canvas.parentElement !== parent) parent.appendChild(canvas);
   }
 
   canvas.addEventListener('webglcontextlost', event => { event.preventDefault(); stop(); renderer = null; });
@@ -407,14 +419,14 @@ SOFTWARE.
   window.addEventListener('pointermove', move, {passive:true});
   window.addEventListener('pointerout', event => { if (!event.relatedTarget) pointer = null; }, {passive:true});
   window.addEventListener('pointerdown', event => {
-    const point = inside(event);
+    const point = inside(event, true);
     if (!point || !visible()) return;
     if (event.pointerType === 'touch') touch = {x:event.clientX, y:event.clientY, id:event.pointerId};
-    else burst(point);
+    else if (event.button === 0) burst(point);
   }, {passive:true});
   window.addEventListener('pointerup', event => {
     if (!touch || event.pointerId !== touch.id) return;
-    const point = inside(event);
+    const point = inside(event, true);
     if (point && Math.hypot(event.clientX - touch.x, event.clientY - touch.y) < 10) burst(point);
     touch = null;
   }, {passive:true});
@@ -423,6 +435,7 @@ SOFTWARE.
   document.addEventListener('visibilitychange', () => { if (!visible()) stop(); });
   if (motion.addEventListener) motion.addEventListener('change', () => { if (!visible()) stop(); });
   else motion.addListener(() => { if (!visible()) stop(); });
-  if (window.MutationObserver) new MutationObserver(() => { if (!visible()) stop(); })
+  if (window.MutationObserver) new MutationObserver(attachCanvas)
     .observe(home, {attributes:true, attributeFilter:['class', 'hidden']});
+  attachCanvas();
 })();

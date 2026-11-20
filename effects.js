@@ -9,7 +9,6 @@
   const hero = document.getElementById('home');
   const heroArt = document.querySelector('.hero-art');
   const pointer = {x: -1000, y: -1000, last: -Infinity};
-  const fragments = [];
   let particles = [], width = 0, height = 0, frame = null, previous = 0;
 
   function resize() {
@@ -95,22 +94,6 @@
       }
     }
 
-    for (let i = fragments.length - 1; i >= 0; i--) {
-      const piece = fragments[i], age = now - piece.started;
-      if (age >= 900) { fragments.splice(i, 1); continue; }
-      piece.x += piece.vx * delta;
-      piece.y += piece.vy * delta;
-      piece.vy += 35 * delta;
-      const alpha = .8 * (1 - age / 900), size = piece.size * (1 - age / 1200);
-      context.fillStyle = `rgba(${piece.color},${alpha})`;
-      context.beginPath();
-      context.moveTo(piece.x, piece.y - size * 2);
-      context.lineTo(piece.x + size, piece.y);
-      context.lineTo(piece.x, piece.y + size * 2);
-      context.lineTo(piece.x - size, piece.y);
-      context.closePath();
-      context.fill();
-    }
     frame = requestAnimationFrame(draw);
   }
 
@@ -120,7 +103,6 @@
     previous = 0;
     if (preference.matches || document.hidden) {
       context.clearRect(0, 0, width, height);
-      fragments.length = 0;
       heroArt?.style.removeProperty('--depth-x');
       heroArt?.style.removeProperty('--depth-y');
     } else frame = requestAnimationFrame(draw);
@@ -160,16 +142,6 @@
     if (card && (!(event.relatedTarget instanceof Node) || !card.contains(event.relatedTarget))) {
       card.style.removeProperty('--tilt-x'); card.style.removeProperty('--tilt-y');
     }
-  }, {passive: true});
-  window.addEventListener('pointerdown', event => {
-    if (preference.matches || event.target.closest?.('a, button, input, textarea, select, summary, dialog')) return;
-    const now = performance.now();
-    for (let i = 0; i < 10; i++) {
-      const angle = i * Math.PI * 2 / 10 + Math.random() * .3, speed = 30 + Math.random() * 65;
-      fragments.push({x:event.clientX, y:event.clientY, vx:Math.cos(angle) * speed, vy:Math.sin(angle) * speed - 15,
-        size:1.2 + Math.random() * 1.5, started:now, color:i % 2 ? '147,220,199' : '242,201,133'});
-    }
-    if (fragments.length > 50) fragments.splice(0, fragments.length - 50);
   }, {passive: true});
   document.addEventListener('visibilitychange', update);
   if (preference.addEventListener) preference.addEventListener('change', update);

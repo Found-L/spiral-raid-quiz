@@ -4,6 +4,25 @@ const {spawn} = require('node:child_process');
 const net = require('node:net');
 const path = require('node:path');
 const {chromium} = require('playwright');
+async function changedPixels(page, before, after) {
+  return page.evaluate(async data => {
+    const images = await Promise.all(data.map(async encoded => {
+      const image = new Image(); image.src = 'data:image/png;base64,' + encoded; await image.decode(); return image;
+    }));
+    const canvas = document.createElement('canvas'), context = canvas.getContext('2d');
+    canvas.width = images[0].width; canvas.height = images[0].height;
+    context.drawImage(images[0], 0, 0);
+    const first = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    context.drawImage(images[1], 0, 0);
+    const second = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    let changed = 0;
+    for (let i = 0; i < first.length; i += 4) {
+      if (Math.abs(first[i] - second[i]) + Math.abs(first[i + 1] - second[i + 1]) +
+          Math.abs(first[i + 2] - second[i + 2]) > 20) changed++;
+    }
+    return changed;
+  }, [before.toString('base64'), after.toString('base64')]);
+}
 
 async function freePort() {
   return new Promise((resolve, reject) => {
@@ -65,6 +84,15 @@ async function waitReady(url) {
             assert.ok(button.x >= box.x && button.x + button.width <= box.x + box.width, `clipped diagram control at ${width}`);
           }
         }
+      }
+      if (width === 3840) {
+        await page.addStyleTag({content:'* {animation:none!important;transition:none!important} #temple-particles {visibility:hidden!important} .hero-art {transform:none!important}'});
+        await page.mouse.move(2400, 800);
+        const clip = {x:2200, y:600, width:400, height:400};
+        const before = await page.screenshot({clip});
+        await page.mouse.click(2400, 800);
+        await page.waitForTimeout(120);
+        assert.ok(await changedPixels(page, before, await page.screenshot({clip})) > 500, 'the click splash should remain visible at 4K');
       }
       assert.deepEqual(errors, []);
       await page.close();
@@ -173,12 +201,14 @@ async function waitReady(url) {
     await scroll.waitForFunction(() => document.querySelector('#guide-stage-0')?.classList.contains('motion-enter'));
     await scroll.evaluate(() => { location.hash = '#guide-witch'; });
     await scroll.waitForFunction(() => document.querySelector('#guide-title').textContent.includes('黑风'));
+    await scroll.waitForFunction(() => document.querySelector('#splash-cursor').parentElement.classList.contains('site-shell'));
     await scroll.waitForFunction(() => document.querySelector('#guide-view').classList.contains('view-emerging') && document.querySelector('.site-shell').classList.contains('view-shifting'));
     assert.equal(await scroll.locator('.site-shell').evaluate(el => getComputedStyle(el, '::after').animationName), 'gate-sweep');
     await scroll.locator('#guide-stage-0').scrollIntoViewIfNeeded();
     await scroll.waitForFunction(() => document.querySelector('#guide-stage-0')?.classList.contains('motion-enter'));
     await scroll.locator('.brand').click();
     await scroll.waitForFunction(() => !document.querySelector('#home-view').classList.contains('hidden'));
+    await scroll.waitForFunction(() => document.querySelector('#splash-cursor').parentElement.id === 'home');
     assert.equal(await scroll.locator('.entrance-cloud-left').evaluate(el => getComputedStyle(el).animationName), 'none', 'returning home must not replay the entrance');
     await scroll.emulateMedia({reducedMotion:'reduce'});
     await scroll.waitForFunction(() => !document.querySelector('.motion-enter'));
@@ -233,6 +263,18 @@ async function waitReady(url) {
     assert.equal(movingInk.equals(await ink.screenshot()), false, 'the fluid should continue evolving after pointer movement');
     assert.equal(await ink.locator('#splash-cursor').getAttribute('data-fluid-active'), 'true');
     assert.equal(await ink.locator('#splash-cursor').evaluate(el => el.getContext('webgl').getError()), 0, 'the fluid renderer should not produce WebGL errors');
+    await ink.evaluate(() => { Object.defineProperty(document, 'hidden', {configurable:true, value:true}); document.dispatchEvent(new Event('visibilitychange')); });
+    await ink.evaluate(() => { Object.defineProperty(document, 'hidden', {configurable:true, value:false}); document.dispatchEvent(new Event('visibilitychange')); });
+    await ink.mouse.move(980, 260);
+    await ink.waitForTimeout(100);
+    const clickArea = {x:830, y:110, width:300, height:300};
+    const beforeClick = await ink.screenshot({clip:clickArea});
+    await ink.mouse.click(980, 260);
+    await ink.waitForTimeout(90);
+    const afterClick = await ink.screenshot({clip:clickArea});
+    assert.ok(await changedPixels(ink, beforeClick, afterClick) > 500, 'a stationary click must create a visible fluid splash');
+    await ink.waitForTimeout(220);
+    assert.ok(await changedPixels(ink, afterClick, await ink.screenshot({clip:clickArea})) > 200, 'the splash should spread and curl after the click');
     await ink.locator('#leaderboard').scrollIntoViewIfNeeded();
     assert.equal(await ink.locator('#splash-cursor').evaluate(el => getComputedStyle(el).position), 'fixed');
     assert.ok(await ink.locator('.ranking-section').evaluate(el => Number(getComputedStyle(el).zIndex) > Number(getComputedStyle(document.querySelector('#temple-particles')).zIndex)), 'ranking content must sit above decorative effects');
@@ -243,6 +285,18 @@ async function waitReady(url) {
     await ink.mouse.move(720, 570, {steps:8});
     assert.equal(await ink.locator('#splash-cursor').getAttribute('data-fluid-active'), 'true', 'the background effect also responds around the ranking');
     await ink.close();
+
+    const touch = await browser.newPage({viewport:{width:390, height:844}, isMobile:true, hasTouch:true});
+    await touch.route('**/api/**', route => route.fulfill({json:{entries:[], boards:[]}, headers:{'Access-Control-Allow-Origin':'*'}}));
+    await touch.goto(url);
+    await touch.touchscreen.tap(315, 600);
+    assert.equal(await touch.locator('#splash-cursor').getAttribute('data-fluid-active'), 'true', 'a tap should create the fluid splash');
+    await touch.evaluate(() => { Object.defineProperty(document, 'hidden', {configurable:true, value:true}); document.dispatchEvent(new Event('visibilitychange')); });
+    await touch.evaluate(() => { Object.defineProperty(document, 'hidden', {configurable:true, value:false}); document.dispatchEvent(new Event('visibilitychange')); });
+    await touch.locator('.hero').dispatchEvent('pointerdown', {pointerType:'touch', pointerId:42, clientX:200, clientY:400, bubbles:true});
+    await touch.locator('.hero').dispatchEvent('pointerup', {pointerType:'touch', pointerId:42, clientX:200, clientY:480, bubbles:true});
+    assert.equal(await touch.locator('#splash-cursor').getAttribute('data-fluid-active'), 'false', 'a scrolling gesture must not create a tap splash');
+    await touch.close();
 
     const inkFallback = await browser.newPage({viewport:{width:900, height:700}});
     const fallbackErrors = [];
@@ -272,6 +326,8 @@ async function waitReady(url) {
     await exam.route('**/api/**', route => route.fulfill({json:{entries:[], boards:[]}, headers:{'Access-Control-Allow-Origin':'*'}}));
     await exam.goto(url);
     await exam.locator('.hero-actions [data-action="start"]').click();
+    await exam.waitForFunction(() => document.querySelector('#splash-cursor').parentElement.classList.contains('site-shell'));
+    assert.equal(await exam.locator('#splash-cursor').getAttribute('data-fluid-active'), 'true', 'button presses should trigger the splash through a view change');
     await exam.locator('#question-options label').first().click();
     assert.equal(await exam.locator('#answered-count').innerText(), '1', 'an answer should be saved while effects are running');
     assert.equal(await exam.locator('#question-options label').first().evaluate(el => el.classList.contains('selection-fresh')), true, 'the chosen answer should receive its selection effect');
