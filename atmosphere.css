@@ -209,7 +209,7 @@ img { -webkit-user-drag: none; }
 @keyframes temple-reveal-light { 0%, 100% { opacity: 0; } 35% { opacity: .8; } }
 @keyframes temple-button-light { 0%, 55% { transform: translateX(-100%); } 85%, 100% { transform: translateX(100%); } }
 @keyframes temple-overview-light { from { transform: translateX(-45%); } to { transform: translateX(45%); } }
-@keyframes temple-scroll-in { from { opacity: .4; translate: 0 30px; } to { opacity: 1; translate: 0 0; } }
+@keyframes temple-scroll-in { from { opacity: .35; translate: 0 30px; filter: blur(4px); } to { opacity: 1; translate: 0 0; filter: blur(0); } }
 @keyframes temple-card-in { from { opacity: .45; } to { opacity: 1; } }
 @keyframes temple-scene-in { from { clip-path: inset(10% 0 0); transform: scale(1.035); } to { clip-path: inset(0); transform: scale(1); } }
 @keyframes chapter-arrival-flare { 0% { opacity: 0; transform: translateX(-110%); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateX(110%); } }

@@ -158,6 +158,9 @@ async function waitReady(url) {
     await scroll.waitForFunction(() => [...document.querySelectorAll('.guide-card')].every(el => el.classList.contains('motion-enter')));
     assert.equal(await scroll.locator('.guide-card').first().evaluate(el => getComputedStyle(el).animationName), 'temple-card-in');
     assert.equal(await scroll.locator('.guide-card').first().evaluate(el => getComputedStyle(el, '::after').animationName), 'chapter-arrival-flare');
+    await scroll.locator('.guide-card').first().hover();
+    assert.notEqual(await scroll.locator('.guide-card').first().evaluate(el => el.style.getPropertyValue('--edge-x')), '', 'card edge light follows the pointer');
+    assert.equal(await scroll.locator('.card-light-edge').first().evaluate(el => getComputedStyle(el).pointerEvents), 'none', 'card light must not block diagram controls');
     const preview = scroll.locator('[data-sequence="overview-twins"]');
     const previousStep = await preview.getAttribute('data-step');
     await preview.locator('[data-action="sequence-next"]').click({timeout:1800});
@@ -221,14 +224,25 @@ async function waitReady(url) {
     await ink.mouse.move(650, 360);
     for (let i = 1; i <= 18; i++) await ink.mouse.move(650 + i * 12, 360 + Math.sin(i / 3) * 45);
     await ink.waitForTimeout(150);
-    assert.equal(beforeInk.equals(await ink.screenshot()), false, 'moving the pointer should leave a visible ink trail');
+    assert.equal(beforeInk.equals(await ink.screenshot()), false, 'moving the pointer should leave a visible particle trail');
+    const trailPixels = await ink.locator('#splash-cursor').evaluate(el => {
+      const pixels = el.getContext('2d').getImageData(0, 0, el.width, el.height).data;
+      let visible = 0, opaque = 0;
+      for (let i = 3; i < pixels.length; i += 4) {
+        if (pixels[i] > 10) visible++;
+        if (pixels[i] > 180) opaque++;
+      }
+      return {visible, opaque, total:el.width * el.height};
+    });
+    assert.ok(trailPixels.visible > 100, 'the trail contains visible fine particles and light strands');
+    assert.ok(trailPixels.opaque < trailPixels.total * .002, 'the trail must not accumulate into large opaque blobs');
     await ink.close();
 
     const inkFallback = await browser.newPage({viewport:{width:900, height:700}});
     await inkFallback.addInitScript(() => {
       const getContext = HTMLCanvasElement.prototype.getContext;
       HTMLCanvasElement.prototype.getContext = function(type, ...args) {
-        if (this.id === 'splash-cursor' && type === 'webgl') return null;
+        if (type === 'webgl' || type === 'webgl2') return null;
         return getContext.call(this, type, ...args);
       };
     });
@@ -248,8 +262,25 @@ async function waitReady(url) {
       const pixels = el.getContext('2d').getImageData(0, 0, el.width, el.height).data;
       for (let i = 3; i < pixels.length; i += 4) if (pixels[i]) return false;
       return true;
-    }), true, 'ink should clear when the page is hidden');
+    }), true, 'particle trails should clear when the page is hidden');
     await inkFallback.close();
+
+    const noCanvas = await browser.newPage({viewport:{width:900, height:700}});
+    const noCanvasErrors = [];
+    noCanvas.on('pageerror', error => noCanvasErrors.push(error.message));
+    await noCanvas.addInitScript(() => {
+      const getContext = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function(type, ...args) {
+        if (this.id === 'splash-cursor' && type === '2d') return null;
+        return getContext.call(this, type, ...args);
+      };
+    });
+    await noCanvas.route('**/api/**', route => route.fulfill({json:{entries:[], boards:[]}, headers:{'Access-Control-Allow-Origin':'*'}}));
+    await noCanvas.goto(url);
+    await noCanvas.locator('.hero-actions [data-action="start"]').click();
+    assert.equal(await noCanvas.locator('#profile-dialog').evaluate(el => el.open), true, 'site controls remain usable if the decorative canvas is unavailable');
+    assert.deepEqual(noCanvasErrors, []);
+    await noCanvas.close();
 
     const exam = await browser.newPage({viewport:{width:1440, height:900}});
     const examErrors = [];

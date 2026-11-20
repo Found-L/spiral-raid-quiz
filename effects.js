@@ -10,7 +10,6 @@
   const heroArt = document.querySelector('.hero-art');
   const pointer = {x: -1000, y: -1000, last: -Infinity};
   const fragments = [];
-  const brush = [];
   let particles = [], width = 0, height = 0, frame = null, previous = 0;
 
   function resize() {
@@ -21,14 +20,15 @@
     canvas.width = Math.round(width * ratio);
     canvas.height = Math.round(height * ratio);
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
-    const count = Math.min(180, Math.max(45, Math.round(width * height / 13500)));
+    const count = Math.min(280, Math.max(80, Math.round(width * height / 8500)));
     particles = Array.from({length: count}, () => {
       const jade = Math.random() < .46;
       return {
         x: Math.random() * width, y: Math.random() * height,
         vx: -5 + Math.random() * 10, vy: -7 - Math.random() * 24,
-        size: .7 + Math.random() * 1.7, phase: Math.random() * Math.PI * 2,
-        tail: Math.random() < .3 ? 7 + Math.random() * 12 : 0,
+        size: .55 + Math.random() * 1.5, phase: Math.random() * Math.PI * 2,
+        tail: Math.random() < .32 ? 7 + Math.random() * 12 : 0,
+        glint: Math.random() < .1,
         color: jade ? '147,220,199' : '242,201,133'
       };
     });
@@ -57,25 +57,6 @@
       context.bezierCurveTo(x - 150, y - 15, x - 70, y + 45, x + 25, y - 25);
       context.stroke();
     }
-    if (pointerVisible) {
-      const glow = context.createRadialGradient(pointer.x, pointer.y, 0, pointer.x, pointer.y, 130);
-      glow.addColorStop(0, 'rgba(131,219,192,.13)');
-      glow.addColorStop(.4, 'rgba(213,191,133,.045)');
-      glow.addColorStop(1, 'rgba(131,219,192,0)');
-      context.fillStyle = glow;
-      context.fillRect(pointer.x - 130, pointer.y - 130, 260, 260);
-    }
-    while (brush.length && now - brush[0].time > 650) brush.shift();
-    for (let i = 1; i < brush.length; i++) {
-      const age = now - brush[i].time;
-      context.strokeStyle = `rgba(174,224,202,${.38 * Math.max(0, 1 - age / 650)})`;
-      context.lineWidth = 1.25;
-      context.beginPath();
-      context.moveTo(brush[i - 1].x, brush[i - 1].y);
-      context.lineTo(brush[i].x, brush[i].y);
-      context.stroke();
-    }
-
     for (const particle of particles) {
       let vx = particle.vx + Math.sin(now / 2100 + particle.y / 180 + particle.phase) * 7;
       let vy = particle.vy;
@@ -95,6 +76,15 @@
       context.beginPath();
       context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
       context.fill();
+      if (particle.glint) {
+        const ray = particle.size * (2.5 + alpha * 2);
+        context.strokeStyle = `rgba(${particle.color},${alpha * .5})`;
+        context.lineWidth = .6;
+        context.beginPath();
+        context.moveTo(particle.x - ray, particle.y); context.lineTo(particle.x + ray, particle.y);
+        context.moveTo(particle.x, particle.y - ray); context.lineTo(particle.x, particle.y + ray);
+        context.stroke();
+      }
       if (particle.tail) {
         context.strokeStyle = `rgba(${particle.color},${alpha * .5})`;
         context.lineWidth = .8;
@@ -131,7 +121,6 @@
     if (preference.matches || document.hidden) {
       context.clearRect(0, 0, width, height);
       fragments.length = 0;
-      brush.length = 0;
       heroArt?.style.removeProperty('--depth-x');
       heroArt?.style.removeProperty('--depth-y');
     } else frame = requestAnimationFrame(draw);
@@ -142,11 +131,6 @@
     if (preference.matches || event.pointerType === 'touch') return;
     pointer.x = event.clientX; pointer.y = event.clientY; pointer.last = performance.now();
     if (!finePointer.matches) return;
-    const previousPoint = brush[brush.length - 1];
-    if (!previousPoint || Math.hypot(previousPoint.x - pointer.x, previousPoint.y - pointer.y) > 6) {
-      brush.push({x:pointer.x, y:pointer.y, time:pointer.last});
-      if (brush.length > 36) brush.shift();
-    }
     if (hero?.contains(event.target)) {
       const box = hero.getBoundingClientRect();
       const x = (event.clientX - box.left) / box.width - .5;
@@ -166,6 +150,9 @@
       card.style.setProperty('--glow-y', `${(y * 100).toFixed(1)}%`);
       card.style.setProperty('--tilt-x', `${((x - .5) * 5).toFixed(2)}deg`);
       card.style.setProperty('--tilt-y', `${((.5 - y) * 5).toFixed(2)}deg`);
+      const cardBox = card.getBoundingClientRect();
+      card.style.setProperty('--edge-x', `${((event.clientX - cardBox.left) / cardBox.width * 100).toFixed(1)}%`);
+      card.style.setProperty('--edge-y', `${((event.clientY - cardBox.top) / cardBox.height * 100).toFixed(1)}%`);
     }
   }, {passive: true});
   window.addEventListener('pointerout', event => {

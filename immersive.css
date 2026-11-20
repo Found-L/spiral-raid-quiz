@@ -55,6 +55,23 @@
 .hero-index .hero-scroll-line {
   width: 38px; margin: 0; border-color: #d7c297; transform-origin: left center;
 }
+/* A narrow edge highlight follows the pointer while leaving the diagram unobscured. */
+.card-light-edge {
+  position: absolute; inset: 0; z-index: 5; padding: 1px; border-radius: inherit;
+  pointer-events: none; opacity: 0;
+  background: radial-gradient(220px circle at var(--edge-x, 50%) var(--edge-y, 50%),
+    color-mix(in srgb, var(--accent) 75%, #fff2ce) 0, transparent 72%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  transition: opacity .25s ease;
+}
+.guide-card:hover .card-light-edge, .guide-card:focus-within .card-light-edge { opacity: .9; }
+.guide-card::before {
+  background: linear-gradient(90deg, var(--accent), #fff0c7, var(--accent), transparent);
+  background-size: 240% 100%;
+}
 @media (min-width: 1101px) {
   .hero { padding-inline: var(--page-inset); }
   .hero h1 { font-size: clamp(62px, 4.5vw, 112px); }
@@ -91,6 +108,9 @@
 @media (prefers-reduced-motion: no-preference) {
   .hero-landscape { animation: immersive-landscape 24s ease-in-out infinite alternate; }
   .hero-index .hero-scroll-line { animation: immersive-scroll 2.8s ease-in-out infinite; }
+  .guide-card::before { animation: card-rim-travel 7s linear infinite; }
+  .guide-card:nth-child(2)::before { animation-delay: -2.3s; }
+  .guide-card:nth-child(3)::before { animation-delay: -4.6s; }
 }
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
   .guide-card:hover, .guide-card:focus-within {
@@ -102,3 +122,4 @@
   to { transform: translate3d(calc(var(--depth-x, 0px) - 1%), var(--depth-y, 0px), 0) scale(1.11); }
 }
 @keyframes immersive-scroll { 0%, 100% { opacity: .45; transform: scaleX(.55); } 50% { opacity: 1; transform: scaleX(1); } }
+@keyframes card-rim-travel { from { background-position: 200% 0; } to { background-position: -40% 0; } }
