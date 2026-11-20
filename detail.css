@@ -94,6 +94,8 @@
 .guard-gold { fill: #816141; stroke: #f6d69a; }
 .guard-silver { fill: #506c70; stroke: #c7e7df; }
 .guard-telegraph { fill: #dc655a; fill-opacity: .14; stroke: #f18b7e; stroke-opacity: .7; stroke-width: 1.5; animation: guard-warning 3s ease-in-out infinite; }
+.guard-flame { fill: #db644b; fill-opacity: .1; animation: guard-warning 3s ease-in-out infinite; }
+.guard-figure .guard-flame-label { fill: #f1a78e; }
 .guard-assignment { fill: none; stroke: #85dfc9; stroke-width: 2; stroke-dasharray: 4 4; animation: guard-assignment 2s linear infinite; }
 .guard-next { fill: none; stroke: #c5ad7f; stroke-width: 1.5; opacity: .8; }
 .guard-copy p { color: #cad6ce; line-height: 1.8; margin: 0 0 12px; }
@@ -114,7 +116,7 @@
   .guard-figure .guard-label { font-size: 18px; }
   .guard-figure .guard-group { font-size: 15px; }
 }
-@media (prefers-reduced-motion: reduce) { .guard-danger, .guard-telegraph, .guard-assignment { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .guard-danger, .guard-telegraph, .guard-flame, .guard-assignment { animation: none; } }
 
 .raid-diagram {
   margin: 0;
