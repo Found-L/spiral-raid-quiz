@@ -586,7 +586,7 @@ def honor_history_page(db, badge_id, page=1, page_size=20):
         participant = event['participant_id']
         metadata.setdefault(participant, (event['nickname'], event['number']))
         achieved.setdefault(participant, (event['achieved_at'], None))
-    ordered = sorted(achieved, key=lambda participant: (achieved[participant][0],
+    ordered = sorted(achieved, key=lambda participant: (-achieved[participant][0],
                      metadata[participant][1] if metadata[participant][1] is not None else float('inf'), participant))
     total = len(ordered)
     pages = max(1, (total + page_size - 1) // page_size)

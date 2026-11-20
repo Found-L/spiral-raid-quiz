@@ -43,7 +43,17 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
       });
       const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
       await page.goto(origin+'/spiral-raid-quiz/admin/');
+      await page.locator('#login-view').waitFor();
       assert.equal(await page.locator('#login-view').isVisible(),true);
+      assert.match(await page.locator('link[rel="icon"]').getAttribute('href'),/^data:image\/svg\+xml,/);
+      if(width===1440){
+        await page.locator('#password').fill('unfinished password');
+        const rechecked=page.waitForResponse(response=>response.url().endsWith('/api/admin/session'));
+        await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));
+        await (await rechecked).body();
+        await page.waitForTimeout(30);
+        assert.equal(await page.locator('#password').inputValue(),'unfinished password','returning to login keeps unfinished input');
+      }
       if(process.env.ADMIN_SCREENSHOT_DIR&&width===390)await page.screenshot({path:path.join(process.env.ADMIN_SCREENSHOT_DIR,'admin-login-mobile.png')});
       await page.locator('#password').fill('wrong');await page.locator('#login-form button').click();
       await page.waitForFunction(()=>document.querySelector('#login-message').textContent.includes('不正确'));
@@ -119,7 +129,17 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
         await page.getByText('评价已删除，举报内容为提交时的记录。').waitFor();
       }
       await page.locator('[data-kind=reactions]').click();await page.waitForFunction(()=>document.querySelector('#interactions-content').textContent.includes('🔥'));
-      await page.reload();await page.locator('#overview-content .metric').first().waitFor();
+      await page.route('**/api/admin/session',async route=>{await new Promise(resolve=>setTimeout(resolve,500));await route.fallback()});
+      await page.reload({waitUntil:'domcontentloaded'});
+      assert.equal(await page.locator('#login-view').isVisible(),false,'valid session reload must not flash the login form');
+      assert.equal(await page.locator('#session-loading').isVisible(),true,'session is verified before either view is shown');
+      await page.locator('#overview-content .metric').first().waitFor();
+      await page.evaluate(()=>{window.restoredMetric=document.querySelector('#overview-content .metric');window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}))});
+      assert.equal(await page.locator('#dashboard').isVisible(),true,'back/forward restore keeps the dashboard visible');
+      assert.equal(await page.locator('#login-view').isVisible(),false,'back/forward restore does not flash login');
+      await page.waitForTimeout(650);
+      assert.equal(await page.evaluate(()=>window.restoredMetric===document.querySelector('#overview-content .metric')),true,'session revalidation keeps the current view mounted');
+      await page.unroute('**/api/admin/session');
 
       if(width===1440) {
         await page.locator('#password-open').click();
@@ -134,6 +154,13 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
       await page.locator('#logout').click();
       await page.waitForFunction(()=>!document.querySelector('#login-view').hidden);
       assert.equal(await page.locator('#overview-content').textContent(),'','private DOM should be cleared at logout');
+      if(width===1440){
+        await page.route('**/api/admin/session',route=>route.abort());
+        await page.reload();
+        await page.waitForFunction(()=>document.querySelector('#login-message').textContent.includes('连接失败'));
+        assert.equal(await page.locator('#session-loading').isVisible(),false,'network errors must not leave the page stuck loading');
+        await page.unroute('**/api/admin/session');
+      }
       assert.deepEqual(errors,[]);
       await context.close();
     }

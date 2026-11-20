@@ -571,6 +571,12 @@
       }
     }
   }
+  const honorDate = new Intl.DateTimeFormat('zh-CN', {timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
+  function updateHonorDetailNote() {
+    $('honor-detail-note').textContent = honorDetailMode === 'history'
+      ? '按首次获得时间从新到旧；缺少完成时间时使用上传时间，仅有留档时使用记录时间。缺失或已删除的记录无法还原。'
+      : '显示符合本榜条件的已上传身份；每个身份只列一次，按成绩排列。';
+  }
   async function loadHonorDetail(page = 1) {
     const requestId = ++honorDetailRequest;
     const badge = honorDetailBadge;
@@ -587,15 +593,16 @@
       $('honor-detail-description').textContent = data.badge.description;
       $('honor-detail-status').textContent = mode === 'history'
         ? `共 ${data.total} 人曾达成 · 其中 ${data.holderCount} 人当前持有`
-        : `共 ${data.total} 人上榜 · ${data.holderCount} 人并列榜首；同成绩按达到时间先后排列`;
+        : `共 ${data.total} 人上榜 · ${data.holderCount} 人当前位列榜首`;
       $('honor-detail-list').innerHTML = data.entries.length ? data.entries.map(entry => {
         const number = formatPlayerNumber(entry.playerNumber);
         const value = entry.recordedOnly ? '纪录已留档' : data.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`;
         const rank = mode === 'current' ? `<span class="honor-detail-rank">${entry.rank}</span>` : '';
         const status = mode === 'history' ? `<small class="${entry.current ? 'is-current' : ''}">${entry.current ? '当前持有' : '曾经获得'}</small>` : '';
-        const time = mode === 'history' ? `<span class="honor-achieved">${new Date(entry.achievedAt).toLocaleDateString('zh-CN')} ${entry.recordedOnly ? '记录时间' : '首次达成'}</span>` : '';
-        return `<li>${rank}<span class="honor-detail-person"><strong>${escape(entry.nickname)}</strong><small>${escape(number)}</small></span>${status}<span class="honor-detail-value"><strong>${mode === 'history' && !entry.recordedOnly ? '当时 ' : ''}${escape(value)}</strong>${time}</span></li>`;
+        const time = mode === 'history' ? `<span class="honor-achieved">${honorDate.format(entry.achievedAt)} ${entry.recordedOnly ? '记录时间' : '首次达成'}</span>` : '';
+        return `<li class="honor-detail-row--${mode}">${rank}<span class="honor-detail-person"><strong>${escape(entry.nickname)}</strong><small>${escape(number)}</small></span>${status}<span class="honor-detail-value"><strong>${mode === 'history' && !entry.recordedOnly ? '当时 ' : ''}${escape(value)}</strong>${time}</span></li>`;
       }).join('') : '<li class="honor-detail-empty">暂无符合条件的记录。</li>';
+      $('honor-detail-list').scrollTop = 0;
       $('honor-detail-page').textContent = `第 ${honorDetailPage} / ${honorDetailPages} 页`;
       $('honor-detail-prev').disabled = honorDetailPage <= 1;
       $('honor-detail-next').disabled = honorDetailPage >= honorDetailPages;
@@ -607,6 +614,7 @@
   function showHonorDetail(badge) {
     honorDetailBadge = badge;
     honorDetailMode = 'history';
+    updateHonorDetailNote();
     honorDetailPage = honorDetailPages = 1;
     $('honor-detail-list').replaceChildren();
     $('honor-detail-page').textContent = '';
@@ -1466,6 +1474,7 @@
       const mode = target.dataset.mode;
       if (!['history', 'current'].includes(mode) || mode === honorDetailMode) return;
       honorDetailMode = mode;
+      updateHonorDetailNote();
       $('honor-dialog').querySelectorAll('[data-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
       $('honor-detail-list').replaceChildren();
       void loadHonorDetail();

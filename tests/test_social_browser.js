@@ -180,7 +180,7 @@ async function context(browser, code, viewport) {
     await owner.locator('[data-action="social-close"]').click();
     await owner.locator('[data-action="honor-show"][data-badge="quickest"]').click();
     await owner.getByText('纪录已留档', {exact:true}).waitFor();
-    await owner.getByText('记录时间', {exact:false}).waitFor();
+    await owner.locator('#honor-detail-list .honor-achieved').filter({hasText:'记录时间'}).waitFor();
     await owner.locator('[data-action="close-honor-detail"]').click();
 
     const resetRate = spawnSync(python, ['-c', "import sqlite3,sys; c=sqlite3.connect(sys.argv[1]); c.execute(\"UPDATE social_rate_limits SET last_at=0 WHERE action='comment'\"); c.commit(); c.close()", database], {encoding:'utf8', windowsHide:true});

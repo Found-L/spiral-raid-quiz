@@ -148,8 +148,9 @@ class BadgeTest(unittest.TestCase):
         entries = [entry for item in history for entry in item['entries']]
         self.assertEqual(len(entries), 13)
         self.assertEqual(sum(entry['current'] for entry in entries), 1)
-        self.assertEqual(entries[-1]['nickname'], 'c')
-        self.assertEqual({entry['nickname'] for entry in entries[:-1]}, set('0123456789ab'))
+        self.assertEqual(entries[0]['nickname'], 'c')
+        self.assertEqual({entry['nickname'] for entry in entries[1:]}, set('0123456789ab'))
+        self.assertEqual([entry['achievedAt'] for entry in entries], sorted((entry['achievedAt'] for entry in entries), reverse=True))
         self.assertNotIn('quickest', self.earned(players[0]))
         self.assertIn('quickest', self.earned(players[12]))
         with self.assertRaises(server.ApiError):
@@ -164,6 +165,31 @@ class BadgeTest(unittest.TestCase):
         self.db.execute('UPDATE attempts SET submitted_at = 1234')
         history = server.honor_history_page(self.db, 'quickest')
         self.assertEqual([entry['nickname'] for entry in history['entries']], ['b'])
+
+    def test_history_pages_include_all_recorded_holders_newest_first(self):
+        inserted = 0
+        for total in (0, 1, 19, 20, 21, 39, 40, 41, 101):
+            while inserted < total:
+                player = {'deviceId': f'{inserted + 1000:032x}', 'secret': 'f' * 64}
+                server.profile(self.db, {**player, 'nickname': f'玩家{inserted}'})
+                self.db.execute('INSERT INTO badge_record_events VALUES (?, ?, ?)',
+                                (player['deviceId'], 'quickest', inserted + 100))
+                inserted += 1
+            pages = max(1, (total + 19) // 20)
+            results = [server.honor_history_page(self.db, 'quickest', page, 20) for page in range(1, pages + 1)]
+            entries = [entry for result in results for entry in result['entries']]
+            self.assertTrue(all(result['total'] == total and result['pages'] == pages for result in results))
+            self.assertEqual([entry['achievedAt'] for entry in entries], list(range(total + 99, 99, -1)))
+            self.assertEqual(len({entry['playerNumber'] for entry in entries}), total)
+
+    def test_history_same_time_has_stable_order_across_pages(self):
+        a, b = self.player('a'), self.player('b')
+        self.db.executemany('INSERT INTO badge_record_events VALUES (?, ?, ?)', [
+            (b['deviceId'], 'quickest', 100), (a['deviceId'], 'quickest', 100),
+        ])
+        entries = [server.honor_history_page(self.db, 'quickest', page, 1)['entries'][0]
+                   for page in (1, 2)]
+        self.assertEqual([entry['nickname'] for entry in entries], ['a', 'b'])
 
     def test_tied_current_records_order_by_when_the_score_was_reached(self):
         a, b, c = self.player('a'), self.player('b'), self.player('c')
