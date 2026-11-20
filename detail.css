@@ -72,7 +72,7 @@
 .guard-card { border: 1px solid #736650; border-radius: 12px; background: linear-gradient(115deg, #292a28, #142129 70%); overflow: hidden; }
 .guard-card > summary { display: flex; align-items: center; gap: 18px; padding: 18px 22px; cursor: pointer; list-style: none; }
 .guard-card > summary::-webkit-details-marker { display: none; }
-.guard-card > summary span { display: grid; gap: 5px; }
+.guard-card > summary span { display: grid; gap: 5px; flex: 1; min-width: 0; }
 .guard-card > summary small { color: #d4b47a; font-size: 11px; letter-spacing: .09em; }
 .guard-card > summary strong { color: #f1e6d2; font: 600 18px/1.4 var(--serif); }
 .guard-card > summary em { margin-left: auto; color: #a6c8b9; font-size: 12px; font-style: normal; white-space: nowrap; }
@@ -91,12 +91,30 @@
 .guard-enemy { fill: #905149; stroke: #ffb7a0; stroke-width: 2; }
 .guard-player { fill: #387b79; stroke: #b6f0df; stroke-width: 2; }
 .guard-ally { fill: #719e93; stroke: #cae8d8; }
+.guard-gold { fill: #816141; stroke: #f6d69a; }
+.guard-silver { fill: #506c70; stroke: #c7e7df; }
+.guard-telegraph { fill: #dc655a; fill-opacity: .14; stroke: #f18b7e; stroke-opacity: .7; stroke-width: 1.5; animation: guard-warning 3s ease-in-out infinite; }
+.guard-assignment { fill: none; stroke: #85dfc9; stroke-width: 2; stroke-dasharray: 4 4; animation: guard-assignment 2s linear infinite; }
+.guard-next { fill: none; stroke: #c5ad7f; stroke-width: 1.5; opacity: .8; }
 .guard-copy p { color: #cad6ce; line-height: 1.8; margin: 0 0 12px; }
+.guard-copy .guard-evidence { color: #e9c780; font-size: 12px; letter-spacing: .04em; }
 .guard-copy a { display: inline-block; margin-top: 4px; color: #efca88; text-decoration: none; }
+.guard-copy a + a { margin-left: 16px; }
 .guard-copy a:hover { text-decoration: underline; }
 @keyframes guard-warning { 50% { fill-opacity: .32; stroke-opacity: 1; } }
-@media (max-width: 700px) { .guard-content { grid-template-columns: 1fr; gap: 16px; } .guard-card > summary { gap: 10px; padding: 16px; } .guard-card > summary strong { font-size: 16px; } .guard-content { padding: 0 16px 18px; } }
-@media (prefers-reduced-motion: reduce) { .guard-danger { animation: none; } }
+@keyframes guard-assignment { to { stroke-dashoffset: -16; } }
+@media (max-width: 700px) {
+  .guard-content { grid-template-columns: 1fr; gap: 16px; padding: 0 16px 18px; }
+  .guard-card > summary { position: relative; flex-wrap: wrap; gap: 5px; padding: 16px 44px 16px 16px; }
+  .guard-card > summary span { flex-basis: 100%; }
+  .guard-card > summary strong { font-size: 16px; }
+  .guard-card > summary em { margin-left: 0; }
+  .guard-card > summary b { position: absolute; right: 18px; top: 16px; }
+  .guard-figure text { font-size: 20px; }
+  .guard-figure .guard-label { font-size: 18px; }
+  .guard-figure .guard-group { font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) { .guard-danger, .guard-telegraph, .guard-assignment { animation: none; } }
 
 .raid-diagram {
   margin: 0;
