@@ -1522,6 +1522,21 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
 @media (prefers-reduced-motion: reduce) {
   .hero::before, .formation-seal, .formation-trace, .formation-marks, .hero-light-shaft, .hero-copy > *, .entrance-cloud, .entrance-light, .motion-enter, .motion-enter h2::after, .hero-actions .btn-primary::after, .overview::before, .site-shell.view-shifting::after, .view-emerging { animation: none; }
 }
+
+.music-toggle { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 7px; color: #99b4aa; background: transparent; cursor: pointer; }
+.music-toggle svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+.music-toggle .music-waves { display: none; }
+.music-toggle[data-state="playing"], .music-toggle[data-state="loading"], .music-toggle[data-state="suspended"] { color: #e8c990; background: #d6b77912; }
+.music-toggle[data-state="playing"] .music-waves, .music-toggle[data-state="loading"] .music-waves, .music-toggle[data-state="suspended"] .music-waves { display: inline; }
+.music-toggle[data-state="playing"] .music-slash, .music-toggle[data-state="loading"] .music-slash, .music-toggle[data-state="suspended"] .music-slash { display: none; }
+.music-toggle:hover { color: #f5dfb6; background: #34524980; }
+.music-toggle:focus-visible { outline: 2px solid #f4cf8e; outline-offset: 3px; }
+.footer-meta { min-width: 0; }
+.music-credit { margin-top: 5px; color: #95a69d; font-size: 11px; line-height: 1.6; }
+.music-credit a { color: #c0b18f; text-decoration: underline; text-decoration-color: #aa987a80; text-underline-offset: 3px; }
+.music-credit a:hover { color: #f5dfb6; }
+.seo-header-actions { display: flex; flex: none; align-items: center; gap: 10px; }
+@media (max-width: 360px) { .profile-trigger #header-profile { display: none; } }
 </style>
 </head>
 <body>
@@ -1567,11 +1582,13 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
       <nav id="main-nav" class="nav-links" aria-label="主导航"><a href="#guide"><svg class="icon" aria-hidden="true"><use href="#badge-book"/></svg><span>机制图解</span></a><button type="button" data-action="show-leaderboard"><svg class="icon" aria-hidden="true"><use href="#badge-crown"/></svg><span>排行榜</span></button><button type="button" data-action="open-history"><svg class="icon" aria-hidden="true"><use href="#icon-clock"/></svg><span>我的记录</span></button><button type="button" data-action="open-badges"><svg class="icon" aria-hidden="true"><use href="#badge-spark"/></svg><span>我的勋章</span></button></nav>
       <div class="header-actions">
       <details id="site-switch" class="site-switch"><summary aria-label="切换访问站点" title="切换国内／国外站点"><svg class="icon" aria-hidden="true"><use href="#icon-globe"/></svg><span id="site-current" hidden>站点</span></summary><div class="site-switch-panel"><p class="site-switch-heading">选择访问站点</p><button id="site-domestic" type="button" data-action="switch-site" data-site="domestic"><span><strong>国内站</strong><small>国内访问推荐</small></span><span class="site-current-tag" hidden>当前</span></button><button id="site-overseas" type="button" data-action="switch-site" data-site="overseas"><span><strong>国外站</strong><small>国外访问推荐</small></span><span class="site-current-tag" hidden>当前</span></button><p class="site-switch-note">排行榜共用，切换时可带上本机进度。</p><button class="site-backup" type="button" data-action="download-transfer">备份本机资料</button></div></details>
+      <button id="music-toggle" class="music-toggle" type="button" aria-label="背景音乐" aria-pressed="false" title="开启背景音乐" data-state="ready"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3.5L12 5.5v13L7.5 15H4z"/><path class="music-waves" d="M15 9c1.4 1.6 1.4 4.4 0 6M18 6.5c2.8 3.3 2.8 7.7 0 11"/><path class="music-slash" d="m16 9 4 6m0-6-4 6"/></svg></button>
       <button id="header-profile-button" class="profile-trigger" type="button" data-action="profile" aria-haspopup="dialog" aria-label="设置我的资料"><span class="avatar" aria-hidden="true"><svg class="icon"><use href="#icon-user"/></svg></span><span id="header-profile">设置我的资料</span></button>
       <button id="nav-toggle" class="nav-toggle" type="button" data-action="toggle-navigation" aria-label="打开导航菜单" aria-controls="main-nav" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#icon-menu"/></svg><span>菜单</span></button>
       </div>
       </div>
     </header>
+    <audio id="background-music" data-src="assets/temple-ripples.mp3" preload="none" loop></audio>
 
     <div id="connection-notice" class="connection-notice" role="status" hidden>
       <span>成绩服务暂时连接不上，可以继续答题。成绩先保存在此浏览器，连通后再上传排行榜。</span>
@@ -1687,7 +1704,7 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
 
       <section id="result-view" class="result-view hidden" aria-label="考核结果"><div class="result-head"><p class="eyebrow">ASSESSMENT COMPLETE <span class="slash">/</span> 考核完成</p><h2>这一轮，辛苦了。</h2><p id="result-name" class="muted"></p><div class="score-display"><strong id="result-score">0</strong><span> / 100</span></div><p id="result-detail"></p><p id="sync-status" class="sync-status" aria-live="polite"></p><div id="result-honors" class="result-honors" aria-live="polite" hidden></div><div class="result-actions"><button class="btn btn-primary" type="button" data-action="retry-upload" id="retry-upload" hidden>重新上传成绩</button><button class="btn btn-secondary" type="button" data-action="restart">再练一次</button><button class="btn btn-ghost" type="button" data-action="open-history">我的答题记录</button><button class="btn btn-ghost" type="button" data-action="open-badges">我的勋章</button><button class="btn btn-ghost" type="button" data-action="results-home">查看排行榜 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div></div><div class="review-head"><div><p class="eyebrow">ANSWER REVIEW</p><h2>答案与解析</h2></div><button id="review-toggle" class="link-button" type="button" data-action="toggle-review">只看错题</button></div><div id="review-list" class="review-list"></div></section>
     </main>
-    <footer><div class="footer-brand">螺旋寺院 <span>·</span> 团队机制考核</div><p>用于团队训练，请结合当前版本实战确认。</p><div class="footer-signature">相逢何必曾相识</div></footer>
+    <footer><div class="footer-brand">螺旋寺院 <span>·</span> 团队机制考核</div><div class="footer-meta"><p>用于团队训练，请结合当前版本实战确认。</p><p class="music-credit">背景音乐：<a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100691" target="_blank" rel="noopener noreferrer">Ripples · Kevin MacLeod</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>（已压缩）</p></div><div class="footer-signature">相逢何必曾相识</div></footer>
   </div>
 
   <dialog id="profile-dialog" class="profile-dialog" aria-labelledby="profile-title"><form id="profile-form"><div class="dialog-top"><div class="profile-heading"><span class="profile-emblem" aria-hidden="true"><svg class="icon"><use href="#icon-user"/></svg></span><div><p class="eyebrow">PLAYER PROFILE <span class="slash">/</span> 个人资料</p><h2 id="profile-title">设置你的昵称</h2></div></div><button class="close-button" type="button" data-action="close-profile" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="profile-intro">设置你的昵称，记录每一次练习与收获。</p><div class="profile-identity"><label for="nickname">昵称</label><input name="nickname" id="nickname" required maxlength="24" autocomplete="nickname" placeholder="建议填写游戏昵称"><p id="profile-player-number" class="profile-note" hidden></p><p class="profile-note">榜单编号自动分配，改名时保留。</p></div><div class="profile-recovery"><p>身份保存在当前浏览器，更换设备前可备份身份码。</p><details class="recovery"><summary>备份或恢复身份码</summary><p class="muted small">身份码可修改你的资料，请妥善保管，不要公开。</p><div class="recovery-row"><button class="btn btn-ghost compact" type="button" data-action="copy-identity">复制我的身份码</button><button class="btn btn-ghost compact" type="button" data-action="import-identity">用身份码恢复</button></div><label for="identity-code">身份码</label><textarea id="identity-code" rows="2" placeholder="恢复时在这里粘贴身份码"></textarea></details><details id="saved-profiles" class="recovery" hidden><summary>切换本机保留的资料</summary><p class="muted small">切换时会保留当前本机资料和未上传成绩。</p><div id="saved-profiles-list"></div></details><details id="file-import" class="recovery" hidden><summary>导入迁移文件</summary><p class="muted small">选择从原网址下载的迁移文件。文件含有身份资料，请妥善保管。</p><label for="transfer-file">选择迁移文件</label><input id="transfer-file" type="file" accept=".json,application/json"></details></div><p id="profile-error" class="error-text" role="alert"></p><div class="dialog-actions"><button class="btn btn-primary" type="submit">保存资料</button><button class="btn btn-ghost" type="button" data-action="close-profile">关闭</button></div><div class="profile-quick-links"><button id="profile-history" type="button" data-action="open-history" hidden><svg class="icon" aria-hidden="true"><use href="#icon-clock"/></svg><span>我的答题记录</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><button id="profile-badges" type="button" data-action="open-badges" hidden><svg class="icon" aria-hidden="true"><use href="#badge-spark"/></svg><span>我的勋章</span><svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div><button id="delete-profile" class="subtle-delete hidden" type="button" data-action="delete-profile">删除我的线上资料与成绩</button></form></dialog>
@@ -7927,6 +7944,116 @@ const GUARD_GUIDES = {
   });
   views.forEach(view => observer.observe(view, {attributes: true, attributeFilter: ['class', 'hidden']}));
   if (title) observer.observe(title, {childList: true, characterData: true, subtree: true});
+})();
+
+(() => {
+  const button = document.getElementById('music-toggle');
+  const audio = document.getElementById('background-music');
+  if (!button || !audio) return;
+
+  const preferenceKey = 'spiral-temple-quiz-v1:music-enabled';
+  const readPreference = () => {
+    try { return localStorage.getItem(preferenceKey) !== 'off'; }
+    catch { return true; }
+  };
+  const savePreference = value => {
+    try { localStorage.setItem(preferenceKey, value ? 'on' : 'off'); }
+    catch { /* The switch still works for this page when storage is unavailable. */ }
+  };
+  let enabled = readPreference();
+  let state = enabled ? 'ready' : 'off';
+  let generation = 0;
+  audio.volume = 0.08;
+  audio.loop = true;
+
+  function render() {
+    const active = enabled && ['loading', 'playing', 'suspended'].includes(state);
+    button.dataset.state = state;
+    button.setAttribute('aria-pressed', String(active));
+    button.title = active ? '关闭背景音乐' : state === 'error' ? '音乐暂不可用，点击重试' : '开启背景音乐';
+  }
+
+  function startPlayback() {
+    if (!enabled || document.hidden) return;
+    const attempt = ++generation;
+    if (audio.error) {
+      audio.removeAttribute('src');
+      audio.load();
+    }
+    if (!audio.getAttribute('src')) audio.setAttribute('src', audio.dataset.src);
+    state = 'loading';
+    render();
+    let result;
+    try { result = audio.play(); }
+    catch (error) { result = Promise.reject(error); }
+    Promise.resolve(result).then(() => {
+      if (attempt !== generation) return;
+      if (!enabled || document.hidden) { audio.pause(); return; }
+      state = 'playing';
+      render();
+    }).catch(error => {
+      if (attempt !== generation) return;
+      state = error && error.name === 'NotAllowedError' ? 'ready' : 'error';
+      render();
+    });
+  }
+
+  button.addEventListener('click', () => {
+    if (enabled && ['loading', 'playing', 'suspended'].includes(state)) {
+      enabled = false;
+      ++generation;
+      audio.pause();
+      state = 'off';
+      savePreference(false);
+      render();
+    } else {
+      enabled = true;
+      savePreference(true);
+      state = 'ready';
+      render();
+      startPlayback();
+    }
+  });
+
+  const startOnGesture = event => {
+    if (enabled && state === 'ready' && !button.contains(event.target)) startPlayback();
+  };
+  document.addEventListener('pointerdown', startOnGesture, true);
+  document.addEventListener('keydown', startOnGesture, true);
+  document.addEventListener('visibilitychange', () => {
+    if (!enabled) return;
+    if (document.hidden && ['loading', 'playing'].includes(state)) {
+      ++generation;
+      audio.pause();
+      state = 'suspended';
+      render();
+    } else if (!document.hidden && ['suspended', 'ready'].includes(state)) {
+      state = 'ready';
+      startPlayback();
+    }
+  });
+  audio.addEventListener('error', () => {
+    if (enabled && ['loading', 'playing'].includes(state)) {
+      state = 'error';
+      render();
+    }
+  });
+  window.addEventListener('storage', event => {
+    if (event.key !== preferenceKey) return;
+    if (event.newValue === 'off') {
+      enabled = false;
+      ++generation;
+      audio.pause();
+      state = 'off';
+    } else if (!enabled) {
+      enabled = true;
+      state = 'ready';
+    }
+    render();
+  });
+
+  render();
+  if (enabled) startPlayback();
 })();
 </script>
 </body>
