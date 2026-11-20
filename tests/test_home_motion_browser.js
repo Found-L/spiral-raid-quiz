@@ -40,13 +40,17 @@ async function waitReady(url) {
       assert.equal(await page.locator('footer .footer-signature').innerText(), '相逢何必曾相识');
       assert.equal(await page.locator('footer .footer-signature').isVisible(), true);
       assert.ok(await page.locator('#temple-particles').evaluate(el => el.width * el.height <= 6050000), `particle canvas budget at ${width}`);
+      assert.ok(await page.locator('#splash-cursor').evaluate(el => el.width * el.height <= 2410000), `ink canvas budget at ${width}`);
       assert.doesNotMatch(await page.locator('body').innerText(), /魔女试卷/);
       assert.match(await page.locator('.sources-section').innerText(), /根据巅峰服螺旋寺院上线后的实战资料整理/);
+      const hero = await page.locator('.hero').boundingBox();
+      const art = await page.locator('.hero-art').boundingBox();
+      const title = await page.locator('.hero h1 em').boundingBox();
+      assert.ok(Math.abs(art.width - hero.width) < 2 && Math.abs(art.height - hero.height) < 2, `scenery must fill the opening at ${width}`);
+      assert.ok(title.x + title.width <= width - 10, `headline should not overflow at ${width}`);
       if (width >= 1101) {
         const copy = await page.locator('.hero-copy').boundingBox();
-        const art = await page.locator('.hero-art').boundingBox();
         const guide = await page.locator('.guide-section').boundingBox();
-        assert.ok(copy.x + copy.width <= art.x + 1, `hero columns overlap at ${width}`);
         assert.ok(Math.abs(copy.x - guide.x) < 2, `content alignment at ${width}`);
         if (width >= 2560) assert.ok(guide.width >= 1900, `wide-screen content is too narrow at ${width}`);
       }
@@ -95,6 +99,7 @@ async function waitReady(url) {
     assert.notEqual(first, second, 'formation energy should move');
     assert.notEqual(await canvas.evaluate(el => el.toDataURL()), firstFrame, 'particles should move');
     assert.equal(await canvas.evaluate(el => getComputedStyle(el).pointerEvents), 'none', 'particles must not intercept controls');
+    assert.equal(await page.locator('#splash-cursor').evaluate(el => getComputedStyle(el).pointerEvents), 'none', 'ink must not intercept controls');
     await page.mouse.move(1100, 350);
     assert.notEqual(await page.locator('.hero-art').evaluate(el => el.style.getPropertyValue('--depth-x')), '', 'hero responds to pointer');
     await page.evaluate(() => { Object.defineProperty(document, 'hidden', {configurable:true, value:true}); document.dispatchEvent(new Event('visibilitychange')); });
@@ -206,6 +211,45 @@ async function waitReady(url) {
     assert.equal(await reduced.locator('.entrance-cloud-left').evaluate(el => getComputedStyle(el).opacity), '0');
     assert.equal(await reduced.locator('.hero-copy').evaluate(el => getComputedStyle(el).opacity), '1');
     await reduced.close();
+
+    const ink = await browser.newPage({viewport:{width:1200, height:800}});
+    await ink.route('**/api/**', route => route.fulfill({json:{entries:[], boards:[]}, headers:{'Access-Control-Allow-Origin':'*'}}));
+    await ink.goto(url);
+    await ink.addStyleTag({content:'* { animation-play-state: paused !important; transition: none !important } #temple-particles { visibility: hidden !important } .entrance-cloud,.entrance-light { opacity: 0 !important } .hero-landscape { animation: none !important; transform: none !important }'});
+    await ink.waitForTimeout(300);
+    const beforeInk = await ink.screenshot();
+    await ink.mouse.move(650, 360);
+    for (let i = 1; i <= 18; i++) await ink.mouse.move(650 + i * 12, 360 + Math.sin(i / 3) * 45);
+    await ink.waitForTimeout(150);
+    assert.equal(beforeInk.equals(await ink.screenshot()), false, 'moving the pointer should leave a visible ink trail');
+    await ink.close();
+
+    const inkFallback = await browser.newPage({viewport:{width:900, height:700}});
+    await inkFallback.addInitScript(() => {
+      const getContext = HTMLCanvasElement.prototype.getContext;
+      HTMLCanvasElement.prototype.getContext = function(type, ...args) {
+        if (this.id === 'splash-cursor' && type === 'webgl') return null;
+        return getContext.call(this, type, ...args);
+      };
+    });
+    await inkFallback.route('**/api/**', route => route.fulfill({json:{entries:[], boards:[]}, headers:{'Access-Control-Allow-Origin':'*'}}));
+    await inkFallback.goto(url);
+    await inkFallback.mouse.move(500, 350);
+    await inkFallback.mouse.move(550, 380, {steps:6});
+    await inkFallback.waitForFunction(() => {
+      const el = document.querySelector('#splash-cursor'), context = el.getContext('2d');
+      if (!context) return false;
+      const pixels = context.getImageData(0, 0, el.width, el.height).data;
+      for (let i = 3; i < pixels.length; i += 4) if (pixels[i]) return true;
+      return false;
+    });
+    await inkFallback.evaluate(() => { Object.defineProperty(document, 'hidden', {configurable:true, value:true}); document.dispatchEvent(new Event('visibilitychange')); });
+    assert.equal(await inkFallback.locator('#splash-cursor').evaluate(el => {
+      const pixels = el.getContext('2d').getImageData(0, 0, el.width, el.height).data;
+      for (let i = 3; i < pixels.length; i += 4) if (pixels[i]) return false;
+      return true;
+    }), true, 'ink should clear when the page is hidden');
+    await inkFallback.close();
 
     const exam = await browser.newPage({viewport:{width:1440, height:900}});
     const examErrors = [];

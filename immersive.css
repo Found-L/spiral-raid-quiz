@@ -1,0 +1,104 @@
+/* The temple fills the whole opening scene; its edges fade into the surrounding page. */
+.splash-cursor {
+  position: fixed; inset: 0; z-index: 3; width: 100%; height: 100%;
+  pointer-events: none; mix-blend-mode: screen; opacity: .8;
+}
+.hero {
+  display: flex; align-items: center; isolation: isolate;
+  min-height: max(690px, calc(100svh - var(--navigation-height)));
+  padding-block: clamp(100px, 12vh, 160px);
+  background: #09151a;
+}
+.hero::before {
+  z-index: 1; inset: 0; width: auto; opacity: .8;
+  background: radial-gradient(ellipse at 76% 45%, #c3ab692b, transparent 32%),
+              radial-gradient(ellipse at 65% 84%, #299c8f20, transparent 40%);
+}
+.hero::after { z-index: 1; opacity: .5; }
+.hero-copy { z-index: 3; max-width: min(1000px, 53%); }
+.hero h1 { text-shadow: 0 4px 35px #000b; }
+.hero h1 em { white-space: nowrap; text-shadow: 0 3px 35px #000d, 0 0 38px #d5a35b4a; }
+.hero-description, .hero-note { text-shadow: 0 2px 12px #000e; }
+.hero-actions .btn-ghost { background: #0b1a1cbf; backdrop-filter: blur(9px); }
+.hero-art {
+  position: absolute; inset: 0; z-index: 0; width: 100%; max-width: none;
+  height: 100%; margin: 0; transform: none !important; pointer-events: none;
+}
+.hero-art::before { display: none; }
+.hero-scene { position: absolute; inset: 0; aspect-ratio: auto; mask-image: none; }
+.hero-scene::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, #08131df5 0%, #08141ce8 22%, #08151d9c 43%, #08151d16 72%),
+              linear-gradient(0deg, #0b1219f2 0%, #0b121977 11%, transparent 32%),
+              linear-gradient(180deg, #07101980, transparent 22%);
+}
+.hero-landscape {
+  object-position: 62% 50%; opacity: .9;
+  filter: saturate(1.08) contrast(1.05) brightness(.83);
+}
+.hero-halo {
+  z-index: 2; left: 68%; top: 51%; width: min(56vw, 1050px);
+  opacity: .46; mix-blend-mode: screen;
+  background: radial-gradient(circle, #dfbb7112 0, #469c8e10 42%, transparent 70%);
+}
+.formation-lines { opacity: .38; }
+.formation-marks { opacity: .7; }
+.art-caption {
+  z-index: 2; left: auto; right: var(--page-inset, 6vw); bottom: 68px;
+  transform: none; color: #e1d0ae; text-shadow: 0 2px 9px #000;
+}
+.hero-index {
+  z-index: 3; left: var(--page-inset, 6vw); right: auto; bottom: 34px;
+  display: flex; align-items: center; gap: 12px; color: #c9c4ac;
+  font-size: 10px; letter-spacing: .18em;
+}
+.hero-index .hero-scroll-line {
+  width: 38px; margin: 0; border-color: #d7c297; transform-origin: left center;
+}
+@media (min-width: 1101px) {
+  .hero { padding-inline: var(--page-inset); }
+  .hero h1 { font-size: clamp(62px, 4.5vw, 112px); }
+}
+@media (max-width: 1100px) {
+  .hero { min-height: max(660px, calc(100svh - var(--navigation-height))); }
+  .hero-copy { max-width: 64%; }
+  .hero-halo { width: 68vw; left: 70%; }
+}
+@media (max-width: 680px) {
+  .hero {
+    min-height: max(700px, calc(100svh - var(--navigation-height)));
+    display: flex; justify-content: flex-start; align-items: flex-start;
+    padding: clamp(62px, 10vh, 96px) 22px 110px;
+  }
+  .hero-copy { max-width: 100%; }
+  .hero h1 { font-size: clamp(36px, 9.2vw, 52px); }
+  .hero-description { max-width: 35em; }
+  .hero-art { width: 100%; height: 100%; margin: 0; }
+  .hero-landscape { object-position: 65% 51%; opacity: .83; }
+  .hero-scene::after {
+    background: linear-gradient(180deg, #08131def 0%, #08141cd9 20%, #08151d8a 43%, #08151d24 69%, #0b1219e6 100%),
+                linear-gradient(90deg, #09141c77, transparent 75%);
+  }
+  .hero-halo { left: 65%; top: 66%; width: min(110vw, 600px); opacity: .36; }
+  .art-caption { right: 22px; bottom: 28px; font-size: 8px; }
+  .hero-index { left: 22px; bottom: 29px; font-size: 9px; }
+  .hero-index .hero-scroll-line { width: 24px; }
+}
+@media (max-width: 360px) {
+  .hero { min-height: 720px; }
+  .art-caption { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-landscape { animation: immersive-landscape 24s ease-in-out infinite alternate; }
+  .hero-index .hero-scroll-line { animation: immersive-scroll 2.8s ease-in-out infinite; }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .guide-card:hover, .guide-card:focus-within {
+    transform: perspective(1400px) translateY(-6px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg));
+  }
+}
+@keyframes immersive-landscape {
+  from { transform: translate3d(var(--depth-x, 0px), var(--depth-y, 0px), 0) scale(1.05); }
+  to { transform: translate3d(calc(var(--depth-x, 0px) - 1%), var(--depth-y, 0px), 0) scale(1.11); }
+}
+@keyframes immersive-scroll { 0%, 100% { opacity: .45; transform: scaleX(.55); } 50% { opacity: 1; transform: scaleX(1); } }

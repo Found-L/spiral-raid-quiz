@@ -161,8 +161,17 @@
     const scene = card?.querySelector('.chapter-scene');
     if (scene) {
       const box = scene.getBoundingClientRect();
-      card.style.setProperty('--glow-x', `${((event.clientX - box.left) / box.width * 100).toFixed(1)}%`);
-      card.style.setProperty('--glow-y', `${((event.clientY - box.top) / box.height * 100).toFixed(1)}%`);
+      const x = (event.clientX - box.left) / box.width, y = (event.clientY - box.top) / box.height;
+      card.style.setProperty('--glow-x', `${(x * 100).toFixed(1)}%`);
+      card.style.setProperty('--glow-y', `${(y * 100).toFixed(1)}%`);
+      card.style.setProperty('--tilt-x', `${((x - .5) * 5).toFixed(2)}deg`);
+      card.style.setProperty('--tilt-y', `${((.5 - y) * 5).toFixed(2)}deg`);
+    }
+  }, {passive: true});
+  window.addEventListener('pointerout', event => {
+    const card = event.target.closest?.('.guide-card');
+    if (card && (!(event.relatedTarget instanceof Node) || !card.contains(event.relatedTarget))) {
+      card.style.removeProperty('--tilt-x'); card.style.removeProperty('--tilt-y');
     }
   }, {passive: true});
   window.addEventListener('pointerdown', event => {
