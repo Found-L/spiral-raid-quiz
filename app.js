@@ -378,7 +378,11 @@
     if(q.type==='multiple') { const current=new Set(draft.answers[q.id]||[]); if(checked) current.add(id); else current.delete(id); draft.answers[q.id]=Array.from(current); }
     else draft.answers[q.id]=[id];
     storeDraft(); renderQuestion(false);
-    const refreshed=$('question-options').querySelector(`input[value="${id}"]`); if(refreshed)refreshed.focus({preventScroll:true});
+    const refreshed=$('question-options').querySelector(`input[value="${id}"]`);
+    if(refreshed) {
+      if(refreshed.checked) refreshed.closest('.option')?.classList.add('selection-fresh');
+      refreshed.focus({preventScroll:true});
+    }
   }
   function renderQuestion(focus=false) {
     const q=qs[index], section=sectionOf(q.section), done=qs.filter(answered).length;
