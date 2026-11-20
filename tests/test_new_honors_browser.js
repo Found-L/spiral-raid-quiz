@@ -69,7 +69,7 @@ async function assertGuardTextFits(page) {
       await page.goto(origin+'/spiral-raid-quiz/#guide-witch');
       await page.locator('.guard-card > summary').click();
       assert.match(await page.locator('.guard-card').textContent(), /玄冥二老.*回血.*三破战士.*跳中/s);
-      assert.match(await page.locator('.guard-card').textContent(), /互相回血.*控制后绕背.*跳向场中央.*保护.*其他战士仍会攻击/s);
+      assert.match(await page.locator('.guard-card').textContent(), /贴近后出现回血.*控制后绕背.*跳向场中央.*保护.*其他战士仍会攻击/s);
       assert.equal(await page.locator('.guard-point').count(), 5);
       assert.doesNotMatch(await page.locator('.guard-card').textContent(), /录像|服务器|来源|待.*核实/);
       for (const svg of await page.locator('.guard-figure svg').all()) assert.doesNotMatch(await svg.getAttribute('aria-label'), /录像|服务器|来源|待.*核实/);
