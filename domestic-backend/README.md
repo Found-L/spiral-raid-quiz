@@ -4,6 +4,8 @@
 
 `POST /api/history/review` 校验浏览器身份及答卷归属，按该次题库返回已保存的错题、正确答案和解析；旧成绩未保存明细时返回不可查看，不推测所选选项。错题数据不出现在公开榜单。
 
+管理页面及 `/api/admin/` 使用独立的管理员密码和短期登录会话，限国内站同源访问；密码哈希保存在数据目录的 `admin-auth.json`，不放入仓库。接口支持查看汇总、玩家、答卷错题、勋章和互动，只返回管理所需的信息，不返回身份密钥或哈希。原始所选选项从未上传，旧答卷缺失错题标记时不能恢复。页面可修改管理员密码，修改后所有管理会话失效。
+
 生产文件位于 `/opt/spiral-raid-quiz/app/`，网页位于 `/opt/spiral-raid-quiz/public/index.html`，数据库位于 `/var/lib/spiral-raid-quiz/quiz.sqlite3`。服务和数据由独立的 `spiral-quiz` 系统账号运行和保护。
 
 `spiral-raid-quiz-backup.timer` 每天创建 SQLite 一致性快照，保留最近 14 份，目录为 `/var/lib/spiral-raid-quiz/backups/`。备份位于同一台服务器，应另行定期复制到其他受保护的位置；身份哈希及答题记录不可公开。手动备份可运行 `systemctl start spiral-raid-quiz-backup.service`。

@@ -20,6 +20,7 @@ from urllib.parse import parse_qs, urlsplit
 
 import badge_metrics
 import social
+import admin
 
 ROOT = Path(__file__).resolve().parent
 BANK = json.loads((ROOT / 'questions.json').read_text(encoding='utf-8'))
@@ -33,6 +34,7 @@ for path in sorted((ROOT / 'banks').glob('*.json')):
         raise RuntimeError(f'Duplicate question bank version: {archived_version}')
     BANKS[archived_version] = archived
 DATABASE = Path(os.environ.get('QUIZ_DATABASE', '/var/lib/spiral-raid-quiz/quiz.sqlite3'))
+ADMIN_SERVICE = admin.AdminService(os.environ.get('QUIZ_ADMIN_AUTH', str(DATABASE.parent / 'admin-auth.json')))
 PORT = int(os.environ.get('QUIZ_PORT', '8791'))
 ALLOWED_ORIGINS = {'https://found-l.github.io', 'https://www.lysue.com'}
 MAX_BODY = 20000
@@ -891,6 +893,12 @@ def delete_profile(db, body):
         raise
 
 
+def admin_context():
+    return {'version':VERSION, 'banks':BANKS, 'version_order':version_order, 'badges':BADGES, 'badge_states':badge_states,
+            'badge_counts':lambda db: badge_metrics.counts(db, BADGES, MISTAKE_RULES, badge_states, honor_boards, HONOR_CATEGORIES),
+            'reactions':social.REACTIONS}
+
+
 class Handler(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
 
@@ -898,7 +906,7 @@ class Handler(BaseHTTPRequestHandler):
         # Credentials and answers must not be logged.
         return
 
-    def respond(self, status, data=None):
+    def respond(self, status, data=None, extra_headers=None):
         body = b'' if data is None else json.dumps(data, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
         self.send_response(status)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -906,18 +914,20 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.send_header('Vary', 'Origin')
         origin = self.headers.get('Origin', '')
-        if origin in ALLOWED_ORIGINS or re.fullmatch(r'http://(?:localhost|127\.0\.0\.1):\d+', origin):
+        if not urlsplit(self.path).path.startswith('/api/admin/') and (origin in ALLOWED_ORIGINS or re.fullmatch(r'http://(?:localhost|127\.0\.0\.1):\d+', origin)):
             self.send_header('Access-Control-Allow-Origin', origin)
             self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
             self.send_header('Access-Control-Allow-Headers', 'Content-Type')
             self.send_header('Access-Control-Max-Age', '600')
+        for name, value in (extra_headers or {}).items():
+            self.send_header(name, value)
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
         if body:
             self.wfile.write(body)
 
     def do_OPTIONS(self):
-        self.respond(204)
+        self.respond(403 if urlsplit(self.path).path.startswith('/api/admin/') else 204)
 
     def do_GET(self):
         url = urlsplit(self.path)
@@ -994,8 +1004,10 @@ class Handler(BaseHTTPRequestHandler):
                   '/api/social/view': social.view, '/api/shares': create_share}
         routes.update({f'/api/social/{name}': (lambda db, body, name=name: social.mutate(db, body, name))
                        for name in ('reaction', 'comment', 'like', 'delete', 'hide')})
-        action = routes.get(urlsplit(self.path).path)
-        if not action:
+        path = urlsplit(self.path).path
+        admin_request = path.startswith('/api/admin/')
+        action = routes.get(path)
+        if not action and not admin_request:
             return self.respond(404, {'error': '页面不存在。'})
         try:
             length = self.headers.get('Content-Length', '')
@@ -1007,11 +1019,14 @@ class Handler(BaseHTTPRequestHandler):
             if not isinstance(data, dict):
                 raise ApiError('请求格式不正确。')
             with closing(database()) as db:
-                result = action(db, data)
-            self.respond(200, result)
+                if admin_request:
+                    result, cookie = ADMIN_SERVICE.dispatch(path, data, self.headers, db, admin_context())
+                else:
+                    result, cookie = action(db, data), None
+            self.respond(200, result, {'Set-Cookie':cookie} if cookie else None)
         except (json.JSONDecodeError, UnicodeDecodeError):
             self.respond(400, {'error': '请求格式不正确。'})
-        except (ApiError, social.SocialError) as error:
+        except (ApiError, social.SocialError, admin.AdminError) as error:
             self.respond(error.status, {'error': str(error)})
         except (BrokenPipeError, ConnectionResetError):
             return

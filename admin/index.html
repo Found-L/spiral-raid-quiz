@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#0b1319">
+  <title>管理总览 · 螺旋寺院</title>
+  <link rel="stylesheet" href="admin.css">
+  <script src="admin.js" defer></script>
+</head>
+<body>
+  <div class="page-glow" aria-hidden="true"></div>
+  <header class="topbar">
+    <a href="../" class="brand"><span class="brand-mark" aria-hidden="true">旋</span><span><strong>螺旋寺院</strong><small>管理总览</small></span></a>
+    <div class="top-actions"><a href="../" class="quiet-link">返回网站 <span aria-hidden="true">↗</span></a><button id="password-open" class="quiet-button" type="button" hidden>修改密码</button><button id="logout" class="quiet-button" type="button" hidden>退出</button></div>
+  </header>
+
+  <main class="wrap">
+    <section id="login-view" class="login-shell" aria-labelledby="login-title">
+      <div class="login-mark" aria-hidden="true">旋</div>
+      <p class="eyebrow">TEMPLE ADMIN <span>/</span> 站点管理</p>
+      <h1 id="login-title">管理总览</h1>
+      <p class="intro">登录后查看网站统计、玩家成绩与互动记录。</p>
+      <form id="login-form" class="login-form">
+        <label for="password">管理员密码</label>
+        <input id="password" type="password" autocomplete="current-password" required maxlength="128" placeholder="输入管理员密码">
+        <button class="primary-button" type="submit">进入管理页面 <span aria-hidden="true">→</span></button>
+        <p id="login-message" class="form-message" role="status"></p>
+      </form>
+      <p class="login-note">此页面仅供管理员使用。</p>
+    </section>
+
+    <div id="dashboard" hidden>
+      <div class="page-heading"><div><p class="eyebrow">TEMPLE ADMIN <span>/</span> 站点管理</p><h1>寺院数据总览</h1><p class="intro">查看已上传的成绩、玩家与互动。</p></div><button id="refresh" class="outline-button" type="button">↻ <span>刷新数据</span></button></div>
+      <nav class="tabs" aria-label="管理页面"><button class="tab active" type="button" data-tab="overview" aria-current="page">数据总览</button><button class="tab" type="button" data-tab="players">玩家记录</button><button class="tab" type="button" data-tab="questions">错题统计</button><button class="tab" type="button" data-tab="badges">勋章统计</button><button class="tab" type="button" data-tab="interactions">互动记录</button></nav>
+      <p id="global-message" class="form-message" role="status"></p>
+
+      <section id="panel-overview" class="panel" aria-label="数据总览"><div id="overview-content"></div></section>
+
+      <section id="panel-players" class="panel" aria-label="玩家记录" hidden>
+        <div id="player-list-view"><div class="section-head"><div><p class="eyebrow">PLAYERS</p><h2>玩家记录</h2><p>按昵称或榜单编号查找。</p></div><form id="player-search" class="search"><label class="sr-only" for="player-query">搜索昵称或编号</label><input id="player-query" type="search" maxlength="64" placeholder="昵称 / 编号"><button class="outline-button" type="submit">搜索</button></form></div><div id="players-content"></div><div id="players-pages" class="pagination"></div></div>
+        <div id="player-detail" hidden><button id="player-back" class="back-link" type="button">← 返回玩家列表</button><div id="player-content"></div><div id="player-pages" class="pagination"></div></div>
+      </section>
+
+      <section id="panel-questions" class="panel" aria-label="错题统计" hidden><div class="section-head"><div><p class="eyebrow">QUESTION INSIGHTS</p><h2>错题统计</h2><p>按已保存错题的答卷次数统计，同一玩家多次答错会分别计入。</p></div><label class="filter">题库 <select id="question-version"><option value="">全部题库</option></select></label></div><div id="questions-content"></div><div id="questions-pages" class="pagination"></div></section>
+
+      <section id="panel-badges" class="panel" aria-label="勋章统计" hidden><div class="section-head"><div><p class="eyebrow">HONORS</p><h2>勋章统计</h2><p>按获得勋章的不同玩家统计；纪录勋章另显示当前与历史人数。</p></div></div><div id="badges-content" class="badge-grid"></div></section>
+
+      <section id="panel-interactions" class="panel" aria-label="互动记录" hidden><div class="section-head"><div><p class="eyebrow">COMMUNITY</p><h2>互动记录</h2><p>查看玩家之间的评价与表情。</p></div><div class="segmented" aria-label="互动类型"><button type="button" data-kind="comments" class="active">评价</button><button type="button" data-kind="reactions">表情</button></div></div><div id="interactions-content"></div><div id="interactions-pages" class="pagination"></div></section>
+      <p class="data-note">本后台展示已上传的数据。较早的答卷可能没有错题明细；玩家所选的具体选项未上传保存。</p>
+    </div>
+  </main>
+
+  <dialog id="password-dialog" aria-labelledby="password-title">
+    <form id="password-form"><div class="dialog-head"><h2 id="password-title">修改管理员密码</h2><button id="password-close" type="button" aria-label="关闭">×</button></div><p>设置至少 16 个字符的新密码。修改后需要重新登录。</p><label for="current-password">当前密码</label><input id="current-password" type="password" autocomplete="current-password" required maxlength="128"><label for="new-password">新密码</label><input id="new-password" type="password" autocomplete="new-password" required minlength="16" maxlength="128"><label for="confirm-password">确认新密码</label><input id="confirm-password" type="password" autocomplete="new-password" required minlength="16" maxlength="128"><p id="password-message" class="form-message" role="status"></p><button class="primary-button" type="submit">保存新密码</button></form>
+  </dialog>
+</body>
+</html>
