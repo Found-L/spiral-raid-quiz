@@ -8,7 +8,7 @@
 
 首页的三个机制图解可打开首领详情，按触发阶段查看俯视图、站位、路线和岗位分工。部分题目配有场景图。
 
-图解附有图例和动态效果，可暂停、播放或点“放大”查看；手机上可在放大图内左右滑动。系统设置为减少动态效果时会停用动画。图中的路线和区域是分工示意，实际位置按团队标记调整。
+首页会随屏幕宽度调整布局，进入时云雾散开；金青碎光随指针流动，点击页面空处会散出光屑，滚动与切换时逐步展示内容。图解附有图例和动态效果，可暂停、播放或点“放大”查看；手机上可在放大图内左右滑动。系统设置为减少动态效果时会停用动画。图中的路线和区域是分工示意，实际位置按团队标记调整。
 
 完成考核可解锁趣味勋章，在“我的勋章”中查看条件并选择最多 3 枚展示在排行榜上。未手动选择时自动展示成绩类勋章；可以保存为空以隐藏全部。新上线的“爆破鬼才”等机制趣味勋章按具体选项解锁，默认不公开，须由本人选择展示。旧成绩未保存逐题选项，无法反推这类勋章；尚未上传的答卷上传时可参与判定。勋章不影响成绩和排名；旧成绩没有用时的不能获得计时类勋章。“快枪手”属于当前纪录：全站已计时答卷的最短用时获得，不限分数，并列同得，纪录被超越后不再持有。用时来自浏览器，仅供趣味展示。
 
@@ -20,7 +20,7 @@
 
 成绩榜下方设有全站趣味榜：快枪手、寺院劳模、满分制造机和满分速通王，每榜展示前 5 人。各榜首可获得相应的纪录勋章，所有并列第一者都获奖；纪录变化时勋章随之易主。统计包含已上传的新旧题库，缺少用时的答卷不参加计时榜。
 
-题目依据螺旋寺院在巅峰服上线后的实战资料和提供的魔女试卷编写。题目直接描述阶段、机制和操作；涉及团队分工时，按题干中的团队安排作答。实战请以当前版本和团长安排为准。图为分工示意。
+题目依据螺旋寺院在巅峰服上线后的实战资料整理。题目直接描述阶段、机制和操作；涉及团队分工时，按题干中的团队安排作答。实战请以当前版本和团长安排为准。图为分工示意。
 
 ## 昵称与成绩
 
@@ -37,10 +37,19 @@
 ## 项目结构
 
 - `index.html` 是包含样式、脚本、题库和插图的独立网页，部署在 GitHub Pages 和国内服务器。
-- `template.html`、`style.css`、`detail.css`、`social.css`、`share.css`、`cinematic.css`、`navigation.css`、`app.js`、`social-ui.js`、`share-ui.js`、`badge-art.js`、`guide.js`、`sequences.js`、`diagrams.js` 和 `questions.json` 是网页源码。修改题库时先运行 `python build_questions.py`，再运行 `python build_page.py` 生成网页并同步国内服务题库。
+- `template.html`、`style.css`、`detail.css`、`social.css`、`share.css`、`cinematic.css`、`navigation.css`、`account.css`、`encounters.css`、`atmosphere.css`、`app.js`、`motion.js`、`effects.js`、`social-ui.js`、`share-ui.js`、`badge-art.js`、`guide.js`、`guard-guides.js`、`sequences.js`、`diagrams.js` 和 `questions.json` 是网页源码。修改题库时先运行 `python build_questions.py`，再运行 `python build_page.py` 生成网页并同步国内服务题库。
 - `assets/share-temple-v1.webp` 是分享卡片背景，`build_page.py` 会将它嵌入生成的网页，图片下载无需依赖外部资源。
+- `seo-pages.json`、`seo-template.html`、`seo-guide.css` 和 `build_seo.py` 生成 `guides/` 下的文字攻略与勋章说明，以及国内入口的 `sitemap.xml`。更新互动图解或勋章规则时，应同步检查文字攻略；`build_page.py` 会一并重新生成这些文件。
 - `domestic-backend/` 是共享计分与排行榜服务；两个入口使用同一份 SQLite 数据库。`banks/` 保留旧版题库，以接收旧版页面或离线待上传的成绩。
 - `backend-source/` 是国外访问线路的源码快照，API 请求转发到同一成绩服务，兼容旧版网页。
+
+## 搜索发现与部署
+
+两个入口内容相同，搜索页面统一将国内地址 `https://www.lysue.com/spiral-raid-quiz/` 标为首选网址。`guides/twins/`、`guides/spirit/`、`guides/witch/` 和 `guides/badges/` 直接返回带标题、正文及描述的 HTML，并链接回互动图解和考核。国内站点地图为 `https://www.lysue.com/spiral-raid-quiz/sitemap.xml`；它列出国内首选地址，不用于提交 GitHub Pages 域名。
+
+发布时除 `index.html` 外，还需部署生成的 `guides/`、`sitemap.xml`、`seo-guide.css` 和 `assets/` 图片，并验证每个页面和图片返回正常状态。`robots.txt` 仅在域名根目录生效；当前网站使用其他目录共用该域名，不要用项目目录下的文件覆盖其他站点规则。如果需要在根目录的现有 `robots.txt` 宣告地图，应合并 `Sitemap: https://www.lysue.com/spiral-raid-quiz/sitemap.xml`，并保留原规则；没有根 `robots.txt` 不等于禁止抓取。
+
+上线后在百度搜索资源平台和 Google Search Console 验证域名或网址前缀并提交站点地图，必要时用平台工具检查首页与攻略页面的抓取状态。搜索引擎何时收录及具体排序由搜索引擎决定，提交站点地图不会保证收录或排名。
 
 ## 巅峰服参考
 
