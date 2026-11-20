@@ -34,6 +34,7 @@
 .history-heading .eyebrow { margin-bottom: 8px; }
 .history-heading h1 { margin: 0; }
 .history-heading #history-player { margin: 9px 0 0; font-size: 13px; color: #a5beb0; }
+.history-privacy { margin: 12px 0 0; color: #a5b7ad; font-size: 12px; line-height: 1.7; }
 .history-badges-link, .history-refresh { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 12px; border: 1px solid #829c8955; border-radius: 7px; color: #dbc89f; background: #172c2c; font-size: 12px; white-space: nowrap; }
 .history-badges-link:hover, .history-refresh:not(:disabled):hover { border-color: #d4bb82; background: #294238; }
 .history-badges-link .icon, .history-refresh .icon { width: 16px; height: 16px; }
