@@ -682,6 +682,36 @@
     setView(historyReturn);
     if (historyReturn === 'home') $('leaderboard').scrollIntoView();
   }
+  function historyLocalAnswers(entry) {
+    if (entry.quizVersion !== bank.version) return null;
+    if (entry.localAnswers && typeof entry.localAnswers === 'object') return entry.localAnswers;
+    const last = read(':last-result');
+    return last?.attemptId === entry.attemptId && last.answers && typeof last.answers === 'object' ? last.answers : null;
+  }
+  function historyLocalQuestions(entry, answers) {
+    if (!answers || !bankQuestions.every(q => Array.isArray(answers[q.id]))) return null;
+    const wrong = bankQuestions.filter(q => !isCorrect(q, answers[q.id]));
+    return wrong.length === entry.totalCount - entry.correctCount ? wrong : null;
+  }
+  function renderHistoryReview(panel, questions, currentVersion, answers) {
+    panel.replaceChildren();
+    const hasChoices = Boolean(answers) && questions.every(q => Array.isArray(answers[q.id]));
+    if (!currentVersion || !hasChoices) {
+      const note = document.createElement('p');
+      note.className = 'history-review-note';
+      note.textContent = [!currentVersion ? '这次使用的是旧题库，请结合当前攻略复习。' : '',
+        !hasChoices ? '本次选择未保留，仍可查看正确答案和解析。' : ''].filter(Boolean).join(' ');
+      panel.append(note);
+    }
+    questions.forEach((q, i) => {
+      const article = document.createElement('article');
+      article.className = 'history-review-question';
+      const selected = hasChoices ? q.options.filter(option => answers[q.id].includes(option.id)).map(option => option.text).join('；') : '';
+      const expected = q.options.filter(option => q.answer.includes(option.id)).map(option => option.text).join('；');
+      article.innerHTML = `<p class="history-review-meta">错题 ${i + 1} / ${questions.length} · ${escape(sectionOf(q.section)?.short || '机制题')}</p><h4>${escape(q.question)}</h4>${hasChoices ? `<p><span>你的选择</span>${escape(selected || '未作答')}</p>` : ''}<p><span>正确答案</span>${escape(expected)}</p><p class="history-review-explanation"><span>解析</span>${escape(q.explanation || '')}</p>`;
+      panel.append(article);
+    });
+  }
   function historyRow(entry) {
     const row = document.createElement('li');
     row.className = 'history-entry';
@@ -705,7 +735,58 @@
     details.append(heading, context);
     const score = document.createElement('strong');
     score.textContent = entry.score == null ? '待上传' : `${formatScore(entry.score)} 分`;
-    row.append(details, score);
+    const main = document.createElement('div');
+    main.className = 'history-entry-main';
+    main.append(details, score);
+    row.append(main);
+    const wrongCount = Number.isSafeInteger(entry.totalCount) && Number.isSafeInteger(entry.correctCount)
+      ? Math.max(0, entry.totalCount - entry.correctCount) : null;
+    const localAnswers = historyLocalAnswers(entry);
+    const localQuestions = historyLocalQuestions(entry, localAnswers);
+    if (wrongCount === 0) {
+      const note = document.createElement('p'); note.className = 'history-review-unavailable'; note.textContent = '本轮全部答对'; row.append(note);
+    } else if (entry.attemptId && (entry.reviewAvailable || localQuestions)) {
+      const review = document.createElement('details'); review.className = 'history-review';
+      const summary = document.createElement('summary');
+      summary.textContent = `查看错题${wrongCount == null ? '' : ` · ${wrongCount} 题`}`;
+      const panel = document.createElement('div'); panel.className = 'history-review-panel'; panel.setAttribute('aria-live', 'polite');
+      review.append(summary, panel); row.append(review);
+      let loading = false, loaded = false;
+      const load = async () => {
+        if (loading || loaded) return;
+        const who = {...identity};
+        if (!activeIdentity(who)) { panel.textContent = '本机资料已切换，请刷新后再查看。'; return; }
+        loading = true; panel.textContent = '正在读取错题…';
+        try {
+          let data;
+          if (!entry.reviewAvailable && localQuestions) data = {available:true, currentVersion:true, questions:localQuestions};
+          else data = await request('/api/history/review', {...who, attemptId:entry.attemptId});
+          if (!row.isConnected || view !== 'history' || !activeIdentity(who)) return;
+          if (!data.available && localQuestions) data = {available:true, currentVersion:true, questions:localQuestions};
+          if (!data.available) {
+            panel.textContent = '这条记录没有保存错题明细。';
+          } else if (!Array.isArray(data.questions) || data.questions.length !== wrongCount ||
+              data.questions.some(q => !q || typeof q.question !== 'string' || !Array.isArray(q.options) || !Array.isArray(q.answer))) {
+            throw new Error('错题暂时无法读取，请稍后重试。');
+          } else renderHistoryReview(panel, data.questions, data.currentVersion, data.currentVersion ? localAnswers : null);
+          loaded = true;
+        } catch (error) {
+          if (!row.isConnected || view !== 'history' || !activeIdentity(who)) return;
+          if (localQuestions) {
+            renderHistoryReview(panel, localQuestions, true, localAnswers);
+            loaded = true;
+          } else {
+            panel.replaceChildren();
+            const message = document.createElement('p'); message.className = 'history-review-note'; message.textContent = error.message;
+            const retry = document.createElement('button'); retry.type = 'button'; retry.className = 'history-review-retry'; retry.textContent = '重新读取';
+            retry.addEventListener('click', load); panel.append(message, retry);
+          }
+        } finally { loading = false; }
+      };
+      review.addEventListener('toggle', () => { if (review.open) void load(); });
+    } else if (wrongCount !== null) {
+      const note = document.createElement('p'); note.className = 'history-review-unavailable'; note.textContent = '这条记录没有保存错题明细'; row.append(note);
+    }
     return row;
   }
   async function loadHistory(append = false) {
@@ -779,7 +860,8 @@
         const rows = local.slice().reverse().map(attempt => {
           if (attempt.version !== bank.version) return {currentVersion:false, pending:true, submittedAt:attempt.localSubmittedAt || null};
           const item = grade(attempt.answers);
-          return {...item, currentVersion:true, pending:true, elapsedSeconds:attempt.elapsedSeconds, submittedAt:attempt.localSubmittedAt || null};
+          return {...item, attemptId:attempt.attemptId, quizVersion:attempt.version, localAnswers:attempt.answers,
+            currentVersion:true, pending:true, elapsedSeconds:attempt.elapsedSeconds, submittedAt:attempt.localSubmittedAt || null};
         });
         list.replaceChildren(...rows.map(historyRow));
         historyOwner = owner;
