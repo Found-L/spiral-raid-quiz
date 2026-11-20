@@ -37,7 +37,7 @@
 ## 项目结构
 
 - `index.html` 是包含样式、脚本、题库和插图的独立网页，部署在 GitHub Pages 和国内服务器。
-- `template.html`、`style.css`、`detail.css`、`social.css`、`share.css`、`cinematic.css`、`navigation.css`、`account.css`、`encounters.css`、`atmosphere.css`、`app.js`、`motion.js`、`effects.js`、`social-ui.js`、`share-ui.js`、`badge-art.js`、`guide.js`、`sequences.js`、`diagrams.js` 和 `questions.json` 是网页源码。修改题库时先运行 `python build_questions.py`，再运行 `python build_page.py` 生成网页并同步国内服务题库。
+- `template.html`、`style.css`、`detail.css`、`social.css`、`share.css`、`cinematic.css`、`navigation.css`、`account.css`、`encounters.css`、`atmosphere.css`、`app.js`、`motion.js`、`effects.js`、`social-ui.js`、`share-ui.js`、`badge-art.js`、`guide.js`、`guard-guides.js`、`sequences.js`、`diagrams.js` 和 `questions.json` 是网页源码。修改题库时先运行 `python build_questions.py`，再运行 `python build_page.py` 生成网页并同步国内服务题库。
 - `assets/share-temple-v1.webp` 是分享卡片背景，`build_page.py` 会将它嵌入生成的网页，图片下载无需依赖外部资源。
 - `seo-pages.json`、`seo-template.html`、`seo-guide.css` 和 `build_seo.py` 生成 `guides/` 下的文字攻略与勋章说明，以及国内入口的 `sitemap.xml`。更新互动图解或勋章规则时，应同步检查文字攻略；`build_page.py` 会一并重新生成这些文件。
 - `domestic-backend/` 是共享计分与排行榜服务；两个入口使用同一份 SQLite 数据库。`banks/` 保留旧版题库，以接收旧版页面或离线待上传的成绩。

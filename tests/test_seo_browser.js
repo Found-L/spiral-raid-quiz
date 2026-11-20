@@ -59,6 +59,9 @@ async function waitReady(url) {
       assert.equal(data.schema.url, data.canonical);
       assert.ok(data.text.length > 300 && data.sectionCount >= 4, `${slug} contains useful text without JavaScript`);
       assert.doesNotMatch(data.text, /魔女试卷/);
+      if (slug === 'twins') assert.match(data.text, /金银童[\s\S]*小怪[\s\S]*不计入考核/);
+      if (slug === 'spirit') assert.match(data.text, /东方朔与血魔灵[\s\S]*暗魔灵[\s\S]*连线[\s\S]*不计入考核/);
+      if (slug === 'witch') assert.match(data.text, /玄冥二老与三破战士[\s\S]*如果两只贴近后出现回血[\s\S]*不计入考核/);
       assert.equal(data.overflow, false, `${slug} fits mobile`);
       assert.equal(await page.locator('.hero-image').getAttribute('draggable'), 'false');
       assert.equal((await page.request.get(data.heroImage)).status(), 200, `${slug} illustration exists`);

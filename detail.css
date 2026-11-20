@@ -77,6 +77,13 @@
 .guard-card > summary strong { color: #f1e6d2; font: 600 18px/1.4 var(--serif); }
 .guard-card > summary b { color: #dfc58f; font-size: 22px; font-weight: 400; transition: transform .2s; }
 .guard-card[open] > summary b { transform: rotate(45deg); }
+.guard-encounter + .guard-encounter { margin: 0 22px; padding-top: 22px; border-top: 1px solid #40504e; }
+.guard-encounter + .guard-encounter .guard-content { padding-inline: 0; }
+.guard-encounter-heading { display: flex; gap: 12px; align-items: center; padding: 0 22px 16px; }
+.guard-encounter + .guard-encounter .guard-encounter-heading { padding-inline: 0; }
+.guard-encounter-heading > span { color: #e4c48b; font: 600 17px/1 var(--serif); }
+.guard-encounter-heading small { color: #9eb6aa; font-size: 12px; }
+.guard-encounter-heading h3 { margin: 2px 0 0; color: #f1e6d2; font-size: 17px; }
 .guard-content { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; padding: 0 22px 24px; align-items: center; }
 .guard-figure { margin: 0; padding: 10px 12px; border-radius: 9px; background: radial-gradient(ellipse at 50% 48%, #254348, #101c23 70%); }
 .guard-figure svg { display: block; width: 100%; max-height: 250px; }
@@ -90,10 +97,18 @@
 .guard-enemy { fill: #905149; stroke: #ffb7a0; stroke-width: 2; }
 .guard-player { fill: #387b79; stroke: #b6f0df; stroke-width: 2; }
 .guard-ally { fill: #719e93; stroke: #cae8d8; }
+.guard-add { fill: #3d5a58; stroke: #a2d6c7; stroke-width: 2; }
+.guard-add-pulse { animation: guard-add-pulse 4s ease-in-out infinite; transform-origin: 164px 151px; }
+.guard-route { fill: none; stroke: #88b9a8; stroke-width: 2; stroke-dasharray: 4 5; opacity: .75; }
+.guard-run-path { fill: none; stroke: #c6dbc8; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: .85; }
+.guard-curse-line { stroke: #f2b36b; stroke-width: 3; stroke-dasharray: 7 5; transform-origin: 240px 122px; animation: guard-tether-out 5s ease-in-out infinite; }
+.guard-runner { animation: guard-run-out 5s ease-in-out infinite; }
 .guard-gold { fill: #816141; stroke: #f6d69a; }
 .guard-silver { fill: #506c70; stroke: #c7e7df; }
 .guard-telegraph { fill: #dc655a; fill-opacity: .14; stroke: #f18b7e; stroke-opacity: .7; stroke-width: 1.5; animation: guard-warning 3s ease-in-out infinite; }
 .guard-flame { fill: #db644b; fill-opacity: .1; animation: guard-warning 3s ease-in-out infinite; }
+.guard-jumper { animation: guard-jump-in 5s ease-in-out infinite; }
+.guard-center-blast { transform-origin: 240px 120px; animation: guard-center-cast 5s ease-in-out infinite; }
 .guard-figure .guard-flame-label { fill: #f1a78e; }
 .guard-assignment { fill: none; stroke: #85dfc9; stroke-width: 2; stroke-dasharray: 4 4; animation: guard-assignment 2s linear infinite; }
 .guard-next { fill: none; stroke: #c5ad7f; stroke-width: 1.5; opacity: .8; }
@@ -105,8 +120,15 @@
 .guard-point-danger .guard-point-number { border-color: #916e5c; background: #382b29; color: #f1b4a0; }
 @keyframes guard-warning { 50% { fill-opacity: .32; stroke-opacity: 1; } }
 @keyframes guard-assignment { to { stroke-dashoffset: -16; } }
+@keyframes guard-add-pulse { 0%, 35%, 100% { opacity: 1; transform: scale(1); } 55%, 72% { opacity: .35; transform: scale(.72); } }
+@keyframes guard-run-out { 0%, 20% { transform: translateX(0); } 60%, 75% { transform: translateX(44px); } 95%, 100% { transform: translateX(0); } }
+@keyframes guard-tether-out { 0%, 20% { transform: scaleX(1); opacity: 1; } 57% { transform: scaleX(1.56); opacity: 1; } 65%, 76% { transform: scaleX(1.56); opacity: 0; } 95%, 100% { transform: scaleX(1); opacity: 1; } }
+@keyframes guard-jump-in { 0%, 20% { transform: translateY(-60px); } 40%, 75% { transform: translateY(0); } 95%, 100% { transform: translateY(-60px); } }
+@keyframes guard-center-cast { 0%, 35%, 95%, 100% { transform: scale(.25); opacity: .15; } 55%, 72% { transform: scale(1); opacity: 1; } }
 @media (max-width: 700px) {
   .guard-content { grid-template-columns: 1fr; gap: 16px; padding: 0 16px 18px; }
+  .guard-encounter + .guard-encounter { margin-inline: 16px; padding-top: 18px; }
+  .guard-encounter-heading { padding: 0 16px 14px; }
   .guard-card > summary { position: relative; flex-wrap: wrap; gap: 5px; padding: 16px 44px 16px 16px; }
   .guard-card > summary span { flex-basis: 100%; }
   .guard-card > summary strong { font-size: 16px; }
@@ -115,7 +137,7 @@
   .guard-figure .guard-label { font-size: 18px; }
   .guard-figure .guard-group { font-size: 15px; }
 }
-@media (prefers-reduced-motion: reduce) { .guard-danger, .guard-telegraph, .guard-flame, .guard-assignment { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .guard-danger, .guard-telegraph, .guard-flame, .guard-assignment, .guard-add-pulse, .guard-curse-line, .guard-runner, .guard-jumper { animation: none; } }
 
 .raid-diagram {
   margin: 0;
