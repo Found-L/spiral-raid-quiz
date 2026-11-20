@@ -3,8 +3,8 @@ from pathlib import Path
 from build_seo import build as build_seo
 root=Path(__file__).resolve().parent
 template=(root/'template.html').read_text(encoding='utf-8')
-css='\n'.join((root/name).read_text(encoding='utf-8') for name in ('style.css','detail.css','social.css','share.css','cinematic.css','navigation.css','account.css','encounters.css','atmosphere.css','music.css'))
-js='\n'.join((root/name).read_text(encoding='utf-8') for name in ('badge-art.js','social-ui.js','share-ui.js','guard-guides.js','app.js','motion.js','effects.js','music.js'))
+css='\n'.join((root/name).read_text(encoding='utf-8') for name in ('style.css','detail.css','social.css','share.css','cinematic.css','navigation.css','account.css','encounters.css','atmosphere.css','music.css','immersive.css'))
+js='\n'.join((root/name).read_text(encoding='utf-8') for name in ('badge-art.js','social-ui.js','share-ui.js','guard-guides.js','app.js','motion.js','effects.js','music.js','splash-cursor.js'))
 background='data:image/webp;base64,' + base64.b64encode((root/'assets'/'share-temple-v1.webp').read_bytes()).decode('ascii')
 assert js.count('/*__SHARE_BACKGROUND__*/') == 1
 js=js.replace('/*__SHARE_BACKGROUND__*/', background)
