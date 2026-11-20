@@ -227,7 +227,7 @@ function drawOverviewSequence(key) {
   const [id, title, art] = overview;
   const scene = RAID_SEQUENCES[id];
   return `<div class="chapter-art" data-sequence="${id}" data-step="0" aria-label="${title}">
-    <div class="chapter-scene"><img class="chapter-scene-image" src="${art}" alt="" aria-hidden="true" decoding="async" loading="lazy">${sequenceSvg(id)}</div>
+    <div class="chapter-scene"><img class="chapter-scene-image" src="${art}" alt="" aria-hidden="true" draggable="false" decoding="async" loading="lazy">${sequenceSvg(id)}</div>
     <div class="chapter-status"><span class="chapter-counter" data-step-count>01 / ${String(scene.steps.length).padStart(2,'0')}</span><span class="chapter-status-text" data-step-text>${scene.steps[0].text}</span></div>
     <div class="chapter-playback"><div class="chapter-progress"><span>动态示意</span><i></i><i></i><i></i></div><div class="chapter-step-controls"><button type="button" class="diagram-pause" data-action="toggle-diagram-motion" aria-pressed="false">暂停</button><button type="button" data-action="sequence-prev" aria-label="${title}上一步">←</button><button type="button" data-action="sequence-next" aria-label="${title}下一步">→</button></div></div>
   </div>`;

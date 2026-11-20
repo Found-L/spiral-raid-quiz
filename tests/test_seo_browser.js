@@ -60,6 +60,7 @@ async function waitReady(url) {
       assert.ok(data.text.length > 300 && data.sectionCount >= 4, `${slug} contains useful text without JavaScript`);
       assert.doesNotMatch(data.text, /魔女试卷/);
       assert.equal(data.overflow, false, `${slug} fits mobile`);
+      assert.equal(await page.locator('.hero-image').getAttribute('draggable'), 'false');
       assert.equal((await page.request.get(data.heroImage)).status(), 200, `${slug} illustration exists`);
       assert.equal((await page.request.get(new URL(data.ogImage).pathname.replace('/spiral-raid-quiz/', base))).status(), 200, 'share image exists');
       titles.add(data.title); descriptions.add(data.description);
@@ -73,6 +74,13 @@ async function waitReady(url) {
     assert.equal(await interactive.locator('link[rel="canonical"]').getAttribute('href'), canonicalBase);
     await interactive.locator('.reading-links a[href="guides/witch/"]').click();
     assert.match(await interactive.locator('h1').innerText(), /黑风魔女/);
+    await interactive.locator('h1').evaluate(el => Promise.all(el.getAnimations().map(animation => animation.finished.catch(() => {}))));
+    const heading = await interactive.locator('h1').boundingBox();
+    await interactive.mouse.move(heading.x + 5, heading.y + heading.height / 2);
+    await interactive.mouse.down();
+    await interactive.mouse.move(heading.x + heading.width - 5, heading.y + heading.height / 2, {steps:8});
+    await interactive.mouse.up();
+    assert.equal(await interactive.evaluate(() => window.getSelection().toString()), '', 'guide display text should not be selected by dragging');
     await interactive.locator('.hero-actions a').first().click();
     await interactive.waitForFunction(() => document.querySelector('#guide-title').textContent.includes('黑风魔女'));
     assert.equal(new URL(interactive.url()).hash, '#guide-witch');

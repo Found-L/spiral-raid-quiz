@@ -1,7 +1,9 @@
 :root { color-scheme: dark; --ink: #f3ede3; --muted: #aebcb7; --gold: #e5c48b; --line: #e6c78c30; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: #0b1119; color: var(--ink); font: 16px/1.8 "Microsoft YaHei", "PingFang SC", sans-serif; }
+body { margin: 0; background: #0b1119; color: var(--ink); font: 16px/1.8 "Microsoft YaHei", "PingFang SC", sans-serif; -webkit-user-select: none; user-select: none; }
+input, textarea, [contenteditable]:not([contenteditable="false"]) { -webkit-user-select: text; user-select: text; }
+img { -webkit-user-drag: none; }
 a { color: inherit; }
 .topbar { min-height: 76px; padding: 14px max(5vw, calc((100vw - 1260px)/2)); display: flex; justify-content: space-between; align-items: center; gap: 20px; border-bottom: 1px solid var(--line); background: #101d21; }
 .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; line-height: 1.3; }
