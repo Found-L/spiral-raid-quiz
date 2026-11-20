@@ -4,7 +4,7 @@
   const state = {csrf:'', tab:'overview', sequence:0, playerPage:1, query:'', playerNumber:null,
     attemptPage:1, questionPage:1, questionVersion:'', badgeId:null, badgePage:1,
     interactionPage:1, interactionKind:'comments', reportStatus:'pending'};
-  let idleTimer = null, rendered = new WeakMap(), viewCache = new Map();
+  let idleTimer = null, sessionCheck = 0, rendered = new WeakMap(), viewCache = new Map();
   const formatDate = new Intl.DateTimeFormat('zh-CN', {timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
   const el = (tag, className, text) => {
     const node = document.createElement(tag);
@@ -24,12 +24,14 @@
   const sectionLabel = value => ({twins:'双剑',spirit:'超魔灵',witch:'黑风魔女'})[value] || '机制题';
 
   function showLogin(message='') {
+    ++sessionCheck;
     state.csrf = '';
     ++state.sequence;
     clearTimeout(idleTimer);
     for (const id of ['overview-content','players-content','players-pages','player-content','player-pages',
       'questions-content','questions-pages','badges-content','badge-detail-content','badge-pages','interactions-content','interactions-pages']) $(id).replaceChildren();
     rendered = new WeakMap(); viewCache.clear(); state.playerNumber = null; state.badgeId = null; state.query = ''; $('player-query').value = '';
+    $('session-loading').hidden = true;
     $('dashboard').hidden = true;
     $('login-view').hidden = false;
     $('password-open').hidden = true;
@@ -49,7 +51,9 @@
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) {
       if (response.status === 401 && !['login','password','session'].includes(route)) showLogin('登录已过期，请重新登录。');
-      throw new Error(payload.error || '暂时无法读取数据，请稍后重试。');
+      const error = new Error(payload.error || '暂时无法读取数据，请稍后重试。');
+      error.status = response.status;
+      throw error;
     }
     if (route !== 'logout') {
       clearTimeout(idleTimer);
@@ -58,12 +62,29 @@
     return payload;
   }
   function showDashboard() {
+    ++sessionCheck;
+    $('session-loading').hidden = true;
     $('login-view').hidden = true;
     $('dashboard').hidden = false;
     $('password-open').hidden = false;
     $('logout').hidden = false;
     $('global-message').textContent = '';
     setTab('overview');
+  }
+  async function restoreSession() {
+    const check = ++sessionCheck;
+    try {
+      const data = await api('session');
+      if (check !== sessionCheck) return;
+      state.csrf = data.csrf;
+      $('session-loading').hidden = true;
+      if ($('dashboard').hidden) showDashboard();
+    } catch (error) {
+      if (check !== sessionCheck) return;
+      if (error.status === 401 && !state.csrf && !$('login-view').hidden) return;
+      const expired = Boolean(state.csrf) && error.status === 401;
+      showLogin(error.status === 401 ? (expired ? '登录已过期，请重新登录。' : '') : error.message);
+    }
   }
   function empty(parent, text) { parent.replaceChildren(el('p','empty',text)); }
   function metric(label, value, note='') {
@@ -318,7 +339,7 @@
     } catch(error) {if(serial===state.sequence)failed(target,error,key);}
   }
   $('login-form').addEventListener('submit',async event=>{
-    event.preventDefault();const button=event.currentTarget.querySelector('button[type=submit]');button.disabled=true;$('login-message').textContent='正在登录…';
+    event.preventDefault();++sessionCheck;const button=event.currentTarget.querySelector('button[type=submit]');button.disabled=true;$('login-message').textContent='正在登录…';
     try {const data=await api('login',{password:$('password').value});state.csrf=data.csrf;$('password').value='';showDashboard();}
     catch(error) {$('login-message').textContent=error.message;}
     finally {button.disabled=false;}
@@ -345,14 +366,15 @@
     finally {button.disabled=false;}
   });
   if (location.origin !== 'https://www.lysue.com') {
+    showLogin();
     $('login-form').hidden=true;$('login-view').append(el('p','login-note','请在国内站打开管理页面。'));
     const link=el('a','outline-button','前往管理页面 ↗');link.href='https://www.lysue.com/spiral-raid-quiz/admin/';$('login-view').append(link);
   } else {
-    api('session').then(data=>{state.csrf=data.csrf;showDashboard()}).catch(()=>{});
+    void restoreSession();
   }
   window.addEventListener('pageshow',event=>{
     if (event.persisted && location.origin === 'https://www.lysue.com') {
-      showLogin(); api('session').then(data=>{state.csrf=data.csrf;showDashboard()}).catch(()=>{});
+      void restoreSession();
     }
   });
 })();

@@ -800,32 +800,53 @@ dialog{width:min(92vw,520px);max-height:90vh;overflow:auto;border:1px solid #716
 .honor-holders { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; }
 .honor-holders button { border: 0; padding: 3px 0; color: #ead2a4; background: none; font-size: 12px; font-weight: 700; white-space: nowrap; }
 .honor-holders button:hover { color: #fff0cc; text-decoration: underline; }
-.honor-dialog { width: min(650px, calc(100vw - 28px)); max-height: min(90vh, 850px); }
-.honor-dialog-description, .honor-history-note { margin: 10px 0; color: #b7c3bd; font-size: 13px; line-height: 1.65; }
-.honor-history-note { color: #9eada6; font-size: 12px; }
-.honor-detail-tabs { display: flex; gap: 6px; padding: 4px; margin: 16px 0 10px; border-radius: 8px; background: #101b21; }
-.honor-detail-tabs button { flex: 1; min-height: 38px; border: 0; border-radius: 6px; color: #aebdb6; background: transparent; font-weight: 650; }
-.honor-detail-tabs button[aria-pressed="true"] { color: #f2d29b; background: #394035; box-shadow: inset 0 0 0 1px #b89e71; }
-.honor-detail-status { display: block; min-height: 25px; color: #e4c995; font-size: 12px; }
-.honor-detail-list { max-height: min(44vh, 430px); min-height: 100px; overflow-y: auto; overscroll-behavior: contain; list-style: none; margin: 4px 0 14px; padding: 0; border-top: 1px solid #ffffff16; }
-.honor-detail-list li { display: flex; align-items: center; gap: 12px; min-height: 62px; padding: 10px 4px; border-bottom: 1px solid #ffffff12; }
-.honor-detail-rank { width: 28px; flex: none; text-align: center; color: #e8c78e; font: 16px Georgia, serif; }
+.honor-dialog { width: min(680px, calc(100vw - 28px)); max-height: min(850px, calc(100dvh - 28px)); padding: 28px; border: 1px solid #a08f685e; border-radius: 16px; background: radial-gradient(ellipse at 100% 0, #826d3e23, transparent 42%), linear-gradient(155deg, #1b2d2d, #121e25 75%); box-shadow: 0 24px 80px #000b; }
+.honor-dialog[open] { display: flex; flex-direction: column; overflow: hidden; }
+.honor-dialog > :not(.honor-detail-list) { flex-shrink: 0; }
+.honor-dialog .close-button { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 9px; color: #afc1b7; }
+.honor-dialog .close-button:hover { color: #f5dfb6; background: #ffffff0c; }
+.honor-dialog-description, .honor-history-note { margin: 8px 0 0; color: #bbc9c0; font-size: 13px; line-height: 1.6; }
+.honor-history-note { color: #99ada2; font-size: 12px; }
+.honor-detail-tabs { display: flex; gap: 4px; padding: 4px; margin: 18px 0 4px; border: 1px solid #a9c7ad20; border-radius: 10px; background: #0c1a1e; }
+.honor-detail-tabs button { flex: 1; min-height: 40px; border: 0; border-radius: 7px; color: #a9bdb1; background: transparent; font-weight: 650; }
+.honor-detail-tabs button[aria-pressed="true"] { color: #f5dba9; background: #3b4939; box-shadow: inset 0 0 0 1px #bd9f69; }
+.honor-detail-status { display: block; margin: 14px 0 8px; color: #e8cb95; font-size: 12px; font-weight: 600; }
+.honor-detail-list { display: flex; flex: 0 1 auto; flex-direction: column; gap: 6px; min-height: 0; max-height: none; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: #6d8274 transparent; list-style: none; margin: 0; padding: 0 4px 0 0; }
+.honor-detail-list li { display: flex; flex: none; align-items: center; gap: 12px; min-height: 65px; padding: 11px 13px; border: 1px solid #a7c0a623; border-radius: 9px; background: #0c191dcc; }
+.honor-detail-rank { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border-radius: 9px; color: #efd19a; background: #dfbd7d19; font: 16px Georgia, serif; }
 .honor-detail-person { min-width: 0; flex: 1; }
 .honor-detail-person strong, .honor-detail-person small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.honor-detail-person small { color: #96a8a1; font-size: 11px; }
-.honor-detail-list li > small { flex: none; padding: 3px 7px; border-radius: 20px; color: #aebcb6; background: #293638; font-size: 11px; white-space: nowrap; }
-.honor-detail-list li > small.is-current { color: #e9d29f; background: #51462f; }
-.honor-detail-value { display: grid; flex: none; gap: 2px; text-align: right; color: #f0debf; font-size: 13px; }
-.honor-achieved { color: #91a49d; font-size: 11px; }
+.honor-detail-person strong { color: #edf2e9; font-size: 14px; }
+.honor-detail-person small { margin-top: 2px; color: #91a99e; font-size: 11px; }
+.honor-detail-list li > small { flex: none; padding: 3px 9px; border-radius: 20px; color: #b2c1b6; background: #2a3d39; font-size: 11px; white-space: nowrap; }
+.honor-detail-list li > small.is-current { color: #f0d9aa; background: #5b4b2e; }
+.honor-detail-value { display: grid; flex: none; gap: 3px; text-align: right; color: #f2dfbc; font-size: 13px; }
+.honor-achieved { color: #91a99e; font-size: 11px; white-space: nowrap; }
 .honor-detail-list .honor-detail-empty { justify-content: center; color: #a8b6af; }
-.honor-detail-pages { display: flex; align-items: center; justify-content: center; gap: 16px; color: #b9c8c0; font-size: 12px; }
-.honor-detail-pages button { min-height: 38px; padding: 6px 14px; border: 1px solid #53635f; border-radius: 6px; color: #eed6aa; background: #14252a; }
+.honor-detail-pages { display: flex; align-items: center; justify-content: center; gap: 16px; padding-top: 16px; color: #b9c8c0; font-size: 12px; }
+.honor-detail-pages button { min-height: 38px; padding: 6px 15px; border: 1px solid #78958860; border-radius: 8px; color: #eed6aa; background: #1c3431; }
+.honor-detail-pages button:not(:disabled):hover { border-color: #c9b07a; background: #304a3d; }
 .honor-detail-pages button:disabled { opacity: .4; }
 @media (max-width: 560px) {
   .honor-dialog { padding: 18px; }
-  .honor-detail-list li { gap: 7px; }
-  .honor-detail-list li > small { padding: 3px 5px; }
+  .honor-detail-tabs { margin-top: 12px; }
+  .honor-detail-status { margin: 10px 0 7px; }
+  .honor-detail-list li { gap: 6px 9px; padding: 10px; }
+  .honor-detail-list .honor-detail-row--history { display: grid; grid-template-columns: minmax(0, 1fr) auto; }
+  .honor-detail-row--history > small { grid-column: 1; grid-row: 2; justify-self: start; }
+  .honor-detail-row--history .honor-detail-value { grid-column: 2; grid-row: 1 / span 2; }
   .honor-detail-value { font-size: 12px; }
+  .honor-achieved { font-size: 10px; }
+  .honor-detail-pages { padding-top: 12px; }
+}
+@media (max-height: 500px) {
+  .honor-dialog { padding-top: 14px; padding-bottom: 14px; }
+  .honor-dialog .dialog-top .eyebrow { margin-bottom: 2px; }
+  .honor-dialog-description, .honor-history-note { margin-top: 4px; line-height: 1.4; }
+  .honor-detail-tabs { margin-top: 8px; }
+  .honor-detail-tabs button { min-height: 32px; }
+  .honor-detail-status { margin: 7px 0; }
+  .honor-detail-pages { padding-top: 8px; }
 }
 
 .badge-people { color: #a6b9b3; font-size: 12px; line-height: 1.5; }
@@ -1883,7 +1904,15 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
   <dialog id="transfer-dialog" aria-labelledby="transfer-title"><div class="dialog-top"><div><p class="eyebrow">TRANSFER</p><h2 id="transfer-title">转移本机资料</h2></div><button class="close-button" type="button" data-action="close-transfer" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><output id="transfer-description" class="muted" aria-live="polite">正在读取原网址的资料…</output><p id="transfer-detail" class="profile-note"></p><p id="transfer-error" class="error-text" role="alert"></p><div class="dialog-actions"><button id="transfer-confirm" class="btn btn-primary" type="button" data-action="confirm-transfer" hidden>确认转移并上传</button><button class="btn btn-ghost" type="button" data-action="close-transfer">取消</button></div></dialog>
   <dialog id="backup-dialog" class="social-confirm-dialog" aria-labelledby="backup-title"><div class="dialog-top"><h2 id="backup-title">备份本机资料</h2><button class="close-button" type="button" data-action="close-backup" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="muted">备份文件包含可修改资料的身份信息，请妥善保管，不要发送给他人。</p><div class="dialog-actions"><button class="btn btn-ghost" type="button" data-action="close-backup">取消</button><button class="btn btn-primary" type="button" data-action="confirm-download-transfer">下载备份</button></div></dialog>
   <dialog id="diagram-dialog" class="diagram-dialog" aria-labelledby="diagram-dialog-title"><div class="dialog-top"><div><p class="eyebrow">TACTICAL MAP</p><h2 id="diagram-dialog-title">放大查看示意图</h2></div><button class="close-button" type="button" data-action="close-diagram" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p class="diagram-dialog-hint">手机可左右滑动查看完整图解。</p><div id="diagram-dialog-content" class="diagram-dialog-content"></div></dialog>
-  <dialog id="honor-dialog" class="honor-dialog" aria-labelledby="honor-dialog-title"><div class="dialog-top"><div><p class="eyebrow">HALL OF HONORS</p><h2 id="honor-dialog-title">趣味榜</h2></div><button class="close-button" type="button" data-action="close-honor-detail" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div><p id="honor-detail-description" class="honor-dialog-description"></p><div class="honor-detail-tabs" aria-label="查看趣味榜"><button type="button" data-action="honor-mode" data-mode="history" aria-pressed="true">历史获得者</button><button type="button" data-action="honor-mode" data-mode="current" aria-pressed="false">当前排名</button></div><p class="honor-history-note">历史名单按现存答卷推算，并包含之后的纪录留档；旧答卷没有完成时间时使用上传时间，已删除的记录无法还原。并列榜首都获得勋章，纪录被超越后会让出。</p><output id="honor-detail-status" class="honor-detail-status" aria-live="polite"></output><ol id="honor-detail-list" class="honor-detail-list"></ol><div class="honor-detail-pages"><button id="honor-detail-prev" type="button" data-action="honor-prev">上一页</button><span id="honor-detail-page"></span><button id="honor-detail-next" type="button" data-action="honor-next">下一页</button></div></dialog>
+  <dialog id="honor-dialog" class="honor-dialog" aria-labelledby="honor-dialog-title">
+    <div class="dialog-top"><div><p class="eyebrow">HALL OF HONORS</p><h2 id="honor-dialog-title">趣味榜</h2></div><button class="close-button" type="button" data-action="close-honor-detail" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div>
+    <p id="honor-detail-description" class="honor-dialog-description"></p>
+    <div class="honor-detail-tabs" aria-label="查看趣味榜"><button type="button" data-action="honor-mode" data-mode="history" aria-pressed="true">历史获得者</button><button type="button" data-action="honor-mode" data-mode="current" aria-pressed="false">当前排名</button></div>
+    <p id="honor-detail-note" class="honor-history-note"></p>
+    <output id="honor-detail-status" class="honor-detail-status" aria-live="polite"></output>
+    <ol id="honor-detail-list" class="honor-detail-list" tabindex="0" aria-label="趣味榜名单"></ol>
+    <div class="honor-detail-pages"><button id="honor-detail-prev" type="button" data-action="honor-prev">上一页</button><span id="honor-detail-page"></span><button id="honor-detail-next" type="button" data-action="honor-next">下一页</button></div>
+  </dialog>
   <dialog id="social-dialog" class="social-dialog" aria-labelledby="social-title">
     <div class="dialog-top"><div><p class="eyebrow">PLAYER NOTES <span class="slash">/</span> 榜单互动</p><h2 id="social-title">玩家互动</h2><small id="social-player-number" class="muted"></small></div><button class="close-button" type="button" data-action="social-close" aria-label="关闭"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button></div>
     <p class="social-section-label">收到的表情</p><div class="social-reaction-bar"><div id="social-reaction-summary" class="social-reaction-summary"></div><button id="social-add-reaction" type="button" data-action="social-toggle-picker" aria-expanded="false" aria-controls="social-reactions" hidden>＋ 添加表情</button></div>
@@ -6965,6 +6994,12 @@ const GUARD_GUIDES = {
       }
     }
   }
+  const honorDate = new Intl.DateTimeFormat('zh-CN', {timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false});
+  function updateHonorDetailNote() {
+    $('honor-detail-note').textContent = honorDetailMode === 'history'
+      ? '按首次获得时间从新到旧；缺少完成时间时使用上传时间，仅有留档时使用记录时间。缺失或已删除的记录无法还原。'
+      : '显示符合本榜条件的已上传身份；每个身份只列一次，按成绩排列。';
+  }
   async function loadHonorDetail(page = 1) {
     const requestId = ++honorDetailRequest;
     const badge = honorDetailBadge;
@@ -6981,15 +7016,16 @@ const GUARD_GUIDES = {
       $('honor-detail-description').textContent = data.badge.description;
       $('honor-detail-status').textContent = mode === 'history'
         ? `共 ${data.total} 人曾达成 · 其中 ${data.holderCount} 人当前持有`
-        : `共 ${data.total} 人上榜 · ${data.holderCount} 人并列榜首；同成绩按达到时间先后排列`;
+        : `共 ${data.total} 人上榜 · ${data.holderCount} 人当前位列榜首`;
       $('honor-detail-list').innerHTML = data.entries.length ? data.entries.map(entry => {
         const number = formatPlayerNumber(entry.playerNumber);
         const value = entry.recordedOnly ? '纪录已留档' : data.valueType === 'time' ? formatDuration(entry.value) : `${entry.value} 次`;
         const rank = mode === 'current' ? `<span class="honor-detail-rank">${entry.rank}</span>` : '';
         const status = mode === 'history' ? `<small class="${entry.current ? 'is-current' : ''}">${entry.current ? '当前持有' : '曾经获得'}</small>` : '';
-        const time = mode === 'history' ? `<span class="honor-achieved">${new Date(entry.achievedAt).toLocaleDateString('zh-CN')} ${entry.recordedOnly ? '记录时间' : '首次达成'}</span>` : '';
-        return `<li>${rank}<span class="honor-detail-person"><strong>${escape(entry.nickname)}</strong><small>${escape(number)}</small></span>${status}<span class="honor-detail-value"><strong>${mode === 'history' && !entry.recordedOnly ? '当时 ' : ''}${escape(value)}</strong>${time}</span></li>`;
+        const time = mode === 'history' ? `<span class="honor-achieved">${honorDate.format(entry.achievedAt)} ${entry.recordedOnly ? '记录时间' : '首次达成'}</span>` : '';
+        return `<li class="honor-detail-row--${mode}">${rank}<span class="honor-detail-person"><strong>${escape(entry.nickname)}</strong><small>${escape(number)}</small></span>${status}<span class="honor-detail-value"><strong>${mode === 'history' && !entry.recordedOnly ? '当时 ' : ''}${escape(value)}</strong>${time}</span></li>`;
       }).join('') : '<li class="honor-detail-empty">暂无符合条件的记录。</li>';
+      $('honor-detail-list').scrollTop = 0;
       $('honor-detail-page').textContent = `第 ${honorDetailPage} / ${honorDetailPages} 页`;
       $('honor-detail-prev').disabled = honorDetailPage <= 1;
       $('honor-detail-next').disabled = honorDetailPage >= honorDetailPages;
@@ -7001,6 +7037,7 @@ const GUARD_GUIDES = {
   function showHonorDetail(badge) {
     honorDetailBadge = badge;
     honorDetailMode = 'history';
+    updateHonorDetailNote();
     honorDetailPage = honorDetailPages = 1;
     $('honor-detail-list').replaceChildren();
     $('honor-detail-page').textContent = '';
@@ -7860,6 +7897,7 @@ const GUARD_GUIDES = {
       const mode = target.dataset.mode;
       if (!['history', 'current'].includes(mode) || mode === honorDetailMode) return;
       honorDetailMode = mode;
+      updateHonorDetailNote();
       $('honor-dialog').querySelectorAll('[data-mode]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.mode === mode)));
       $('honor-detail-list').replaceChildren();
       void loadHonorDetail();

@@ -7,6 +7,7 @@
   <meta name="referrer" content="no-referrer">
   <meta name="theme-color" content="#0b1319">
   <title>管理总览 · 螺旋寺院</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230e1b21' stroke='%23d8b67b' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%235f9d8d' stroke-width='1'/%3E%3Cpath d='M17 31 32 20 47 31M20 35 32 27 44 35M23 37v9h18v-9M29 46v-7h6v7M18 49h28' fill='none' stroke='%23f0d19a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='15' r='2' fill='%23f0d19a'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="admin.css">
   <script src="admin.js" defer></script>
 </head>
@@ -18,7 +19,9 @@
   </header>
 
   <main class="wrap">
-    <section id="login-view" class="login-shell" aria-labelledby="login-title">
+    <p id="session-loading" class="session-loading" role="status">正在验证登录状态…</p>
+    <noscript><style>#session-loading{display:none}</style><p class="session-loading">请启用 JavaScript 后使用管理页面。</p></noscript>
+    <section id="login-view" class="login-shell" aria-labelledby="login-title" hidden>
       <div class="login-mark" aria-hidden="true">旋</div>
       <p class="eyebrow">TEMPLE ADMIN <span>/</span> 站点管理</p>
       <h1 id="login-title">管理总览</h1>
