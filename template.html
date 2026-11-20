@@ -3,14 +3,24 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="剑灵巅峰服螺旋寺院团本机制练习，覆盖主 T 和各机制位。">
+  <meta name="description" content="剑灵巅峰服螺旋寺院攻略与机制考核：查看双剑、超魔灵和黑风魔女图解，练习团本机制并了解勋章。">
+  <link rel="canonical" href="https://www.lysue.com/spiral-raid-quiz/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="螺旋寺院攻略与机制考核 · 黑风魔女、超魔灵、双剑">
+  <meta property="og:description" content="剑灵巅峰服螺旋寺院机制图解、考核练习、排行榜与勋章。">
+  <meta property="og:url" content="https://www.lysue.com/spiral-raid-quiz/">
+  <meta property="og:image" content="https://www.lysue.com/spiral-raid-quiz/assets/share-temple-v1.webp">
+  <meta property="og:image:alt" content="螺旋寺院夜景">
+  <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#0b1019">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%230e1b21' stroke='%23d8b67b' stroke-width='2'/%3E%3Ccircle cx='32' cy='32' r='24' fill='none' stroke='%235f9d8d' stroke-width='1'/%3E%3Cpath d='M17 31 32 20 47 31M20 35 32 27 44 35M23 37v9h18v-9M29 46v-7h6v7M18 49h28' fill='none' stroke='%23f0d19a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='15' r='2' fill='%23f0d19a'/%3E%3C/svg%3E">
-  <title>螺旋寺院 · 团本机制考核</title>
+  <title>螺旋寺院攻略与机制考核 · 黑风魔女、超魔灵、双剑</title>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"螺旋寺院机制考核","url":"https://www.lysue.com/spiral-raid-quiz/","inLanguage":"zh-CN","description":"剑灵巅峰服螺旋寺院机制图解、考核练习和勋章。"}</script>
   <style>/*__APP_CSS__*/</style>
 </head>
 <body>
   <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <filter id="entrance-cloud-filter" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.012 0.025" numOctaves="3" seed="8" result="noise"/><feDisplacementMap in="SourceGraphic" in2="noise" scale="65" xChannelSelector="R" yChannelSelector="G"/><feGaussianBlur stdDeviation="4"/></filter>
     <symbol id="icon-arrow-right" viewBox="0 0 24 24"><path d="M4.5 12h14M13 6.5l5.5 5.5L13 17.5"/></symbol>
     <symbol id="icon-arrow-left" viewBox="0 0 24 24"><path d="M19.5 12h-14M11 6.5 5.5 12l5.5 5.5"/></symbol>
     <symbol id="icon-arrow-down" viewBox="0 0 24 24"><path d="M12 4.5v14M6.5 13 12 18.5l5.5-5.5"/></symbol>
@@ -44,6 +54,7 @@
   </svg>
   <div class="site-shell">
     <div class="ambient-world" aria-hidden="true"><span></span><span></span><span></span></div>
+    <canvas id="temple-particles" class="temple-particles" aria-hidden="true"></canvas>
     <header class="topbar">
       <a href="#home" class="brand" aria-label="螺旋寺院机制考核首页"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><circle class="brand-ring" cx="24" cy="24" r="17"/><path d="M13 23 24 15l11 8M15 26l9-6 9 6M17 28v8h14v-8M21 36v-6h6v6M14 39h20"/><circle class="brand-star" cx="24" cy="11" r="1.5"/></svg></span><span class="brand-copy"><strong>螺旋寺院</strong><small>团队机制考核</small></span></a>
       <div class="header-dock">
@@ -64,18 +75,21 @@
       <div id="home-view">
         <section class="hero" id="home">
           <div class="hero-copy">
-            <p class="eyebrow"><span class="dot"></span>剑灵巅峰服 <span class="slash">/</span> 12 人团本</p>
+            <p class="eyebrow"><span class="dot"></span>剑灵巅峰服 · 螺旋寺院 <span class="slash">/</span> 12 人团本</p>
             <h1>一起通关<br><em>也要一起懂机制</em></h1>
             <p class="hero-description">从双剑的球与花，到超魔灵的染灯，<br class="desktop-only">再到黑风魔女的冲锋与蜘蛛。把每个位置的关键操作，练成团队的默契。</p>
             <div class="hero-actions"><button class="btn btn-primary" type="button" data-action="start">开始机制考核 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><a class="btn btn-ghost" href="#guide">先看机制图解 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-down"/></svg></a></div>
             <p class="hero-note">免注册 · 自动评分 · 支持中途继续。答题页在前台时计时，离开或切到后台自动暂停。</p>
           </div>
           <div class="hero-art" aria-hidden="true">
+            <div class="hero-halo"><svg class="formation-seal" viewBox="0 0 600 600" aria-hidden="true"><defs><linearGradient id="formation-gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eed29b"/><stop offset=".52" stop-color="#84d4bd"/><stop offset="1" stop-color="#e7be78"/></linearGradient></defs><g class="formation-lines"><path d="M300 30 490 110 570 300 490 490 300 570 110 490 30 300 110 110Z"/><path d="M300 70 463 137 530 300 463 463 300 530 137 463 70 300 137 137Z"/><path d="M300 102 498 300 300 498 102 300Z"/><path d="M300 48v38M552 300h-38M300 552v-38M48 300h38"/></g><path class="formation-trace" d="M300 30 490 110 570 300 490 490 300 570 110 490 30 300 110 110Z"/><g class="formation-marks"><path d="m300 14 6 11-6 11-6-11Z"/><path d="m586 300-11 6-11-6 11-6Z"/><path d="m300 586-6-11 6-11 6 11Z"/><path d="m14 300 11-6 11 6-11 6Z"/></g></svg></div>
             <div class="hero-scene">
               <img class="hero-landscape" src="__HERO_IMAGE__" alt="" decoding="async" fetchpriority="high">
               <span class="hero-radiance"></span>
+              <span class="hero-light-shaft"></span>
               <span class="hero-mist hero-mist-near"></span><span class="hero-mist hero-mist-far"></span>
-              <span class="hero-embers"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="hero-embers"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              <span class="entrance-cloud entrance-cloud-left"></span><span class="entrance-cloud entrance-cloud-right"></span><span class="entrance-cloud entrance-cloud-center"></span><span class="entrance-light"></span>
             </div>
             <span class="art-caption">THE SPIRAL TEMPLE <i></i> TEAM STUDY</span>
           </div>
@@ -87,7 +101,7 @@
         </section>
 
         <section class="section guide-section" id="guide">
-          <div class="section-heading"><div><p class="eyebrow">ENCOUNTER GUIDE <span class="slash">/</span> 机制速览</p><h2>先认清，你的位置</h2></div><p>三个区间，各司其职。图中为分工示意，<br>具体站位和流程以团队实战为准。</p></div>
+          <div class="section-heading"><div><p class="eyebrow">ENCOUNTER GUIDE <span class="slash">/</span> 机制速览</p><h2>先认清，你的位置</h2></div><p>螺旋寺院攻略分为双剑、超魔灵和黑风魔女三个区间。<br>图中为分工示意，具体站位和流程以团队实战为准。</p></div>
           <div class="guide-grid">
             <article class="guide-card twins"><div class="chapter-heading"><div class="card-top"><span>01 / 双首领</span><span>球 · 花 · 治疗</span></div><h3>灼热剑 &amp; 酷寒剑</h3><p>分清同色与异色，让接球、踩花和治疗有序衔接。</p></div>
 
@@ -102,6 +116,7 @@
               <div class="overview-placeholder" data-overview="witch-bomb"></div>
               <a class="card-footer" href="#guide-witch" aria-label="查看黑风魔女详细图解"><span class="card-roles">主 T / 控制 / 炸弹 / 蜘蛛</span><span class="card-cta">查看图解 <span class="icon-ring" aria-hidden="true"><svg class="icon"><use href="#icon-arrow-right"/></svg></span></span></a></article>
           </div>
+          <nav class="reading-links" aria-label="文字攻略与勋章说明"><span>文字攻略与勋章</span><a href="guides/twins/">双剑攻略</a><a href="guides/spirit/">超魔灵攻略</a><a href="guides/witch/">黑风魔女攻略</a><a href="guides/badges/">考核勋章</a></nav>
         </section>
 
         <section class="section how-section"><div class="how-copy"><p class="eyebrow">HOW IT WORKS <span class="slash">/</span> 考核方式</p><h2>练的是判断，<br>也是配合。</h2><p>单选、多选、判断和选择式填空。每题等权，多选需要全部选对。完成后立即查看分数与每题解析。</p><button class="text-action icon-action" type="button" data-action="start">进入考核 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button></div>
@@ -114,7 +129,7 @@
           <div id="honor-boards" class="honor-boards" aria-live="polite"><p class="empty-state">正在读取趣味榜…</p></div>
           <p class="muted honor-foot">统计所有已上传答卷，包含新旧题库；没有记录用时的答卷不参加计时榜。榜首纪录变化时勋章会易主。用时由浏览器记录，趣味榜仅供娱乐。</p>
         </section>
-        <section class="section sources-section"><div><p class="eyebrow">BEFORE YOU START <span class="slash">/</span> 资料说明</p><h2>版本与资料</h2></div><div><p>题库根据巅峰服螺旋寺院上线后的实战资料和提供的魔女试卷整理。</p><p>团队站位、控制顺序和人员分配可按配置调整，实际操作请结合当前版本和团长安排。</p><div class="source-links"><a href="https://www.bilibili.com/video/BV15uny6qENV/" target="_blank" rel="noopener noreferrer">双剑教学 · 10 月 22 日 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1d9n265EyM/" target="_blank" rel="noopener noreferrer">双剑换边补充 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1rFWY6REex/" target="_blank" rel="noopener noreferrer">超魔灵教学 · 11 月 13 日 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1rQHP6zE56/" target="_blank" rel="noopener noreferrer">超魔灵机制补充 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1Gh4x6wEAt/" target="_blank" rel="noopener noreferrer">魔女教学 · 11 月 8 日 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1o1x36hEC6/" target="_blank" rel="noopener noreferrer">魔女主 T 实战 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a></div></div></section>
+        <section class="section sources-section"><div><p class="eyebrow">BEFORE YOU START <span class="slash">/</span> 资料说明</p><h2>版本与资料</h2></div><div><p>题库根据巅峰服螺旋寺院上线后的实战资料整理。</p><p>团队站位、控制顺序和人员分配可按配置调整，实际操作请结合当前版本和团长安排。</p><div class="source-links"><a href="https://www.bilibili.com/video/BV15uny6qENV/" target="_blank" rel="noopener noreferrer">双剑教学 · 10 月 22 日 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1d9n265EyM/" target="_blank" rel="noopener noreferrer">双剑换边补充 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1rFWY6REex/" target="_blank" rel="noopener noreferrer">超魔灵教学 · 11 月 13 日 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1rQHP6zE56/" target="_blank" rel="noopener noreferrer">超魔灵机制补充 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1Gh4x6wEAt/" target="_blank" rel="noopener noreferrer">魔女教学 · 11 月 8 日 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a><a href="https://www.bilibili.com/video/BV1o1x36hEC6/" target="_blank" rel="noopener noreferrer">魔女主 T 实战 <svg class="icon" aria-hidden="true"><use href="#icon-external"/></svg></a></div></div></section>
       </div>
 
       <section id="guide-view" class="guide-view hidden" aria-labelledby="guide-title">
