@@ -37,6 +37,8 @@ async function waitReady(url) {
       await page.locator('.hero-landscape').waitFor({state:'visible'});
       assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, `horizontal overflow at ${width}`);
       assert.equal(await page.locator('.site-shell').evaluate(el => Math.round(el.getBoundingClientRect().width)), width, `shell width at ${width}`);
+      assert.equal(await page.locator('footer .footer-signature').innerText(), '相逢何必曾相识');
+      assert.equal(await page.locator('footer .footer-signature').isVisible(), true);
       assert.ok(await page.locator('#temple-particles').evaluate(el => el.width * el.height <= 6050000), `particle canvas budget at ${width}`);
       assert.doesNotMatch(await page.locator('body').innerText(), /魔女试卷/);
       assert.match(await page.locator('.sources-section').innerText(), /根据巅峰服螺旋寺院上线后的实战资料整理/);
