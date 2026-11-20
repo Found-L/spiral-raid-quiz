@@ -141,12 +141,22 @@ class AdminTest(unittest.TestCase):
             server.profile(self.db,{**identity,'nickname':f'玩家{index}'})
             self.db.execute('INSERT INTO attempts VALUES (?,?,?,?,?,?)',
                             (f'{index+1000:032x}',identity['deviceId'],server.VERSION,8,10,index+100))
+            self.db.execute('INSERT INTO badge_record_events VALUES (?,?,?)',
+                            (identity['deviceId'],'quickest',index+1000))
         headers, _ = self.login()
         page1 = self.call('badge-detail',{'badgeId':'first','page':1},headers)[0]
         page2 = self.call('badge-detail',{'badgeId':'first','page':2},headers)[0]
         self.assertEqual((page1['total'],page1['pages'],len(page1['entries']),len(page2['entries'])),(22,2,20,2))
         self.assertEqual(len({item['number'] for item in page1['entries']+page2['entries']}),22)
-        self.assertEqual([item['achievedAt'] for item in page1['entries']], sorted(item['achievedAt'] for item in page1['entries']))
+        all_entries = page1['entries']+page2['entries']
+        self.assertEqual([item['achievedAt'] for item in all_entries], sorted((item['achievedAt'] for item in all_entries), reverse=True))
+        record1 = self.call('badge-detail',{'badgeId':'quickest','page':1},headers)[0]
+        record2 = self.call('badge-detail',{'badgeId':'quickest','page':2},headers)[0]
+        record_entries = record1['entries']+record2['entries']
+        self.assertEqual((record1['total'],record1['pages']), (22,2))
+        self.assertEqual([item['achievedAt'] for item in record_entries], sorted((item['achievedAt'] for item in record_entries), reverse=True))
+        public = server.honor_history_page(self.db,'quickest',1,20)['entries']
+        self.assertEqual([item['achievedAt'] for item in public], sorted(item['achievedAt'] for item in public))
 
     def test_report_review_stale_content_and_moderation(self):
         headers, _ = self.login()
