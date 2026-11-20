@@ -151,6 +151,14 @@ async function context(browser, code, viewport) {
     await mobile.waitForFunction(() => document.querySelector('#social-dialog').getAttribute('aria-busy') === 'false');
     assert.equal(likeCalls, 1, 'repeated likes are locked while saving');
     await mobile.unroute('**/api/social/like');
+    await mobile.locator('[data-action="social-report"]').first().click();
+    await mobile.locator('#social-report-dialog[open]').waitFor();
+    if (screenshotDir) await mobile.screenshot({path:path.join(screenshotDir, 'mobile-report.png')});
+    await mobile.locator('#social-report-reason').selectOption('abuse');
+    await mobile.locator('#social-report-details').fill('请审核这条评价');
+    await mobile.locator('#social-report-dialog button[value="confirm"]').click();
+    await mobile.getByText('举报已提交，感谢反馈。').waitFor();
+    assert.equal(await mobile.locator('[data-action="social-report"]').first().isDisabled(), true);
     if (screenshotDir) await mobile.screenshot({path:path.join(screenshotDir, 'mobile-social.png')});
     assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true, 'mobile horizontal overflow');
     const box = await mobile.locator('#social-dialog').boundingBox();
@@ -240,9 +248,9 @@ async function context(browser, code, viewport) {
     await anonymous.locator('#social-dialog[open]').waitFor();
     await anonymous.locator('[data-action="social-reaction"][data-reaction="fire"]').click();
     await anonymous.getByText('你贴了 🔥', {exact:true}).waitFor();
-    assert.equal(await anonymous.locator('[data-action="social-report"]').count(), 0);
-    const removedRoute = await fetch(`http://127.0.0.1:${apiPort}/api/social/report`, {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
-    assert.equal(removedRoute.status, 404);
+    assert.ok(await anonymous.locator('[data-action="social-report"]').count() > 0);
+    const unauthenticatedReport = await fetch(`http://127.0.0.1:${apiPort}/api/social/report`, {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+    assert.equal(unauthenticatedReport.status, 403);
     await anonymous.setViewportSize({width:320, height:700});
     await anonymous.locator('[data-action="social-toggle-picker"]').click();
     await anonymous.locator('#social-reactions').waitFor();
@@ -268,7 +276,7 @@ async function context(browser, code, viewport) {
     assert.match(await page.locator('.badge-card[data-badge="perfect"] .badge-people').innerText(), /1 人获得/);
     if (screenshotDir) await page.screenshot({path:path.join(screenshotDir, 'desktop-badges.png')});
     assert.deepEqual(errors, []);
-    console.log('PASS browser reactions, comments, safe rendering, likes, hide/restore, badge counts and mobile layout');
+    console.log('PASS browser reactions, comments, reporting, safe rendering, hide/restore and mobile layout');
     await Promise.all([a.close(), b.close(), c.close(), visitor.close()]);
   } finally {
     if (browser) await browser.close();

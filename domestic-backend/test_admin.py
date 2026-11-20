@@ -8,6 +8,7 @@ from pathlib import Path
 
 import admin
 import server
+import social
 
 
 class AdminTest(unittest.TestCase):
@@ -119,6 +120,62 @@ class AdminTest(unittest.TestCase):
         comment = self.call('interactions',{'kind':'comments'},headers)[0]['entries'][0]
         self.assertEqual((comment['content'],comment['state']),('测试评价','owner_hidden'))
         self.assertEqual(self.call('interactions',{'kind':'reactions'},headers)[0]['entries'][0]['reaction'],'🔥')
+
+    def test_badge_recipients_use_saved_attempts_and_record_history(self):
+        headers, _ = self.login()
+        first = self.call('badge-detail',{'badgeId':'first'},headers)[0]
+        self.assertEqual((first['total'],first['entries'][0]['number']), (1,1))
+        self.assertEqual(first['entries'][0]['achievedAt'], self.db.execute('SELECT submitted_at FROM attempts').fetchone()[0])
+        self.assertEqual(first['entries'][0]['timeSource'], '按上传时间')
+        record = self.call('badge-detail',{'badgeId':'quickest'},headers)[0]
+        self.assertTrue(record['record'])
+        self.assertEqual(record['total'],1)
+        self.assertTrue(record['entries'][0]['current'])
+        self.assertNotIn(self.person['deviceId'],str(record))
+        with self.assertRaises(admin.AdminError):
+            self.call('badge-detail',{'badgeId':'missing'},headers)
+
+    def test_badge_recipients_paginate_and_keep_earliest_qualifying_upload(self):
+        for index in range(21):
+            identity = {'deviceId':f'{index+100:032x}','secret':'3'*64}
+            server.profile(self.db,{**identity,'nickname':f'玩家{index}'})
+            self.db.execute('INSERT INTO attempts VALUES (?,?,?,?,?,?)',
+                            (f'{index+1000:032x}',identity['deviceId'],server.VERSION,8,10,index+100))
+        headers, _ = self.login()
+        page1 = self.call('badge-detail',{'badgeId':'first','page':1},headers)[0]
+        page2 = self.call('badge-detail',{'badgeId':'first','page':2},headers)[0]
+        self.assertEqual((page1['total'],page1['pages'],len(page1['entries']),len(page2['entries'])),(22,2,20,2))
+        self.assertEqual(len({item['number'] for item in page1['entries']+page2['entries']}),22)
+        self.assertEqual([item['achievedAt'] for item in page1['entries']], sorted(item['achievedAt'] for item in page1['entries']))
+
+    def test_report_review_stale_content_and_moderation(self):
+        headers, _ = self.login()
+        comment = self.db.execute('SELECT id FROM social_comments').fetchone()[0]
+        self.db.execute("UPDATE social_comments SET state='visible' WHERE id=?",(comment,))
+        social.mutate(self.db,{**self.person,'commentId':comment,'reason':'abuse','details':'请审核'},'report')
+        report = self.call('interactions',{'kind':'reports'},headers)[0]['entries'][0]
+        self.assertEqual((report['content'],report['status']),('测试评价','pending'))
+        self.assertEqual(self.call('overview',headers=headers)[0]['pendingReports'],1)
+        self.db.execute("UPDATE social_comments SET content='修改后的评价',updated_at=11 WHERE id=?",(comment,))
+        with self.assertRaises(admin.AdminError) as error:
+            self.call('moderate',{'commentId':comment,'updatedAt':10,'action':'hide'},headers)
+        self.assertEqual(error.exception.status,409)
+        self.assertEqual(self.call('interactions',{'kind':'reports'},headers)[0]['entries'][0]['content'],'测试评价')
+        self.db.execute("UPDATE social_comments SET state='owner_hidden',content='测试评价',updated_at=10 WHERE id=?",(comment,))
+        self.call('moderate',{'commentId':comment,'updatedAt':10,'action':'hide'},headers)
+        self.assertEqual(self.db.execute('SELECT state FROM social_comments').fetchone()[0],'admin_hidden')
+        self.assertEqual(self.call('interactions',{'kind':'reports','status':'resolved'},headers)[0]['total'],1)
+        with self.assertRaises(social.SocialError):
+            social.mutate(self.db,{**self.person,'commentId':comment,'hidden':False},'hide')
+        self.call('moderate',{'commentId':comment,'updatedAt':10,'action':'restore'},headers)
+        self.assertEqual(self.db.execute('SELECT state FROM social_comments').fetchone()[0],'owner_hidden')
+        self.call('moderate',{'commentId':comment,'updatedAt':10,'action':'delete'},headers)
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM social_comments').fetchone()[0],0)
+        self.assertIsNone(self.db.execute('SELECT comment_id FROM social_reports').fetchone()[0])
+        self.call('report-resolve',{'reportId':report['id'],'status':'pending'},headers)
+        self.assertEqual(self.call('interactions',{'kind':'reports'},headers)[0]['total'],1)
+        with self.assertRaises(admin.AdminError):
+            self.call('report-resolve',{'reportId':report['id'],'status':'dismissed'}, {**headers,'X-CSRF-Token':'wrong'})
 
     def test_http_responses_do_not_allow_admin_cors(self):
         httpd = server.QuizServer(('127.0.0.1',0),server.Handler)

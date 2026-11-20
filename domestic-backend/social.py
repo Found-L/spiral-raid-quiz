@@ -11,6 +11,7 @@ REACTIONS = {
     'down': '👎', 'facepalm': '🤦', 'confused': '🤔',
     'awkward': '😅', 'clown': '🤡', 'skull': '💀',
 }
+REPORT_REASONS = {'abuse': '侮辱或骚扰', 'privacy': '泄露个人信息', 'spam': '广告或刷屏', 'other': '其他'}
 
 
 class SocialError(Exception):
@@ -44,6 +45,22 @@ def initialize(db):
             action TEXT NOT NULL, last_at INTEGER NOT NULL, PRIMARY KEY (actor_id, action)
         );
         CREATE INDEX IF NOT EXISTS social_comments_target_state ON social_comments(target_id, state, created_at);
+        CREATE TABLE IF NOT EXISTS social_reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            comment_id INTEGER REFERENCES social_comments(id) ON DELETE SET NULL,
+            reporter_id TEXT NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+            author_id TEXT NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+            target_id TEXT NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+            comment_updated_at INTEGER NOT NULL, content_snapshot TEXT NOT NULL,
+            reason TEXT NOT NULL, details TEXT NOT NULL DEFAULT '',
+            created_at INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'pending', resolved_at INTEGER,
+            UNIQUE(comment_id, reporter_id, comment_updated_at)
+        );
+        CREATE INDEX IF NOT EXISTS social_reports_status_time ON social_reports(status, created_at);
+        CREATE TABLE IF NOT EXISTS social_admin_moderation (
+            comment_id INTEGER PRIMARY KEY REFERENCES social_comments(id) ON DELETE CASCADE,
+            previous_state TEXT NOT NULL, updated_at INTEGER NOT NULL
+        );
         CREATE TABLE IF NOT EXISTS badge_record_events (
             participant_id TEXT NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
             badge_id TEXT NOT NULL, achieved_at INTEGER NOT NULL,
@@ -131,11 +148,12 @@ def view(db, body):
     sorting = 'likes DESC, c.created_at DESC, c.id DESC' if order == 'hot' else 'c.created_at DESC, c.id DESC'
     rows = db.execute('''SELECT c.*, p.nickname, n.number,
           (SELECT COUNT(*) FROM social_likes l WHERE l.comment_id=c.id) AS likes,
-          EXISTS(SELECT 1 FROM social_likes l WHERE l.comment_id=c.id AND l.actor_id=?) AS liked
+          EXISTS(SELECT 1 FROM social_likes l WHERE l.comment_id=c.id AND l.actor_id=?) AS liked,
+          EXISTS(SELECT 1 FROM social_reports r WHERE r.comment_id=c.id AND r.reporter_id=? AND r.comment_updated_at=c.updated_at) AS reported
           FROM social_comments c JOIN participants p ON p.id=c.author_id
           LEFT JOIN participant_numbers n ON n.participant_id=p.id
           WHERE c.target_id=? AND ''' + visible + ' ORDER BY ' + sorting + ' LIMIT ? OFFSET ?',
-          (viewer or '', *params, size, (page - 1) * size)).fetchall()
+          (viewer or '', viewer or '', *params, size, (page - 1) * size)).fetchall()
     reactions = {row['reaction']: row['count'] for row in db.execute('''SELECT reaction, COUNT(*) AS count
                    FROM social_reactions WHERE target_id=? GROUP BY reaction''', (player['id'],))}
     mine = db.execute('SELECT reaction FROM social_reactions WHERE target_id=? AND actor_id=?',
@@ -145,7 +163,7 @@ def view(db, body):
     return {'player': {'number': player['number'], 'nickname': player['nickname']},
             'reactions': [{'id': key, 'count': reactions.get(key, 0)} for key in REACTIONS],
             'myReaction': mine['reaction'] if mine else None,
-            'ownComment': {'id': own_comment['id'], 'content': own_comment['content']} if own_comment else None,
+            'ownComment': {'id': own_comment['id'], 'content': own_comment['content'], 'state': own_comment['state']} if own_comment else None,
             'isTarget': bool(viewer and viewer == player['id']),
             'commentCount': summaries(db, [player['id']])[player['id']]['commentCount'],
             'page': page, 'pages': pages, 'sort': order,
@@ -154,6 +172,7 @@ def view(db, body):
                           'liked': bool(row['liked']),
                           'own': bool(viewer and viewer == row['author_id']),
                           'canHide': bool(viewer and viewer == row['target_id']),
+                          'reported': bool(row['reported']),
                           'hidden': row['state'] != 'visible'} for row in rows]}
 
 
@@ -226,6 +245,23 @@ def mutate(db, body, action):
                 if type(hidden) is not bool or comment['target_id'] != actor or comment['state'] == 'admin_hidden':
                     raise SocialError('无法修改这条评价的展示状态。', 403)
                 db.execute('UPDATE social_comments SET state=? WHERE id=?', ('owner_hidden' if hidden else 'visible', comment_id))
+            elif action == 'report':
+                reason, details = body.get('reason'), body.get('details', '')
+                if comment['state'] != 'visible' or comment['author_id'] == actor:
+                    raise SocialError('无法举报这条评价。', 403)
+                if not isinstance(reason, str) or reason not in REPORT_REASONS or not isinstance(details, str):
+                    raise SocialError('请选择举报原因。')
+                details = unicodedata.normalize('NFKC', ' '.join(details.split()))
+                if len(details) > 120 or any(unicodedata.category(c).startswith('C') for c in details):
+                    raise SocialError('补充说明请填写 120 个字以内。')
+                old = db.execute('''SELECT id FROM social_reports WHERE comment_id=? AND reporter_id=?
+                                    AND comment_updated_at=?''', (comment_id, actor, comment['updated_at'])).fetchone()
+                if not old:
+                    now = rate_limit(db, actor, 'report', 10000)
+                    db.execute('''INSERT INTO social_reports (comment_id,reporter_id,author_id,target_id,comment_updated_at,
+                                   content_snapshot,reason,details,created_at) VALUES (?,?,?,?,?,?,?,?,?)''',
+                               (comment_id,actor,comment['author_id'],comment['target_id'],comment['updated_at'],
+                                comment['content'],reason,details,now))
             else:
                 raise SocialError('操作不存在。', 404)
         db.execute('COMMIT')
