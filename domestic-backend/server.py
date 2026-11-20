@@ -896,6 +896,8 @@ def delete_profile(db, body):
 def admin_context():
     return {'version':VERSION, 'banks':BANKS, 'version_order':version_order, 'badges':BADGES, 'badge_states':badge_states,
             'badge_counts':lambda db: badge_metrics.counts(db, BADGES, MISTAKE_RULES, badge_states, honor_boards, HONOR_CATEGORIES),
+            'attempt_badges':attempt_badges, 'honor_history_page':honor_history_page,
+            'honor_ids':{item[0] for item in HONOR_CATEGORIES}, 'report_reasons':social.REPORT_REASONS,
             'reactions':social.REACTIONS}
 
 
@@ -1003,7 +1005,7 @@ class Handler(BaseHTTPRequestHandler):
                   '/api/history': history, '/api/history/review': history_review, '/api/delete-profile': delete_profile,
                   '/api/social/view': social.view, '/api/shares': create_share}
         routes.update({f'/api/social/{name}': (lambda db, body, name=name: social.mutate(db, body, name))
-                       for name in ('reaction', 'comment', 'like', 'delete', 'hide')})
+                       for name in ('reaction', 'comment', 'like', 'delete', 'hide', 'report')})
         path = urlsplit(self.path).path
         admin_request = path.startswith('/api/admin/')
         action = routes.get(path)

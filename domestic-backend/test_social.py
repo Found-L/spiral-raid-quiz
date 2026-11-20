@@ -147,6 +147,29 @@ class SocialTest(unittest.TestCase):
         self.assertIsNone(self.view('b')['ownComment'])
         self.assertEqual(self.db.execute('SELECT COUNT(*) FROM social_likes').fetchone()[0], 0)
 
+    def test_report_identity_deduplication_and_comment_snapshot(self):
+        comment = self.comment('b', '需要审核的内容')
+        self.db.execute('UPDATE social_comments SET updated_at=10 WHERE id=?', (comment,))
+        with self.assertRaises(social.SocialError):
+            self.action('b', 'report', commentId=comment, reason='abuse')
+        with self.assertRaises(social.SocialError):
+            self.action('c', 'report', commentId=comment, reason='invalid')
+        self.action('a', 'report', commentId=comment, reason='abuse', details='请检查')
+        self.action('a', 'report', commentId=comment, reason='abuse', details='请检查')
+        self.assertTrue(self.view('a')['comments'][0]['reported'])
+        self.assertFalse(self.view('c')['comments'][0]['reported'])
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM social_reports').fetchone()[0], 1)
+        self.db.execute("UPDATE social_rate_limits SET last_at=0 WHERE action='comment'")
+        self.action('b', 'comment', playerNumber=self.players['a']['number'], content='修改后的内容')
+        self.assertEqual(self.db.execute('SELECT content_snapshot FROM social_reports').fetchone()[0], '需要审核的内容')
+        self.assertFalse(self.view('a')['comments'][0]['reported'])
+        self.action('b', 'delete', commentId=comment)
+        report = self.db.execute('SELECT comment_id,content_snapshot FROM social_reports').fetchone()
+        self.assertIsNone(report['comment_id'])
+        self.assertEqual(report['content_snapshot'], '需要审核的内容')
+        server.delete_profile(self.db, self.actor('a'))
+        self.assertEqual(self.db.execute('SELECT COUNT(*) FROM social_reports').fetchone()[0], 0)
+
     def test_badge_counts_deduplicate_and_preserve_record_events(self):
         b = self.attempt('b', 2, 10)
         c = self.attempt('c', 3, 10)

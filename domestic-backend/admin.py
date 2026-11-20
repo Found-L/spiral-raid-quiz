@@ -99,6 +99,7 @@ def overview(db, context):
     counts = {name: db.execute('SELECT COUNT(*) FROM ' + table).fetchone()[0] for name, table in (
         ('players', 'participants'), ('comments', 'social_comments'), ('reactions', 'social_reactions'),
         ('shares', 'share_cards'), ('analyzed', 'attempt_analysis'))}
+    counts['pendingReports'] = db.execute("SELECT COUNT(*) FROM social_reports WHERE status='pending'").fetchone()[0]
     recent = db.execute('''SELECT a.id, a.quiz_version, a.correct_count, a.total_count, a.submitted_at,
                                   t.elapsed_seconds, c.completed_at, x.attempt_id AS analyzed, p.nickname, n.number
                            FROM attempts a JOIN participants p ON p.id=a.participant_id
@@ -240,30 +241,103 @@ def questions(db, body, context):
 
 def badge_statistics(db, context):
     counts = context['badge_counts'](db)
-    return {'entries':[{'name':badge['name'],'description':badge['description'],'tone':badge['tone'],
+    return {'entries':[{'id':badge['id'],'name':badge['name'],'description':badge['description'],'tone':badge['tone'],
                         **counts[badge['id']]} for badge in context['badges']]}
+
+
+def badge_detail(db, body, context):
+    badge_id, page = body.get('badgeId'), page_number(body)
+    badge = next((item for item in context['badges'] if item['id'] == badge_id), None)
+    if not badge:
+        raise AdminError('勋章不存在。', 404)
+    if badge_id in context['honor_ids']:
+        history = context['honor_history_page'](db, badge_id, page, PAGE_SIZE)
+        return {'badge':badge, 'page':history['page'], 'pages':history['pages'], 'total':history['total'],
+                'record':True, 'entries':[{'nickname':item['nickname'], 'number':item['playerNumber'],
+                'achievedAt':item['achievedAt'], 'current':item['current'],
+                'timeSource':'纪录留档时间' if item['recordedOnly'] else '完成或上传时间推算'}
+                for item in history['entries']]}
+
+    triggered = {row['attempt_id'] for row in db.execute('SELECT attempt_id FROM attempt_mistake_badges WHERE badge_id=?', (badge_id,))}
+    rows = db.execute('''SELECT a.id,a.participant_id,a.correct_count,a.total_count,a.submitted_at,t.elapsed_seconds,
+                         p.nickname,n.number FROM attempts a JOIN participants p ON p.id=a.participant_id
+                         LEFT JOIN participant_numbers n ON n.participant_id=p.id
+                         LEFT JOIN attempt_timings t ON t.attempt_id=a.id
+                         ORDER BY a.participant_id,a.submitted_at,a.id''')
+    progress, achieved = {}, {}
+    thresholds = {'first':1, 'three_rounds':3, 'five_rounds':5, 'ten_rounds':10}
+    for row in rows:
+        participant = row['participant_id']
+        if participant in achieved:
+            continue
+        item = progress.setdefault(participant, {'rounds':0, 'high':0, 'low':False})
+        item['rounds'] += 1
+        high = row['correct_count'] * 100 >= 90 * row['total_count']
+        if high:
+            item['high'] += 1
+        matches = (badge_id in context['attempt_badges'](row, None) or row['id'] in triggered
+                   or (badge_id in thresholds and item['rounds'] >= thresholds[badge_id])
+                   or (badge_id == 'steady' and item['high'] >= 3)
+                   or (badge_id == 'comeback' and item['low'] and high))
+        if row['correct_count'] * 100 < 60 * row['total_count']:
+            item['low'] = True
+        if matches:
+            achieved[participant] = {'nickname':row['nickname'], 'number':row['number'],
+                                     'achievedAt':row['submitted_at'], 'timeSource':'按上传时间', 'current':True}
+    entries = sorted(achieved.values(), key=lambda item:(item['achievedAt'], item['number'] if item['number'] is not None else float('inf'), item['nickname']))
+    total = len(entries)
+    page, pages = paging(total, page)
+    return {'badge':badge, 'page':page, 'pages':pages, 'total':total, 'record':False,
+            'entries':entries[(page-1)*PAGE_SIZE:page*PAGE_SIZE]}
 
 
 def interactions(db, body, context):
     page = page_number(body)
     kind = body.get('kind', 'comments')
-    if kind not in ('comments', 'reactions'):
+    if kind not in ('comments', 'reactions', 'reports'):
         raise AdminError('互动类型无效。')
+    if kind == 'reports':
+        status = body.get('status', 'pending')
+        if status not in ('pending', 'resolved', 'all'):
+            raise AdminError('举报状态无效。')
+        condition = "WHERE r.status='pending'" if status == 'pending' else "WHERE r.status<>'pending'" if status == 'resolved' else ''
+        total = db.execute('SELECT COUNT(*) FROM social_reports r '+condition).fetchone()[0]
+        page, pages = paging(total, page)
+        rows = db.execute('''SELECT r.*, reporter.nickname AS reporter, rn.number AS reporter_number,
+                             author.nickname AS author, an.number AS author_number,
+                             target.nickname AS target, tn.number AS target_number,
+                             c.updated_at AS current_updated_at,c.content AS current_content,c.state AS current_state
+                             FROM social_reports r JOIN participants reporter ON reporter.id=r.reporter_id
+                             JOIN participants author ON author.id=r.author_id JOIN participants target ON target.id=r.target_id
+                             LEFT JOIN participant_numbers rn ON rn.participant_id=reporter.id
+                             LEFT JOIN participant_numbers an ON an.participant_id=author.id
+                             LEFT JOIN participant_numbers tn ON tn.participant_id=target.id
+                             LEFT JOIN social_comments c ON c.id=r.comment_id ''' + condition + '''
+                             ORDER BY r.created_at DESC,r.id DESC LIMIT ? OFFSET ?''', (PAGE_SIZE,(page-1)*PAGE_SIZE)).fetchall()
+        entries = [{'id':r['id'], 'commentId':r['comment_id'], 'reporter':r['reporter'], 'reporterNumber':r['reporter_number'],
+                    'author':r['author'], 'authorNumber':r['author_number'], 'target':r['target'], 'targetNumber':r['target_number'],
+                    'content':r['content_snapshot'], 'reason':context['report_reasons'].get(r['reason'],'其他'), 'details':r['details'],
+                    'createdAt':r['created_at'], 'status':r['status'], 'resolvedAt':r['resolved_at'],
+                    'commentUpdatedAt':r['comment_updated_at'], 'currentUpdatedAt':r['current_updated_at'],
+                    'currentContent':r['current_content'], 'currentState':r['current_state']} for r in rows]
+        return {'page':page,'pages':pages,'total':total,'kind':kind,'status':status,'entries':entries}
     table = 'social_comments' if kind == 'comments' else 'social_reactions'
     total = db.execute('SELECT COUNT(*) FROM ' + table).fetchone()[0]
     page, pages = paging(total, page)
     if kind == 'comments':
-        rows = db.execute('''SELECT c.content,c.state,c.created_at,c.updated_at,author.nickname AS author,
+        rows = db.execute('''SELECT c.id,c.content,c.state,c.created_at,c.updated_at,author.nickname AS author,
                              an.number AS author_number,target.nickname AS target,tn.number AS target_number,
-                             (SELECT COUNT(*) FROM social_likes l WHERE l.comment_id=c.id) AS likes
+                             (SELECT COUNT(*) FROM social_likes l WHERE l.comment_id=c.id) AS likes,
+                             (SELECT COUNT(*) FROM social_reports r WHERE r.comment_id=c.id AND r.status='pending') AS pending_reports
                              FROM social_comments c JOIN participants author ON author.id=c.author_id
                              JOIN participants target ON target.id=c.target_id
                              LEFT JOIN participant_numbers an ON an.participant_id=author.id
                              LEFT JOIN participant_numbers tn ON tn.participant_id=target.id
                              ORDER BY c.updated_at DESC,c.id DESC LIMIT ? OFFSET ?''', (PAGE_SIZE,(page-1)*PAGE_SIZE)).fetchall()
-        entries = [{'author':r['author'],'authorNumber':r['author_number'],'target':r['target'],
+        entries = [{'id':r['id'],'author':r['author'],'authorNumber':r['author_number'],'target':r['target'],
                     'targetNumber':r['target_number'],'content':r['content'],'state':r['state'],
-                    'createdAt':r['created_at'],'updatedAt':r['updated_at'],'likes':r['likes']} for r in rows]
+                    'createdAt':r['created_at'],'updatedAt':r['updated_at'],'likes':r['likes'],
+                    'pendingReports':r['pending_reports']} for r in rows]
     else:
         rows = db.execute('''SELECT r.reaction,r.updated_at,author.nickname AS author,an.number AS author_number,
                              target.nickname AS target,tn.number AS target_number
@@ -276,6 +350,47 @@ def interactions(db, body, context):
                     'targetNumber':r['target_number'],'reaction':context['reactions'].get(r['reaction'],r['reaction']),
                     'updatedAt':r['updated_at']} for r in rows]
     return {'page':page,'pages':pages,'total':total,'kind':kind,'entries':entries}
+
+
+def moderate(db, body, context):
+    comment_id, action, expected = body.get('commentId'), body.get('action'), body.get('updatedAt')
+    if type(comment_id) is not int or not 1 <= comment_id <= 2**63-1 or action not in ('hide','restore','delete') or type(expected) is not int:
+        raise AdminError('审核操作无效。')
+    comment = db.execute('SELECT * FROM social_comments WHERE id=?', (comment_id,)).fetchone()
+    if not comment:
+        raise AdminError('这条评价已不存在，请刷新。', 404)
+    if comment['updated_at'] != expected:
+        raise AdminError('评价已被修改，请刷新后重新审核。', 409)
+    now = int(time.time()*1000)
+    if action == 'hide':
+        if comment['state'] != 'admin_hidden':
+            db.execute('INSERT OR REPLACE INTO social_admin_moderation VALUES (?,?,?)', (comment_id,comment['state'],now))
+            db.execute("UPDATE social_comments SET state='admin_hidden' WHERE id=?", (comment_id,))
+    elif action == 'restore':
+        if comment['state'] != 'admin_hidden':
+            raise AdminError('只有管理员下架的评价可以恢复。', 409)
+        old = db.execute('SELECT previous_state FROM social_admin_moderation WHERE comment_id=?', (comment_id,)).fetchone()
+        previous = old['previous_state'] if old and old['previous_state'] in ('visible','owner_hidden') else 'visible'
+        db.execute('UPDATE social_comments SET state=? WHERE id=?', (previous,comment_id))
+        db.execute('DELETE FROM social_admin_moderation WHERE comment_id=?', (comment_id,))
+    if action in ('hide','delete'):
+        db.execute("""UPDATE social_reports SET status='handled',resolved_at=? WHERE comment_id=? AND comment_updated_at=?
+                      AND content_snapshot=? AND status='pending'""", (now,comment_id,expected,comment['content']))
+    if action == 'delete':
+        db.execute('DELETE FROM social_comments WHERE id=?', (comment_id,))
+    return {'ok':True}
+
+
+def resolve_report(db, body, context):
+    report_id, status = body.get('reportId'), body.get('status')
+    if type(report_id) is not int or not 1 <= report_id <= 2**63-1 or status not in ('dismissed','handled','pending'):
+        raise AdminError('举报处理状态无效。')
+    row = db.execute('SELECT id FROM social_reports WHERE id=?', (report_id,)).fetchone()
+    if not row:
+        raise AdminError('举报记录已不存在。', 404)
+    db.execute('UPDATE social_reports SET status=?,resolved_at=? WHERE id=?',
+               (status, None if status == 'pending' else int(time.time()*1000), report_id))
+    return {'ok':True}
 
 
 class AdminService:
@@ -387,11 +502,13 @@ class AdminService:
                 self.login_attempts.clear()
             return {'ok':True}, self.cookie('',0)
         actions = {'overview':overview, 'players':players, 'player':player, 'attempt':attempt,
-                   'questions':questions, 'badges':badge_statistics, 'interactions':interactions}
+                   'questions':questions, 'badges':badge_statistics, 'badge-detail':badge_detail,
+                   'interactions':interactions, 'moderate':moderate, 'report-resolve':resolve_report}
         action = actions.get(route)
         if not action:
             raise AdminError('页面不存在。', 404)
-        db.execute('BEGIN')
+        write = route in ('moderate', 'report-resolve')
+        db.execute('BEGIN IMMEDIATE' if write else 'BEGIN')
         try:
             if route == 'players':
                 result = action(db,body)
@@ -399,6 +516,8 @@ class AdminService:
                 result = action(db,context)
             else:
                 result = action(db,body,context)
+            db.execute('COMMIT' if write else 'ROLLBACK')
             return result, None
-        finally:
+        except BaseException:
             db.execute('ROLLBACK')
+            raise

@@ -43,9 +43,9 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
     input.disabled = busy;
     $('social-reactions').querySelectorAll('button').forEach(button => { button.disabled = locked || data?.isTarget || remaining('reaction') > 0; });
     $('social-list').querySelectorAll('button').forEach(button => {
-      button.disabled = locked || (button.dataset.action === 'social-like' && remaining('like') > 0);
+      button.disabled = locked || button.dataset.reported === 'true' || (button.dataset.action === 'social-like' && remaining('like') > 0);
     });
-    const hint = data?.ownComment ? '每人可留一条评价；修改内容后，原有点赞会清零。' : '每人可留一条评价，最多 60 个字。';
+    const hint = data?.ownComment?.state === 'admin_hidden' ? '这条评价已被管理员下架，修改后不会自动公开。' : data?.ownComment ? '每人可留一条评价；修改内容后，原有点赞会清零。' : '每人可留一条评价，最多 60 个字。';
     const wait = remaining('comment');
     $('social-form-note').textContent = `${hint} ${length}/60${wait ? ` · ${Math.ceil(wait / 1000)} 秒后可再次保存` : ''}`;
     clearTimeout(cooldownTimer);
@@ -67,6 +67,19 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
     return new Promise(resolve => {
       modal.addEventListener('close', () => {
         confirming = false; syncControls(); resolve(modal.returnValue === 'confirm');
+      }, {once:true});
+      modal.showModal();
+    });
+  }
+  function askReport() {
+    if (confirming) return Promise.resolve(null);
+    confirming = true; syncControls();
+    const modal = $('social-report-dialog');
+    $('social-report-form').reset(); modal.returnValue = '';
+    return new Promise(resolve => {
+      modal.addEventListener('close', () => {
+        const result = modal.returnValue === 'confirm' ? {reason:$('social-report-reason').value, details:$('social-report-details').value} : null;
+        confirming = false; syncControls(); resolve(result);
       }, {once:true});
       modal.showModal();
     });
@@ -105,10 +118,11 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
           const like = comment.own || comment.hidden ? '' : `<button type="button" data-action="social-like" data-id="${comment.id}" data-liked="${String(comment.liked)}" aria-pressed="${String(comment.liked)}">👍 ${comment.likes}</button>`;
           const own = comment.own ? `<button type="button" data-action="social-delete" data-id="${comment.id}">删除</button>` : '';
           const hide = comment.canHide ? `<button type="button" data-action="social-hide" data-id="${comment.id}" data-hidden="${String(comment.hidden)}">${comment.hidden ? '恢复展示' : '隐藏'}</button>` : '';
+          const report = !comment.own && !comment.hidden ? `<button type="button" data-action="social-report" data-id="${comment.id}" data-reported="${String(comment.reported)}">${comment.reported ? '已举报' : '举报'}</button>` : '';
           const date = new Date(comment.createdAt).toLocaleDateString('zh-CN');
           item.className = `social-comment${comment.hidden ? ' is-hidden' : ''}`;
           item.dataset.commentId = key; item.dataset.signature = signature;
-          item.innerHTML = `<div class="social-comment-head"><strong>${escape(comment.nickname)}</strong><small>${escape(numberLabel)} · ${escape(date)}${comment.hidden ? ' · 已隐藏' : ''}</small></div><p>${escape(comment.content)}</p><div class="social-comment-actions">${like}${own}${hide}</div>`;
+          item.innerHTML = `<div class="social-comment-head"><strong>${escape(comment.nickname)}</strong><small>${escape(numberLabel)} · ${escape(date)}${comment.hidden ? ' · 已隐藏' : ''}</small></div><p>${escape(comment.content)}</p><div class="social-comment-actions">${like}${own}${hide}${report}</div>`;
         }
         if (list.children[index] !== item) list.insertBefore(item, list.children[index] || null);
       });
@@ -195,6 +209,7 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
       if (action === 'reaction') showPicker(false);
       const updated = await load(resetForm, '正在更新互动…');
       if (updated === false && dialog.open && number === selectedNumber) status('已保存，但互动内容刷新失败，请点击重新读取。');
+      else if (action === 'report' && updated && dialog.open) status('举报已提交，感谢反馈。');
       void refreshRanking();
     } catch (error) {
       if (dialog.open && requestId === generation) status(error.message);
@@ -228,11 +243,16 @@ function createSocialUI({request, getProfile, getIdentity, activeIdentity, showP
     } else if (action === 'social-delete' || action === 'social-delete-own') {
       const commentId = action === 'social-delete' ? Number(target.dataset.id) : data.ownComment?.id;
       const generation = requestId;
-      if (commentId && await confirmSocial('删除这条评价？', '删除后，评价和收到的点赞都会移除。', '确认删除')) {
+      if (commentId && await confirmSocial('删除这条评价？', '删除后，评价和点赞会移除；已提交的举报会保留供管理员审核。', '确认删除')) {
         if (generation === requestId && dialog.open) void mutate('delete', {commentId}, true);
       }
     } else if (action === 'social-hide') {
       void mutate('hide', {commentId:Number(target.dataset.id), hidden:target.dataset.hidden !== 'true'});
+    } else if (action === 'social-report') {
+      if (needIdentity('report')) return;
+      const commentId = Number(target.dataset.id), generation = requestId;
+      const report = await askReport();
+      if (report && generation === requestId && dialog.open) void mutate('report', {commentId, ...report});
     } else if (action === 'social-sort') {
       if (sort === target.dataset.sort) return;
       sort = target.dataset.sort; page = 1; void load();

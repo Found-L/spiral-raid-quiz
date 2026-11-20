@@ -42,6 +42,11 @@
 .social-dialog form p { margin: 0; }
 .social-form-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .social-dialog form .btn { min-height: 38px; }
+#social-report-form { display: grid; gap: 10px; }
+#social-report-form label { color: #d9cfb8; font-weight: 700; }
+#social-report-form select, #social-report-form textarea { width: 100%; min-height: 42px; padding: 10px; color: #f0eee6; background: #101920; border: 1px solid #46534e; border-radius: 5px; font: inherit; }
+#social-report-form textarea { min-height: 82px; resize: vertical; }
+#social-report-form p { margin: 0; }
 @media (max-width: 680px) {
   .rank-social { max-width: 100%; }
   .social-dialog { width: calc(100vw - 24px); max-height: 90vh; padding: 18px; }
