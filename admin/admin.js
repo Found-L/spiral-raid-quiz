@@ -23,14 +23,124 @@
   const versionLabel = value => value ? `题库 ${value.split('-').pop()}` : '未知题库';
   const sectionLabel = value => ({twins:'双剑',spirit:'超魔灵',witch:'黑风魔女'})[value] || '机制题';
 
+  function enhanceSelect(select) {
+    const wrapper=el('div','admin-select'), trigger=el('button','admin-select-trigger');
+    const value=el('span','admin-select-value'), list=el('div','admin-select-list');
+    const arrow=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    arrow.setAttribute('viewBox','0 0 24 24');arrow.setAttribute('aria-hidden','true');arrow.classList.add('admin-select-arrow');
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d','m6 9 6 6 6-6');arrow.append(path);
+    trigger.type='button';trigger.id=`${select.id}-trigger`;trigger.setAttribute('role','combobox');
+    trigger.setAttribute('aria-haspopup','listbox');trigger.setAttribute('aria-expanded','false');
+    value.id=`${select.id}-value`;list.id=`${select.id}-list`;list.hidden=true;list.setAttribute('role','listbox');
+    list.setAttribute('aria-labelledby',`${select.id}-label`);trigger.setAttribute('aria-controls',list.id);
+    trigger.setAttribute('aria-labelledby',`${select.id}-label ${value.id}`);$(select.id+'-label').htmlFor=trigger.id;
+    trigger.append(value,arrow);wrapper.append(trigger,list);select.after(wrapper);select.hidden=true;
+    let active=0, typed='', typeTimer=null;
+    function highlight() {
+      const items=[...list.children];
+      items.forEach((item,index)=>item.classList.toggle('is-active',index===active));
+      if(items[active]) { trigger.setAttribute('aria-activedescendant',items[active].id);if(!list.hidden)items[active].scrollIntoView({block:'nearest'}); }
+      else trigger.removeAttribute('aria-activedescendant');
+    }
+    function close() { list.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.removeAttribute('aria-activedescendant');wrapper.classList.remove('opens-up');typed='';clearTimeout(typeTimer); }
+    function choose(index) {
+      const before=select.value;select.selectedIndex=index;sync();close();trigger.focus();
+      if(select.value!==before)select.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+    function sync() {
+      const options=[...select.options];value.textContent=options[select.selectedIndex]?.textContent || '';
+      active=Math.max(0,select.selectedIndex);list.replaceChildren();
+      options.forEach((option,index)=>{
+        const item=el('div','admin-select-option',option.textContent);item.id=`${select.id}-option-${index}`;
+        item.setAttribute('role','option');item.setAttribute('aria-selected',String(index===select.selectedIndex));
+        item.addEventListener('pointerdown',event=>event.preventDefault());item.addEventListener('click',()=>choose(index));list.append(item);
+      });
+      if(!list.hidden)highlight();
+    }
+    function open() {
+      sync();list.hidden=false;trigger.setAttribute('aria-expanded','true');
+      const box=trigger.getBoundingClientRect(),menuHeight=list.getBoundingClientRect().height;
+      wrapper.classList.toggle('opens-up',box.bottom+menuHeight+12>innerHeight && box.top>innerHeight-box.bottom);
+      highlight();
+    }
+    trigger.addEventListener('click',()=>list.hidden?open():close());
+    trigger.addEventListener('keydown',event=>{
+      if(event.key==='ArrowDown'||event.key==='ArrowUp') {
+        event.preventDefault();if(list.hidden)open();else {active=Math.max(0,Math.min(list.children.length-1,active+(event.key==='ArrowDown'?1:-1)));highlight();}
+      } else if(!list.hidden && (event.key==='Home'||event.key==='End')) {
+        event.preventDefault();active=event.key==='Home'?0:list.children.length-1;highlight();
+      } else if(!list.hidden && (event.key==='Enter'||event.key===' ')) {
+        event.preventDefault();choose(active);
+      } else if(!list.hidden && event.key==='Escape') {
+        event.preventDefault();event.stopPropagation();close();
+      } else if(event.key.length===1 && event.key!==' ' && !event.ctrlKey && !event.metaKey && !event.altKey) {
+        event.preventDefault();if(list.hidden)open();typed+=event.key.toLocaleLowerCase();
+        clearTimeout(typeTimer);typeTimer=setTimeout(()=>{typed=''},700);
+        const match=[...list.children].findIndex(item=>item.textContent.toLocaleLowerCase().includes(typed));
+        if(match>=0){active=match;highlight();}
+      } else if(event.key==='Tab')close();
+    });
+    trigger.addEventListener('blur',event=>{if(!wrapper.contains(event.relatedTarget))close()});
+    document.addEventListener('pointerdown',event=>{if(!wrapper.contains(event.target))close()});
+    select.addEventListener('change',sync);sync();return {sync,close};
+  }
+  const selectWidgets=new Map(['question-version','report-status'].map(id=>[id,enhanceSelect($(id))]));
+
+  const tooltip=$('admin-tooltip');let tooltipAnchor=null, tooltipTimer=null;
+  function hideTooltip() {
+    clearTimeout(tooltipTimer);if(tooltipAnchor)tooltipAnchor.removeAttribute('aria-describedby');
+    tooltipAnchor=null;tooltip.hidden=true;tooltip.textContent='';
+  }
+  function positionTooltip() {
+    if(!tooltipAnchor || !tooltipAnchor.isConnected){hideTooltip();return;}
+    const anchor=tooltipAnchor.getBoundingClientRect(), box=tooltip.getBoundingClientRect();
+    if(anchor.bottom<=0 || anchor.top>=innerHeight){hideTooltip();return;}
+    const left=Math.max(12,Math.min(innerWidth-box.width-12,anchor.left+(anchor.width-box.width)/2));
+    const top=anchor.bottom+8+box.height<=innerHeight-12 ? anchor.bottom+8 : Math.max(12,anchor.top-box.height-8);
+    tooltip.style.left=`${left}px`;tooltip.style.top=`${top}px`;
+  }
+  function showTooltip(anchor,description) {
+    clearTimeout(tooltipTimer);if(tooltipAnchor && tooltipAnchor!==anchor)tooltipAnchor.removeAttribute('aria-describedby');
+    tooltipAnchor=anchor;tooltip.textContent=description;tooltip.hidden=false;anchor.setAttribute('aria-describedby',tooltip.id);positionTooltip();
+  }
+  function deferTooltipHide() { clearTimeout(tooltipTimer);tooltipTimer=setTimeout(()=>{if(document.activeElement!==tooltipAnchor)hideTooltip()},160); }
+  function badgeTooltip(chip,description) {
+    chip.addEventListener('pointerenter',()=>showTooltip(chip,description));
+    chip.addEventListener('pointerleave',deferTooltipHide);
+    chip.addEventListener('focus',()=>showTooltip(chip,description));
+    chip.addEventListener('blur',deferTooltipHide);
+  }
+  tooltip.addEventListener('pointerenter',()=>clearTimeout(tooltipTimer));tooltip.addEventListener('pointerleave',deferTooltipHide);
+  window.addEventListener('resize',()=>{if(tooltipAnchor)positionTooltip()});
+  window.addEventListener('scroll',()=>{if(tooltipAnchor)positionTooltip()},true);
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&tooltipAnchor)hideTooltip()});
+
+  function confirmReview(action) {
+    const dialog=$('confirm-dialog');if(dialog.open)return Promise.resolve(false);
+    const deleting=action==='delete';
+    $('confirm-title').textContent=deleting?'删除这条评价？':'下架这条评价？';
+    $('confirm-description').textContent=deleting?'评价和点赞将被删除，举报记录会保留供审核。':'下架后这条评价将不再公开显示，可在管理页面恢复。';
+    $('confirm-accept').textContent=deleting?'删除评价':'确认下架';dialog.returnValue='cancel';
+    return new Promise(resolve=>{dialog.addEventListener('close',()=>resolve(dialog.returnValue==='confirm'),{once:true});dialog.showModal();$('confirm-cancel').focus()});
+  }
+  function setPasswordVisibility(button,show) {
+    $(button.dataset.passwordToggle).type=show?'text':'password';
+    button.setAttribute('aria-pressed',String(show));button.setAttribute('aria-label',show?'隐藏密码':'显示密码');
+  }
+  document.querySelectorAll('[data-password-toggle]').forEach(button=>button.addEventListener('click',()=>setPasswordVisibility(button,button.getAttribute('aria-pressed')!=='true')));
+  function concealPasswords() { document.querySelectorAll('[data-password-toggle]').forEach(button=>setPasswordVisibility(button,false)); }
+
   function showLogin(message='') {
     ++sessionCheck;
     state.csrf = '';
+    hideTooltip();selectWidgets.forEach(widget=>widget.close());
+    concealPasswords();
+    if ($('confirm-dialog').open) $('confirm-dialog').close('cancel');
     ++state.sequence;
     clearTimeout(idleTimer);
     for (const id of ['overview-content','players-content','players-pages','player-content','player-pages',
       'questions-content','questions-pages','badges-content','badge-detail-content','badge-pages','interactions-content','interactions-pages']) $(id).replaceChildren();
-    rendered = new WeakMap(); viewCache.clear(); state.playerNumber = null; state.badgeId = null; state.query = ''; $('player-query').value = '';
+    rendered = new WeakMap(); viewCache.clear(); state.playerNumber = null; state.badgeId = null; state.query = ''; $('player-query').value = ''; $('player-search-clear').hidden = true;
     $('session-loading').hidden = true;
     $('dashboard').hidden = true;
     $('login-view').hidden = false;
@@ -38,6 +148,7 @@
     $('logout').hidden = true;
     $('login-message').textContent = message;
     $('password').value = '';
+    $('password').removeAttribute('aria-invalid');
     $('password-form').reset();
     if ($('password-dialog').open) $('password-dialog').close();
   }
@@ -105,6 +216,7 @@
     parent.append(prev,el('span','',`第 ${data.page} / ${data.pages} 页 · 共 ${total} 条`),next);
   }
   function setTab(tab) {
+    hideTooltip();selectWidgets.forEach(widget=>widget.close());
     state.tab = tab;
     for (const button of document.querySelectorAll('[data-tab]')) {
       const active = button.dataset.tab === tab;
@@ -230,6 +342,7 @@
     details.addEventListener('toggle',()=>{if(details.open)void load()}); return details;
   }
   async function loadPlayer(playerNumber,page=1) {
+    hideTooltip();
     state.playerNumber=playerNumber;state.attemptPage=page;$('player-list-view').hidden=true;$('player-detail').hidden=false;
     const serial=++state.sequence,target=$('player-content'),key=`player:${playerNumber}:${page}`;loading(target,key);
     try {
@@ -239,7 +352,7 @@
       const metrics=el('div','metric-grid player-metrics');
       [['答题次数',`${data.attemptCount} 次`],['历史最高分',points(data.bestScore)],['满分次数',`${data.perfects} 次`],['收到互动',`${data.receivedComments} 条评价 · ${data.receivedReactions} 个表情`]].forEach(item=>metrics.append(metric(...item)));
       const medals=el('section','surface'),medalTitle=el('div','section-title');medalTitle.append(el('h2','','获得的勋章'),el('small','',`共 ${data.badges.length} 枚`));medals.append(medalTitle);
-      const chips=el('div','badge-chips');if(data.badges.length)data.badges.forEach(item=>{const chip=el('span','badge-chip'+(item.selected?' is-shown':''),`${item.name}${item.selected?' · 已展示':''}`);chip.title=item.description;chips.append(chip)});else chips.append(el('p','review-note','还没有获得勋章。'));medals.append(chips);
+      const chips=el('div','badge-chips');if(data.badges.length)data.badges.forEach(item=>{const chip=el('button','badge-chip'+(item.selected?' is-shown':''),`${item.name}${item.selected?' · 已展示':''}`);chip.type='button';badgeTooltip(chip,item.description);chips.append(chip)});else chips.append(el('p','review-note','还没有获得勋章。'));medals.append(chips);
       const history=el('section','record-list'),heading=el('div','section-title');heading.append(el('h2','','历次答题'),el('small','','按上传时间排列'));history.append(heading);
       const list=el('div','stack');if(data.attempts.length)data.attempts.forEach(item=>list.append(attemptRow(item)));else empty(list,'还没有提交过答卷。');history.append(list);
       target.replaceChildren(title,metrics,medals,history);pagination($('player-pages'),{page:data.page,pages:data.pages},p=>loadPlayer(playerNumber,p),data.attemptCount);
@@ -250,7 +363,7 @@
     try {
       const data=await api('questions',{page,version:state.questionVersion});if(serial!==state.sequence)return;
       state.questionPage=data.page;if(!changed(target,data,key))return;const select=$('question-version');select.replaceChildren(new Option('全部题库',''));
-      data.versions.forEach(version=>select.add(new Option(`${versionLabel(version)}${version===data.currentVersion?' · 当前':''}`,version)));select.value=state.questionVersion;
+      data.versions.forEach(version=>select.add(new Option(`${versionLabel(version)}${version===data.currentVersion?' · 当前':''}`,version)));select.value=state.questionVersion;selectWidgets.get('question-version').sync();
       const list=el('div','stack'); if(!data.entries.length)empty(list,'暂无保存的错题统计。');
       data.entries.forEach(item=>{const card=el('article','question-card');card.append(el('div','question-meta',`${versionLabel(item.quizVersion)} · ${sectionLabel(item.section)}`),el('h3','',item.question),el('p','question-count',`答错 ${item.mistakes} 次 · ${item.players} 位玩家`));list.append(card)});
       target.replaceChildren(list);pagination($('questions-pages'),data,p=>loadQuestions(p));
@@ -294,8 +407,8 @@
     });return button;
   }
   async function moderateComment(item, action) {
-    if(action==='delete' && !window.confirm('确定删除这条评价和点赞？举报记录会保留供审核。'))return;
-    if(action==='hide' && !window.confirm('确定下架这条评价？'))return;
+    if((action==='delete'||action==='hide') && !(await confirmReview(action)))return;
+    if(!state.csrf)return;
     await api('moderate',{commentId:item.commentId ?? item.id,updatedAt:item.currentUpdatedAt ?? item.updatedAt,action});
     await loadInteractions(state.interactionPage);
   }
@@ -339,7 +452,9 @@
     } catch(error) {if(serial===state.sequence)failed(target,error,key);}
   }
   $('login-form').addEventListener('submit',async event=>{
-    event.preventDefault();++sessionCheck;const button=event.currentTarget.querySelector('button[type=submit]');button.disabled=true;$('login-message').textContent='正在登录…';
+    event.preventDefault();
+    if(!$('password').value){$('login-message').textContent='请输入管理员密码。';$('password').setAttribute('aria-invalid','true');$('password').focus();return;}
+    ++sessionCheck;const button=event.currentTarget.querySelector('button[type=submit]');button.disabled=true;$('login-message').textContent='正在登录…';
     try {const data=await api('login',{password:$('password').value});state.csrf=data.csrf;$('password').value='';showDashboard();}
     catch(error) {$('login-message').textContent=error.message;}
     finally {button.disabled=false;}
@@ -347,24 +462,32 @@
   document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>{if(state.tab!==button.dataset.tab)setTab(button.dataset.tab)}));
   $('refresh').addEventListener('click',()=>setTab(state.tab));
   $('player-search').addEventListener('submit',event=>{event.preventDefault();state.query=$('player-query').value.trim();void loadPlayers(1)});
+  $('player-query').addEventListener('input',event=>{$('player-search-clear').hidden=!event.target.value});
+  $('player-search-clear').addEventListener('click',()=>{$('player-query').value='';$('player-search-clear').hidden=true;state.query='';void loadPlayers(1);$('player-query').focus()});
   $('player-back').addEventListener('click',()=>loadPlayers(state.playerPage));
   $('badge-back').addEventListener('click',()=>loadBadges());
   $('question-version').addEventListener('change',event=>{state.questionVersion=event.target.value;void loadQuestions(1)});
-  document.querySelectorAll('[data-kind]').forEach(button=>button.addEventListener('click',()=>{if(state.interactionKind===button.dataset.kind)return;state.interactionKind=button.dataset.kind;document.querySelectorAll('[data-kind]').forEach(other=>other.classList.toggle('active',other===button));void loadInteractions(1)}));
+  document.querySelectorAll('[data-kind]').forEach(button=>button.addEventListener('click',()=>{if(state.interactionKind===button.dataset.kind)return;state.interactionKind=button.dataset.kind;document.querySelectorAll('[data-kind]').forEach(other=>{other.classList.toggle('active',other===button);other.setAttribute('aria-pressed',String(other===button))});void loadInteractions(1)}));
   $('report-status').addEventListener('change',event=>{state.reportStatus=event.target.value;void loadInteractions(1)});
   $('logout').addEventListener('click',async()=>{
     try {await api('logout');showLogin('已退出管理页面。');}
     catch {$('global-message').textContent='退出失败，请检查网络后重试。';}
   });
-  $('password-open').addEventListener('click',()=>{$('password-form').reset();$('password-message').textContent='';$('password-dialog').showModal()});
+  $('password-open').addEventListener('click',()=>{$('password-form').reset();['current-password','new-password','confirm-password'].forEach(id=>$(id).removeAttribute('aria-invalid'));$('password-message').textContent='';$('password-dialog').showModal()});
   $('password-close').addEventListener('click',()=>$('password-dialog').close());
+  $('password-dialog').addEventListener('close',concealPasswords);
   $('password-form').addEventListener('submit',async event=>{
-    event.preventDefault();if($('new-password').value!==$('confirm-password').value){$('password-message').textContent='两次输入的新密码不一致。';return;}
+    event.preventDefault();
+    const invalid=(id,message)=>{$('password-message').textContent=message;$(id).setAttribute('aria-invalid','true');$(id).focus()};
+    if(!$('current-password').value){invalid('current-password','请输入当前密码。');return;}
+    if(Array.from($('new-password').value).length<16){invalid('new-password','新密码至少需要 16 个字符。');return;}
+    if($('new-password').value!==$('confirm-password').value){invalid('confirm-password','两次输入的新密码不一致。');return;}
     const button=event.currentTarget.querySelector('button[type=submit]');button.disabled=true;$('password-message').textContent='正在保存…';
     try {await api('password',{currentPassword:$('current-password').value,newPassword:$('new-password').value});$('password-form').reset();$('password-dialog').close();showLogin('密码已更新，请用新密码登录。');}
     catch(error) {$('password-message').textContent=error.message;}
     finally {button.disabled=false;}
   });
+  ['password','current-password','new-password','confirm-password'].forEach(id=>$(id).addEventListener('input',event=>event.target.removeAttribute('aria-invalid')));
   if (location.origin !== 'https://www.lysue.com') {
     showLogin();
     $('login-form').hidden=true;$('login-view').append(el('p','login-note','请在国内站打开管理页面。'));

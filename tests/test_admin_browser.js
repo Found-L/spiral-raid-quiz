@@ -23,11 +23,12 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
     browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'C:/Program Files/Google/Chrome/Application/chrome.exe'});
 
     for(const width of [320,390,1440]) {
-      const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce'});
+      const context=await browser.newContext({viewport:{width,height:900},reducedMotion:'reduce',hasTouch:width===390,isMobile:width===390});
       await context.route('**/*',async route=>{
         const request=route.request(),url=new URL(request.url());
         if(url.origin!==origin)return route.abort();
         if(url.pathname.startsWith('/spiral-raid-quiz/admin/')) {
+          if(process.env.ADMIN_LIVE_STATIC==='1')return route.continue();
           const name=url.pathname.endsWith('/')?'index.html':url.pathname.split('/').pop();
           if(!['index.html','admin.css','admin.js'].includes(name))return route.abort();
           const contentType=name.endsWith('.html')?'text/html':name.endsWith('.css')?'text/css':'text/javascript';
@@ -41,7 +42,8 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
         const returned={};for(const name of ['content-type','cache-control','set-cookie'])if(response.headers.has(name))returned[name]=response.headers.get(name);
         return route.fulfill({status:response.status,headers:returned,body:Buffer.from(await response.arrayBuffer())});
       });
-      const page=await context.newPage(),errors=[];page.on('pageerror',error=>errors.push(error.message));
+      const page=await context.newPage(),errors=[],nativeDialogs=[];page.on('pageerror',error=>errors.push(error.message));
+      page.on('dialog',dialog=>{nativeDialogs.push(dialog.type());void dialog.dismiss()});
       await page.goto(origin+'/spiral-raid-quiz/admin/');
       await page.locator('#login-view').waitFor();
       assert.equal(await page.locator('#login-view').isVisible(),true);
@@ -55,9 +57,16 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
         assert.equal(await page.locator('#password').inputValue(),'unfinished password','returning to login keeps unfinished input');
       }
       if(process.env.ADMIN_SCREENSHOT_DIR&&width===390)await page.screenshot({path:path.join(process.env.ADMIN_SCREENSHOT_DIR,'admin-login-mobile.png')});
-      await page.locator('#password').fill('wrong');await page.locator('#login-form button').click();
+      await page.locator('#password').fill('');
+      await page.locator('#login-form button[type=submit]').click();
+      assert.match(await page.locator('#login-message').textContent(),/请输入管理员密码/);
+      assert.equal(await page.locator('#password').getAttribute('aria-invalid'),'true');
+      await page.locator('[data-password-toggle=password]').click();assert.equal(await page.locator('#password').getAttribute('type'),'text');
+      assert.equal(await page.locator('[data-password-toggle=password]').getAttribute('aria-label'),'隐藏密码');
+      await page.locator('[data-password-toggle=password]').click();assert.equal(await page.locator('#password').getAttribute('type'),'password');
+      await page.locator('#password').fill('wrong');await page.locator('#login-form button[type=submit]').click();
       await page.waitForFunction(()=>document.querySelector('#login-message').textContent.includes('不正确'));
-      await page.locator('#password').fill(password);await page.locator('#login-form button').click();
+      await page.locator('#password').fill(password);await page.locator('#login-form button[type=submit]').click();
       await page.locator('#overview-content .metric').first().waitFor();
       assert.equal(await page.locator('#overview-content .metric').count(),8);
       await page.evaluate(()=>{window.overviewMetric=document.querySelector('#overview-content .metric')});
@@ -74,10 +83,30 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
       const cookies=await context.cookies();assert.ok(cookies.some(c=>c.name==='temple_admin_session'&&c.httpOnly&&c.secure&&c.sameSite==='Strict'));
       assert.doesNotMatch(await page.evaluate(()=>document.cookie),/temple_admin_session/);
 
-      await page.locator('[data-tab=players]').click();await page.locator('#player-query').fill('#000001');await page.locator('#player-search button').click();
+      await page.locator('[data-tab=players]').click();
+      await page.locator('#players-content .player-row').first().waitFor();
+      const searchLayout=await page.locator('.search-submit').evaluate(button=>({width:button.getBoundingClientRect().width,whiteSpace:getComputedStyle(button).whiteSpace,spanWidth:button.querySelector('span').getBoundingClientRect().width}));
+      assert.equal(searchLayout.whiteSpace,'nowrap');assert.ok(searchLayout.width>searchLayout.spanWidth+20,`search button must not wrap ${width}`);
+      if(process.env.ADMIN_SCREENSHOT_DIR)await page.screenshot({path:path.join(process.env.ADMIN_SCREENSHOT_DIR,`admin-players-${width}.png`)});
+      await page.locator('#player-query').fill('#000001');await page.locator('#player-search button[type=submit]').click();
       await page.locator('#players-content .player-row').first().waitFor();assert.equal(await page.locator('#players-content .player-row').count(),1);
+      await page.locator('#player-search-clear').click();await page.waitForFunction(()=>document.querySelectorAll('#players-content .player-row').length===2);
+      await page.locator('#player-query').fill('#000001');await page.locator('#player-search button[type=submit]').click();
+      await page.waitForFunction(()=>document.querySelectorAll('#players-content .player-row').length===1);
       await page.locator('#players-content .player-row').first().click();await page.locator('#player-content .record-row').first().waitFor();
       assert.match(await page.locator('#player-content').textContent(),/流云见月/);
+      const chip=page.locator('#player-content .badge-chip').first();await chip.waitFor();
+      assert.equal(await page.locator('[title]').count(),0,'admin must not use native title tooltips');
+      await chip.hover();await page.locator('#admin-tooltip').waitFor();
+      const tooltipLayout=await page.locator('#admin-tooltip').evaluate(node=>{const r=node.getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:innerWidth,height:innerHeight}});
+      assert.ok(tooltipLayout.left>=0&&tooltipLayout.right<=tooltipLayout.width&&tooltipLayout.top>=0&&tooltipLayout.bottom<=tooltipLayout.height,JSON.stringify(tooltipLayout));
+      if(process.env.ADMIN_SCREENSHOT_DIR)await page.screenshot({path:path.join(process.env.ADMIN_SCREENSHOT_DIR,`admin-tooltip-${width}.png`)});
+      await chip.focus();assert.equal(await chip.getAttribute('aria-describedby'),'admin-tooltip');
+      await page.keyboard.press('Escape');assert.equal(await page.locator('#admin-tooltip').isVisible(),false);
+      if(width===390){
+        await chip.tap();await page.locator('#admin-tooltip').waitFor();
+        await page.locator('.player-title h2').tap();await page.locator('#admin-tooltip').waitFor({state:'hidden'});
+      }
       await page.locator('#player-content .record-row summary').first().click();
       await page.locator('#player-content .review-question').last().waitFor();
       assert.equal(await page.locator('#player-content .review-question').count(),3);
@@ -89,6 +118,28 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
 
       await page.locator('[data-tab=questions]').click();await page.locator('#questions-content .question-card').first().waitFor();
       assert.match(await page.locator('#questions-content').textContent(),/答错/);
+      const questionFilter=page.locator('#question-version-trigger');await questionFilter.focus();await page.keyboard.press('ArrowDown');
+      assert.equal(await questionFilter.getAttribute('aria-expanded'),'true');
+      assert.ok(await page.locator('#question-version-list [role=option]').count()>1);
+      if(process.env.ADMIN_SCREENSHOT_DIR)await page.screenshot({path:path.join(process.env.ADMIN_SCREENSHOT_DIR,`admin-filter-${width}.png`)});
+      await page.keyboard.press('End');await page.keyboard.press('Enter');
+      assert.notEqual(await page.locator('#question-version').inputValue(),'');
+      assert.equal(await questionFilter.getAttribute('aria-expanded'),'false');
+      await questionFilter.click();await page.locator('#question-version-list [role=option]').first().click();
+      await page.locator('#questions-content .question-card').first().waitFor();
+      if(width===1440){
+        const filtered=page.waitForResponse(response=>response.url().endsWith('/api/admin/questions')&&response.request().postDataJSON().version.endsWith('-v9'));
+        await questionFilter.focus();await page.keyboard.press('v');await page.keyboard.press('9');await page.keyboard.press('Enter');
+        assert.match(await questionFilter.textContent(),/v9/,'typing selects a matching option');
+        await filtered;await page.getByText('暂无保存的错题统计。').waitFor();
+        await questionFilter.click();await page.locator('#question-version-list [role=option]').first().click();
+        await page.locator('#questions-content .question-card').first().waitFor();
+      }
+      if(width===390){
+        await questionFilter.tap();await page.locator('#question-version-list [role=option]').nth(1).tap();
+        assert.notEqual(await page.locator('#question-version').inputValue(),'','touch selection updates the filter');
+        await questionFilter.tap();await page.locator('#question-version-list [role=option]').first().tap();
+      }
       await page.locator('[data-tab=badges]').click();await page.locator('#badges-content .badge-card').first().waitFor();
       assert.match(await page.locator('#badges-content').textContent(),/初入寺院/);
       await page.locator('#badges-content .badge-card').filter({hasText:'初入寺院'}).click();
@@ -104,6 +155,15 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
       assert.equal(await page.evaluate(()=>window.__xss),undefined,'comment markup must not execute');
       await page.evaluate(()=>{window.savedAdminComment=document.querySelector('#interactions-content .interaction-card')});
       await page.locator('[data-kind=reports]').click();await page.locator('#interactions-content .report-card').first().waitFor();
+      assert.equal(await page.locator('[data-kind=reports]').getAttribute('aria-pressed'),'true');
+      if(width===390){
+        await page.getByRole('button',{name:'下架评价'}).tap();await page.locator('#confirm-dialog').waitFor();
+        if(process.env.ADMIN_SCREENSHOT_DIR)await page.screenshot({path:path.join(process.env.ADMIN_SCREENSHOT_DIR,'admin-confirm-mobile.png')});
+        await page.locator('#confirm-cancel').tap();assert.equal(await page.locator('#confirm-dialog').isVisible(),false);
+      }
+      await page.locator('#report-status-trigger').click();
+      assert.equal(await page.locator('#report-status-trigger').getAttribute('aria-expanded'),'true');
+      await page.keyboard.press('Escape');assert.equal(await page.locator('#report-status-trigger').getAttribute('aria-expanded'),'false');
       if(process.env.ADMIN_SCREENSHOT_DIR&&width===390)await page.screenshot({path:path.join(process.env.ADMIN_SCREENSHOT_DIR,'admin-reports-mobile.png'),fullPage:true});
       assert.match(await page.locator('#interactions-content').textContent(),/请审核/);
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true,`reports overflow ${width}`);
@@ -116,16 +176,24 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
       await page.unroute('**/api/admin/interactions');
       await page.locator('[data-kind=reports]').click();await page.locator('#interactions-content .report-card').first().waitFor();
       if(width===1440){
-        page.on('dialog',dialog=>dialog.accept());
         await page.getByRole('button',{name:'下架评价'}).click();
+        await page.locator('#confirm-dialog').waitFor();assert.match(await page.locator('#confirm-title').textContent(),/下架/);
+        await page.locator('#confirm-cancel').click();assert.equal(await page.locator('#confirm-dialog').isVisible(),false);
+        assert.equal(await page.locator('#interactions-content .report-card').count(),1,'cancel must not moderate');
+        await page.getByRole('button',{name:'下架评价'}).click();await page.keyboard.press('Escape');
+        assert.equal(await page.locator('#confirm-dialog').isVisible(),false,'Escape cancels the confirmation');
+        await page.getByRole('button',{name:'下架评价'}).click();await page.locator('#confirm-accept').click();
         await page.getByText('没有符合条件的举报。').waitFor();
         await page.locator('[data-kind=comments]').click();
         await page.getByText('管理员下架',{exact:false}).first().waitFor();
         await page.getByRole('button',{name:'恢复',exact:true}).click();
         await page.getByText('被评价人隐藏',{exact:false}).first().waitFor();
         await page.getByRole('button',{name:'删除',exact:true}).click();
+        assert.match(await page.locator('#confirm-description').textContent(),/评价和点赞将被删除/);
+        if(process.env.ADMIN_SCREENSHOT_DIR)await page.screenshot({path:path.join(process.env.ADMIN_SCREENSHOT_DIR,'admin-confirm-desktop.png')});
+        await page.locator('#confirm-accept').click();
         await page.getByText('暂无互动记录。').waitFor();
-        await page.locator('[data-kind=reports]').click();await page.locator('#report-status').selectOption('resolved');
+        await page.locator('[data-kind=reports]').click();await page.locator('#report-status-trigger').click();await page.locator('#report-status-list [role=option]').filter({hasText:'已处理'}).click();
         await page.getByText('评价已删除，举报内容为提交时的记录。').waitFor();
       }
       await page.locator('[data-kind=reactions]').click();await page.waitForFunction(()=>document.querySelector('#interactions-content').textContent.includes('🔥'));
@@ -143,12 +211,20 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
 
       if(width===1440) {
         await page.locator('#password-open').click();
+        await page.locator('[data-password-toggle=current-password]').click();
+        assert.equal(await page.locator('#current-password').getAttribute('type'),'text');
+        await page.locator('#password-close').click();await page.locator('#password-open').click();
+        assert.equal(await page.locator('#current-password').getAttribute('type'),'password','closing the dialog conceals passwords');
+        await page.locator('#password-form button[type=submit]').click();
+        assert.match(await page.locator('#password-message').textContent(),/请输入当前密码/);
         await page.locator('#current-password').fill(password);
+        await page.locator('#new-password').fill('short');await page.locator('#password-form button[type=submit]').click();
+        assert.match(await page.locator('#password-message').textContent(),/至少需要 16/);
         await page.locator('#new-password').fill('New Admin Password 2027!');
         await page.locator('#confirm-password').fill('New Admin Password 2027!');
         await page.locator('#password-form button[type=submit]').click();
         await page.waitForFunction(()=>document.querySelector('#login-message').textContent.includes('密码已更新'));
-        await page.locator('#password').fill('New Admin Password 2027!');await page.locator('#login-form button').click();
+        await page.locator('#password').fill('New Admin Password 2027!');await page.locator('#login-form button[type=submit]').click();
         await page.locator('#overview-content .metric').first().waitFor();
       }
       await page.locator('#logout').click();
@@ -162,6 +238,7 @@ const origin='https://www.lysue.com',password='Admin Test Password 2026!';
         await page.unroute('**/api/admin/session');
       }
       assert.deepEqual(errors,[]);
+      assert.deepEqual(nativeDialogs,[],'moderation must not use browser-native dialogs');
       await context.close();
     }
     console.log('PASS secure login, data views, password change, logout and 320–1440px admin layout');
