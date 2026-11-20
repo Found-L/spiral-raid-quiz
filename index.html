@@ -1332,7 +1332,7 @@ img { -webkit-user-drag: none; }
 .site-shell { width: 100%; max-width: none; }
 .temple-particles { position: fixed; inset: 0; z-index: 4; width: 100%; height: 100%; pointer-events: none; }
 /* Keep decorative particles behind encounter diagrams and question content. */
-.guide-card, .guide-view, .exam-view, .result-view, .history-view, .badges-view { position: relative; z-index: 5; }
+.guide-card, .ranking-section, .guide-view, .exam-view, .result-view, .history-view, .badges-view { position: relative; z-index: 5; }
 .site-shell::after {
   content: ''; position: fixed; inset: -5% -55%; z-index: 45; opacity: 0; pointer-events: none;
   background: linear-gradient(105deg, transparent 38%, #4eaa9930 44%, #e5c88766 49.6%, #ffedbdad 50%, #77d9c46b 50.4%, transparent 59%);
@@ -1364,7 +1364,7 @@ img { -webkit-user-drag: none; }
 .formation-lines path:nth-child(3) { opacity: .55; }
 .formation-trace { fill: none; stroke: #f6d89f; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 22 440; filter: drop-shadow(0 0 6px #f0c782); }
 .formation-marks { fill: #efcc8e; filter: drop-shadow(0 0 7px #edc37d); }
-.hero-radiance { background: radial-gradient(ellipse 25% 28% at 65% 51%, #ffda9b99, #e5a55728 48%, transparent 78%); }
+.hero-radiance { background: radial-gradient(ellipse 20% 24% at 65% 51%, #ffd28d35, #d99b4e0a 45%, transparent 76%); }
 .hero-light-shaft {
   position: absolute; inset: -12%; pointer-events: none; mix-blend-mode: screen;
   background: linear-gradient(118deg, transparent 38%, #d9d8aa1c 40%, transparent 42%, #e8cb8f26 44%, transparent 47%, #87c9b918 51%, transparent 54%);
@@ -1565,8 +1565,8 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
 
 /* The temple fills the whole opening scene; its edges fade into the surrounding page. */
 .splash-cursor {
-  position: fixed; inset: 0; z-index: 3; width: 100%; height: 100%;
-  pointer-events: none; mix-blend-mode: screen; opacity: .8;
+  position: fixed; inset: 0; z-index: 2; width: 100%; height: 100%;
+  pointer-events: none; mix-blend-mode: screen;
 }
 .hero {
   display: flex; align-items: center; isolation: isolate;
@@ -1593,13 +1593,13 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
 .hero-scene { position: absolute; inset: 0; aspect-ratio: auto; mask-image: none; }
 .hero-scene::after {
   content: ''; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(90deg, #08131df5 0%, #08141ce8 22%, #08151d9c 43%, #08151d16 72%),
-              linear-gradient(0deg, #0b1219f2 0%, #0b121977 11%, transparent 32%),
-              linear-gradient(180deg, #07101980, transparent 22%);
+  background: linear-gradient(90deg, #08131df2 0%, #08141cd9 20%, #08151d80 41%, transparent 72%),
+              linear-gradient(0deg, #0b1219db 0%, #0b121944 11%, transparent 32%),
+              linear-gradient(180deg, #07101950, transparent 22%);
 }
 .hero-landscape {
-  object-position: 62% 50%; opacity: .9;
-  filter: saturate(1.08) contrast(1.05) brightness(.83);
+  object-position: 62% 50%; opacity: 1;
+  filter: saturate(1.08) contrast(1.08) brightness(1.03);
 }
 .hero-halo {
   z-index: 2; left: 68%; top: 51%; width: min(56vw, 1050px);
@@ -1637,6 +1637,13 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
   background: linear-gradient(90deg, var(--accent), #fff0c7, var(--accent), transparent);
   background-size: 240% 100%;
 }
+.option { position: relative; overflow: hidden; }
+.option > * { position: relative; z-index: 1; }
+.option.selection-fresh::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(100deg, #f4d29338, #87c8b52b 45%, transparent 75%);
+  opacity: 0;
+}
 @media (min-width: 1101px) {
   .hero { padding-inline: var(--page-inset); }
   .hero h1 { font-size: clamp(62px, 4.5vw, 112px); }
@@ -1656,9 +1663,9 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
   .hero h1 { font-size: clamp(36px, 9.2vw, 52px); }
   .hero-description { max-width: 35em; }
   .hero-art { width: 100%; height: 100%; margin: 0; }
-  .hero-landscape { object-position: 65% 51%; opacity: .83; }
+  .hero-landscape { object-position: 65% 51%; opacity: 1; }
   .hero-scene::after {
-    background: linear-gradient(180deg, #08131def 0%, #08141cd9 20%, #08151d8a 43%, #08151d24 69%, #0b1219e6 100%),
+    background: linear-gradient(180deg, #08131def 0%, #08141cd4 20%, #08151d78 43%, #08151d18 69%, #0b1219d9 100%),
                 linear-gradient(90deg, #09141c77, transparent 75%);
   }
   .hero-halo { left: 65%; top: 66%; width: min(110vw, 600px); opacity: .36; }
@@ -1672,6 +1679,14 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
 }
 @media (prefers-reduced-motion: no-preference) {
   .hero-landscape { animation: immersive-landscape 24s ease-in-out infinite alternate; }
+  .hero-title-line > span, .hero h1 em > span {
+    display: inline-block;
+    animation: hero-letter-in .75s cubic-bezier(.22, 1, .36, 1) calc(.16s + var(--letter) * .065s) backwards;
+  }
+  body.intro-seen .hero-title-line > span, body.intro-seen .hero h1 em > span { animation: none; }
+  .guide-card.motion-enter .chapter-heading { animation: chapter-heading-in .8s ease-out var(--reveal-delay, 0s) backwards; }
+  .option.selection-fresh::before { animation: option-selection-light .65s ease-out; }
+  .option.selection-fresh .option-letter { animation: option-selection-mark .45s cubic-bezier(.2, .9, .3, 1.3); }
   .hero-index .hero-scroll-line { animation: immersive-scroll 2.8s ease-in-out infinite; }
   .guide-card::before { animation: card-rim-travel 7s linear infinite; }
   .guide-card:nth-child(2)::before { animation-delay: -2.3s; }
@@ -1682,6 +1697,10 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
     transform: perspective(1400px) translateY(-6px) rotateX(var(--tilt-y, 0deg)) rotateY(var(--tilt-x, 0deg));
   }
 }
+@keyframes hero-letter-in { from { opacity: 0; transform: translateY(.32em); filter: blur(6px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+@keyframes chapter-heading-in { from { opacity: 0; filter: blur(5px); } to { opacity: 1; filter: blur(0); } }
+@keyframes option-selection-light { 0% { opacity: 0; transform: translateX(-24%); } 24% { opacity: 1; } 100% { opacity: 0; transform: translateX(18%); } }
+@keyframes option-selection-mark { 0% { transform: scale(.86); } 55% { transform: scale(1.24); color: #ffe5ae; } 100% { transform: scale(1); } }
 @keyframes immersive-landscape {
   from { transform: translate3d(var(--depth-x, 0px), var(--depth-y, 0px), 0) scale(1.05); }
   to { transform: translate3d(calc(var(--depth-x, 0px) - 1%), var(--depth-y, 0px), 0) scale(1.11); }
@@ -1727,7 +1746,6 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
   <div class="site-shell">
     <div class="ambient-world" aria-hidden="true"><span></span><span></span><span></span></div>
     <canvas id="temple-particles" class="temple-particles" aria-hidden="true"></canvas>
-    <canvas id="splash-cursor" class="splash-cursor" aria-hidden="true"></canvas>
     <header class="topbar">
       <a href="#home" class="brand" aria-label="螺旋寺院机制考核首页"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="21"/><circle class="brand-ring" cx="24" cy="24" r="17"/><path d="M13 23 24 15l11 8M15 26l9-6 9 6M17 28v8h14v-8M21 36v-6h6v6M14 39h20"/><circle class="brand-star" cx="24" cy="11" r="1.5"/></svg></span><span class="brand-copy"><strong>螺旋寺院</strong><small>团队机制考核</small></span></a>
       <div class="header-dock">
@@ -1749,9 +1767,10 @@ body.intro-seen .hero-copy > *, body.intro-seen .entrance-cloud, body.intro-seen
     <main>
       <div id="home-view">
         <section class="hero" id="home">
+          <canvas id="splash-cursor" class="splash-cursor" aria-hidden="true"></canvas>
           <div class="hero-copy">
             <p class="eyebrow"><span class="dot"></span>剑灵巅峰服 · 螺旋寺院 <span class="slash">/</span> 12 人团本</p>
-            <h1>一起通关<br><em>也要一起懂机制</em></h1>
+            <h1 aria-label="一起通关，也要一起懂机制"><span class="hero-title-line"><span style="--letter:0">一</span><span style="--letter:1">起</span><span style="--letter:2">通</span><span style="--letter:3">关</span></span><br><em><span style="--letter:4">也</span><span style="--letter:5">要</span><span style="--letter:6">一</span><span style="--letter:7">起</span><span style="--letter:8">懂</span><span style="--letter:9">机</span><span style="--letter:10">制</span></em></h1>
             <p class="hero-description">从双剑的球与花，到超魔灵的染灯，<br class="desktop-only">再到黑风魔女的冲锋与蜘蛛。把每个位置的关键操作，练成团队的默契。</p>
             <div class="hero-actions"><button class="btn btn-primary" type="button" data-action="start">开始机制考核 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-right"/></svg></button><a class="btn btn-ghost" href="#guide">先看机制图解 <svg class="icon" aria-hidden="true"><use href="#icon-arrow-down"/></svg></a></div>
             <p class="hero-note">免注册 · 自动评分 · 支持中途继续。答题页在前台时计时，离开或切到后台自动暂停。</p>
@@ -6753,7 +6772,11 @@ const GUARD_GUIDES = {
     if(q.type==='multiple') { const current=new Set(draft.answers[q.id]||[]); if(checked) current.add(id); else current.delete(id); draft.answers[q.id]=Array.from(current); }
     else draft.answers[q.id]=[id];
     storeDraft(); renderQuestion(false);
-    const refreshed=$('question-options').querySelector(`input[value="${id}"]`); if(refreshed)refreshed.focus({preventScroll:true});
+    const refreshed=$('question-options').querySelector(`input[value="${id}"]`);
+    if(refreshed) {
+      if(refreshed.checked) refreshed.closest('.option')?.classList.add('selection-fresh');
+      refreshed.focus({preventScroll:true});
+    }
   }
   function renderQuestion(focus=false) {
     const q=qs[index], section=sectionOf(q.section), done=qs.filter(answered).length;
@@ -8310,191 +8333,432 @@ const GUARD_GUIDES = {
   if (enabled) startPlayback();
 })();
 
-// Fine, short-lived stardust follows the pointer without covering page content.
+/*
+Fluid solver adapted from WebGL Fluid Simulation by Pavel Dobryakov:
+https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
+
+MIT License
+
+Copyright (c) 2017 Pavel Dobryakov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 (() => {
   const canvas = document.getElementById('splash-cursor');
+  const hero = document.getElementById('home');
   const home = document.getElementById('home-view');
-  const context = canvas?.getContext('2d');
-  if (!canvas || !home || !context || !window.matchMedia) return;
+  if (!canvas || !hero || !home || !window.matchMedia) return;
 
-  const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const finePointer = window.matchMedia('(pointer: fine)');
-  const particles = [], trail = [];
-  const colors = ['149,235,216', '103,205,193', '244,206,144', '218,236,211'];
-  let width = 0, height = 0, frame = 0, lastFrame = 0, pointer = null, touch = null;
-  let sequence = 0, limit = 300;
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const finePointer = matchMedia('(pointer: fine)');
+  const inputs = [];
+  let renderer = null, frame = 0, lastFrame = 0, lastInput = 0;
+  let pointer = null, touch = null, resizeFrame = 0;
 
-  const active = () => !document.hidden && !motion.matches && !home.hidden && !home.classList.contains('hidden');
-  const editable = target => !!target?.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"]), dialog');
-  const between = (min, max) => min + Math.random() * (max - min);
+  function visible() {
+    return !document.hidden && !motion.matches && !home.hidden &&
+      !home.classList.contains('hidden');
+  }
+  function inside(event) {
+    if (!home.contains(event.target) || event.clientX < 0 || event.clientX > innerWidth ||
+        event.clientY < 0 || event.clientY > innerHeight ||
+        event.target.closest?.('button, a, input, textarea, select, dialog, [contenteditable="true"]')) return null;
+    return {x:event.clientX / innerWidth, y:1 - event.clientY / innerHeight};
+  }
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
+  function makeRenderer() {
+    const gl = canvas.getContext('webgl', {alpha:true, depth:false, stencil:false, antialias:false, premultipliedAlpha:true});
+    if (!gl) return null;
+    const half = gl.getExtension('OES_texture_half_float');
+    if (!half) return null;
+    gl.getExtension('EXT_color_buffer_half_float');
+    const linear = !!gl.getExtension('OES_texture_half_float_linear');
+    const type = half.HALF_FLOAT_OES;
+    const vertex = `
+      precision highp float;
+      attribute vec2 aPosition;
+      uniform vec2 texelSize;
+      varying vec2 vUv, vL, vR, vT, vB;
+      void main() {
+        vUv = aPosition * .5 + .5;
+        vL = vUv - vec2(texelSize.x, 0.);
+        vR = vUv + vec2(texelSize.x, 0.);
+        vT = vUv + vec2(0., texelSize.y);
+        vB = vUv - vec2(0., texelSize.y);
+        gl_Position = vec4(aPosition, 0., 1.);
+      }`;
+    const shared = `
+      precision highp float;
+      precision highp sampler2D;
+      varying vec2 vUv, vL, vR, vT, vB;
+    `;
+    const bilerp = `
+      vec4 bilerp(sampler2D image, vec2 uv, vec2 size) {
+        vec2 st = uv / size - .5;
+        vec2 base = floor(st), f = fract(st);
+        vec4 a = texture2D(image, (base + vec2(.5, .5)) * size);
+        vec4 b = texture2D(image, (base + vec2(1.5, .5)) * size);
+        vec4 c = texture2D(image, (base + vec2(.5, 1.5)) * size);
+        vec4 d = texture2D(image, (base + vec2(1.5, 1.5)) * size);
+        return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+      }
+    `;
+    const shaders = {
+      splat: `
+        uniform sampler2D target;
+        uniform float aspect, radius;
+        uniform vec2 point;
+        uniform vec3 color;
+        void main() {
+          vec2 p = vUv - point;
+          p.x *= aspect;
+          vec3 ink = exp(-dot(p, p) / radius) * color;
+          gl_FragColor = vec4(texture2D(target, vUv).xyz + ink, 1.);
+        }`,
+      advection: `
+        uniform sampler2D velocity, source;
+        uniform vec2 texelSize, sourceTexel;
+        uniform float dt, dissipation;
+        ` + bilerp + (linear ? `
+        void main() {
+          vec2 coord = vUv - dt * texture2D(velocity, vUv).xy * texelSize;
+          gl_FragColor = texture2D(source, coord) / (1. + dissipation * dt);
+        }` : `
+        void main() {
+          vec2 coord = vUv - dt * bilerp(velocity, vUv, texelSize).xy * texelSize;
+          gl_FragColor = bilerp(source, coord, sourceTexel) / (1. + dissipation * dt);
+        }`),
+      curl: `
+        uniform sampler2D velocity;
+        void main() {
+          float l = texture2D(velocity, vL).y, r = texture2D(velocity, vR).y;
+          float t = texture2D(velocity, vT).x, b = texture2D(velocity, vB).x;
+          gl_FragColor = vec4(.5 * (r - l - t + b), 0., 0., 1.);
+        }`,
+      vorticity: `
+        uniform sampler2D velocity, curlField;
+        uniform float strength, dt;
+        void main() {
+          float l = texture2D(curlField, vL).x, r = texture2D(curlField, vR).x;
+          float t = texture2D(curlField, vT).x, b = texture2D(curlField, vB).x;
+          float c = texture2D(curlField, vUv).x;
+          vec2 force = .5 * vec2(abs(t) - abs(b), abs(r) - abs(l));
+          force /= length(force) + .0001;
+          force *= strength * c;
+          force.y *= -1.;
+          vec2 vel = texture2D(velocity, vUv).xy + force * dt;
+          gl_FragColor = vec4(clamp(vel, -1000., 1000.), 0., 1.);
+        }`,
+      divergence: `
+        uniform sampler2D velocity;
+        void main() {
+          float l = texture2D(velocity, vL).x, r = texture2D(velocity, vR).x;
+          float t = texture2D(velocity, vT).y, b = texture2D(velocity, vB).y;
+          vec2 c = texture2D(velocity, vUv).xy;
+          if (vL.x < 0.) l = -c.x;
+          if (vR.x > 1.) r = -c.x;
+          if (vT.y > 1.) t = -c.y;
+          if (vB.y < 0.) b = -c.y;
+          gl_FragColor = vec4(.5 * (r - l + t - b), 0., 0., 1.);
+        }`,
+      clear: `
+        uniform sampler2D target;
+        uniform float amount;
+        void main() { gl_FragColor = amount * texture2D(target, vUv); }`,
+      pressure: `
+        uniform sampler2D pressure, divergence;
+        void main() {
+          float l = texture2D(pressure, vL).x, r = texture2D(pressure, vR).x;
+          float t = texture2D(pressure, vT).x, b = texture2D(pressure, vB).x;
+          float d = texture2D(divergence, vUv).x;
+          gl_FragColor = vec4((l + r + b + t - d) * .25, 0., 0., 1.);
+        }`,
+      gradient: `
+        uniform sampler2D pressure, velocity;
+        void main() {
+          float l = texture2D(pressure, vL).x, r = texture2D(pressure, vR).x;
+          float t = texture2D(pressure, vT).x, b = texture2D(pressure, vB).x;
+          vec2 vel = texture2D(velocity, vUv).xy - vec2(r - l, t - b);
+          gl_FragColor = vec4(vel, 0., 1.);
+        }`,
+      display: `
+        uniform sampler2D dye;
+        uniform vec2 sourceTexel;
+        ` + bilerp + (linear ? `
+        vec3 sampleInk(vec2 uv) { return texture2D(dye, uv).rgb; }
+        ` : `
+        vec3 sampleInk(vec2 uv) { return bilerp(dye, uv, sourceTexel).rgb; }
+        `) + `
+        void main() {
+          vec3 ink = max(sampleInk(vUv), vec3(0.));
+          float peak = max(ink.r, max(ink.g, ink.b));
+          float left = length(sampleInk(vUv - vec2(sourceTexel.x, 0.)));
+          float right = length(sampleInk(vUv + vec2(sourceTexel.x, 0.)));
+          float bottom = length(sampleInk(vUv - vec2(0., sourceTexel.y)));
+          float top = length(sampleInk(vUv + vec2(0., sourceTexel.y)));
+          float rim = smoothstep(.025, .4, length(vec2(right - left, top - bottom)));
+          vec3 hue = mix(ink / max(peak, .0001), vec3(.86, 1., .73), rim * .16);
+          float alpha = min((1. - exp(-peak * .5)) * .62 + rim * .08, .57);
+          gl_FragColor = vec4(hue * alpha, alpha);
+        }`
+    };
+
+    function compile(type, source) {
+      const shader = gl.createShader(type);
+      gl.shaderSource(shader, source);
+      gl.compileShader(shader);
+      if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+        gl.deleteShader(shader);
+        throw new Error('Fluid shader unavailable');
+      }
+      return shader;
+    }
+    function createProgram(fragment) {
+      const v = compile(gl.VERTEX_SHADER, vertex), f = compile(gl.FRAGMENT_SHADER, shared + fragment);
+      const program = gl.createProgram();
+      gl.attachShader(program, v); gl.attachShader(program, f);
+      gl.linkProgram(program); gl.deleteShader(v); gl.deleteShader(f);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Fluid program unavailable');
+      const uniforms = {};
+      for (let i = 0; i < gl.getProgramParameter(program, gl.ACTIVE_UNIFORMS); i++) {
+        const name = gl.getActiveUniform(program, i).name;
+        uniforms[name] = gl.getUniformLocation(program, name);
+      }
+      return {program, uniforms, position:gl.getAttribLocation(program, 'aPosition')};
+    }
+    const programs = Object.fromEntries(Object.entries(shaders).map(([key, source]) => [key, createProgram(source)]));
+    const quad = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+    let resources = [], velocity, dye, pressure, divergence, curl;
+
+    function surface(w, h, filter) {
+      const texture = gl.createTexture(), framebuffer = gl.createFramebuffer();
+      resources.push({texture, framebuffer});
+      gl.bindTexture(gl.TEXTURE_2D, texture);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, filter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, filter);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, type, null);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+      if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) throw new Error('Fluid buffer unavailable');
+      gl.viewport(0, 0, w, h);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+      return {texture, framebuffer, width:w, height:h, x:1/w, y:1/h};
+    }
+    function pair(w, h, filter) {
+      return {read:surface(w,h,filter), write:surface(w,h,filter),
+        swap() { const previous = this.read; this.read = this.write; this.write = previous; }};
+    }
+    function dimensions(shortSide) {
+      const aspect = canvas.width / canvas.height;
+      return aspect >= 1
+        ? [Math.min(2048, Math.round(shortSide * aspect)), shortSide]
+        : [shortSide, Math.min(2048, Math.round(shortSide / aspect))];
+    }
+    function resize() {
+      for (const item of resources) { gl.deleteTexture(item.texture); gl.deleteFramebuffer(item.framebuffer); }
+      resources = [];
+      const sim = dimensions(128), ink = dimensions(linear ? 512 : 384);
+      const filter = linear ? gl.LINEAR : gl.NEAREST;
+      velocity = pair(sim[0], sim[1], filter);
+      dye = pair(ink[0], ink[1], filter);
+      pressure = pair(sim[0], sim[1], gl.NEAREST);
+      divergence = surface(sim[0], sim[1], gl.NEAREST);
+      curl = surface(sim[0], sim[1], gl.NEAREST);
+      clear();
+    }
+    function bind(name, texel) {
+      const item = programs[name];
+      gl.useProgram(item.program);
+      gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+      gl.enableVertexAttribArray(item.position);
+      gl.vertexAttribPointer(item.position, 2, gl.FLOAT, false, 0, 0);
+      if (item.uniforms.texelSize && texel) gl.uniform2f(item.uniforms.texelSize, texel.x, texel.y);
+      return item.uniforms;
+    }
+    function texture(target, id) {
+      gl.activeTexture(gl.TEXTURE0 + id); gl.bindTexture(gl.TEXTURE_2D, target.texture);
+      return id;
+    }
+    function draw(target) {
+      gl.bindFramebuffer(gl.FRAMEBUFFER, target ? target.framebuffer : null);
+      gl.viewport(0, 0, target ? target.width : canvas.width, target ? target.height : canvas.height);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    }
+    function clear() {
+      gl.disable(gl.BLEND);
+      gl.clearColor(0, 0, 0, 0);
+      for (const item of resources) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, item.framebuffer); gl.clear(gl.COLOR_BUFFER_BIT);
+      }
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null); gl.clear(gl.COLOR_BUFFER_BIT);
+    }
+    function splat(input) {
+      const u = bind('splat');
+      gl.uniform1f(u.aspect, canvas.width / canvas.height);
+      gl.uniform1f(u.radius, .0017 * Math.max(1, canvas.width / canvas.height));
+      gl.uniform2f(u.point, input.x, input.y);
+      gl.uniform1i(u.target, texture(velocity.read, 0));
+      gl.uniform3f(u.color, input.dx, input.dy, 0);
+      draw(velocity.write); velocity.swap();
+      gl.uniform1i(u.target, texture(dye.read, 0));
+      gl.uniform3f(u.color, input.color[0], input.color[1], input.color[2]);
+      draw(dye.write); dye.swap();
+    }
+    function step(dt) {
+      gl.disable(gl.BLEND);
+      let u = bind('curl', velocity.read);
+      gl.uniform1i(u.velocity, texture(velocity.read, 0)); draw(curl);
+      u = bind('vorticity', velocity.read);
+      gl.uniform1i(u.velocity, texture(velocity.read, 0)); gl.uniform1i(u.curlField, texture(curl, 1));
+      gl.uniform1f(u.strength, 28); gl.uniform1f(u.dt, dt);
+      draw(velocity.write); velocity.swap();
+      u = bind('divergence', velocity.read);
+      gl.uniform1i(u.velocity, texture(velocity.read, 0)); draw(divergence);
+      u = bind('clear');
+      gl.uniform1i(u.target, texture(pressure.read, 0)); gl.uniform1f(u.amount, .8);
+      draw(pressure.write); pressure.swap();
+      u = bind('pressure', velocity.read);
+      gl.uniform1i(u.divergence, texture(divergence, 0));
+      for (let i = 0; i < 18; i++) {
+        gl.uniform1i(u.pressure, texture(pressure.read, 1)); draw(pressure.write); pressure.swap();
+      }
+      u = bind('gradient', velocity.read);
+      gl.uniform1i(u.pressure, texture(pressure.read, 0)); gl.uniform1i(u.velocity, texture(velocity.read, 1));
+      draw(velocity.write); velocity.swap();
+      u = bind('advection', velocity.read);
+      gl.uniform1i(u.velocity, texture(velocity.read, 0)); gl.uniform1i(u.source, 0);
+      if (u.sourceTexel) gl.uniform2f(u.sourceTexel, velocity.read.x, velocity.read.y);
+      gl.uniform1f(u.dt, dt); gl.uniform1f(u.dissipation, .35);
+      draw(velocity.write); velocity.swap();
+      gl.uniform1i(u.velocity, texture(velocity.read, 0)); gl.uniform1i(u.source, texture(dye.read, 1));
+      if (u.sourceTexel) gl.uniform2f(u.sourceTexel, dye.read.x, dye.read.y);
+      gl.uniform1f(u.dissipation, 1.15);
+      draw(dye.write); dye.swap();
+    }
+    function render() {
+      gl.disable(gl.BLEND);
+      const u = bind('display', dye.read);
+      gl.uniform1i(u.dye, texture(dye.read, 0));
+      gl.uniform2f(u.sourceTexel, dye.read.x, dye.read.y);
+      draw(null);
+    }
+    return {resize, clear, splat, step, render};
+  }
+
+  function initialize() {
+    try {
+      renderer = makeRenderer();
+      if (renderer) {
+        canvas.dataset.fluid = 'webgl';
+        resize();
+      } else canvas.dataset.fluid = 'unavailable';
+    } catch (_) {
+      renderer = null;
+      canvas.dataset.fluid = 'unavailable';
+    }
+  }
   function resize() {
     stop();
-    width = window.innerWidth;
-    height = window.innerHeight;
-    if (!width || !height) return;
-    const ratio = Math.min(window.devicePixelRatio || 1, 1.25, Math.sqrt(2400000 / (width * height)));
-    canvas.width = Math.max(1, Math.round(width * ratio));
-    canvas.height = Math.max(1, Math.round(height * ratio));
-    context.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0);
-    limit = Math.min(620, Math.max(200, Math.round(width * height / 2700)));
+    if (!renderer) return;
+    if (!innerWidth || !innerHeight) return;
+    const ratio = Math.min(devicePixelRatio || 1, 1.25, Math.sqrt(2400000 / (innerWidth * innerHeight)));
+    canvas.width = Math.max(1, Math.round(innerWidth * ratio));
+    canvas.height = Math.max(1, Math.round(innerHeight * ratio));
+    try { renderer.resize(); } catch (_) { renderer = null; canvas.dataset.fluid = 'unavailable'; }
   }
-
   function stop() {
     if (frame) cancelAnimationFrame(frame);
+    frame = 0; lastFrame = 0; pointer = null; touch = null; inputs.length = 0;
+    canvas.dataset.fluidActive = 'false';
+    if (renderer) renderer.clear();
+  }
+  function animate(now) {
     frame = 0;
-    lastFrame = 0;
-    pointer = null;
-    touch = null;
-    particles.length = 0;
-    trail.length = 0;
-    context.clearRect(0, 0, width, height);
-  }
-
-  function start() {
-    if (!frame && active()) frame = requestAnimationFrame(draw);
-  }
-
-  function addParticle(x, y, dx, dy, burst) {
-    const angle = between(0, Math.PI * 2);
-    const radius = between(2, burst ? 11 : 8);
-    const speed = between(burst ? 55 : 28, burst ? 155 : 105);
-    const carry = burst ? 0 : between(12, 45);
-    const color = colors[Math.floor(Math.random() * colors.length)];
-    particles.push({
-      x: x + Math.cos(angle) * radius,
-      y: y + Math.sin(angle) * radius,
-      vx: Math.cos(angle) * speed + dx * carry,
-      vy: Math.sin(angle) * speed + dy * carry - 8,
-      spin: between(-2.8, 2.8), age: 0, life: between(1.1, burst ? 2.15 : 2),
-      size: between(.7, 2), color, glint: Math.random() < .2
-    });
-    if (particles.length > limit) particles.splice(0, particles.length - limit);
-  }
-
-  function burst(x, y) {
-    for (let i = 0; i < 28; i++) addParticle(x, y, 0, 0, true);
-    start();
-  }
-
-  function move(event) {
-    if (!active() || !finePointer.matches || event.pointerType === 'touch' || editable(event.target)) {
-      pointer = null;
-      return;
-    }
-    const now = performance.now(), x = event.clientX, y = event.clientY;
-    if (!pointer || now - pointer.time > 180 || Math.hypot(x - pointer.x, y - pointer.y) > 220) {
-      pointer = {x, y, time: now};
-      sequence++;
-      return;
-    }
-    const dx = x - pointer.x, dy = y - pointer.y, distance = Math.hypot(dx, dy);
-    if (distance < 2) return;
-    const ux = dx / distance, uy = dy / distance;
-    const steps = Math.min(28, Math.max(1, Math.ceil(distance / 8)));
-    for (let i = 1; i <= steps; i++) {
-      const fraction = i / steps, px = pointer.x + dx * fraction, py = pointer.y + dy * fraction;
-      trail.push({x: px, y: py, nx: -uy, ny: ux, time: now, sequence});
-      addParticle(px, py, ux, uy, false);
-      addParticle(px, py, ux, uy, false);
-      addParticle(px, py, ux, uy, false);
-    }
-    if (trail.length > 150) trail.splice(0, trail.length - 150);
-    pointer = {x, y, time: now};
-    start();
-  }
-
-  function drawTrail(now) {
-    while (trail.length && now - trail[0].time > 1650) trail.shift();
-    const tones = ['149,235,216', '242,203,138', '113,206,193'];
-    for (let i = 1; i < trail.length; i++) {
-      const a = trail[i - 1], b = trail[i];
-      if (a.sequence !== b.sequence) continue;
-      const age = (now - b.time) / 1650;
-      const fade = Math.max(0, 1 - age) ** 2;
-      for (let strand = 0; strand < 3; strand++) {
-        const waveA = Math.sin(i * .31 + strand * 2.2 + (now - a.time) * .003) * (3 + strand * 4.5);
-        const waveB = Math.sin((i + 1) * .31 + strand * 2.2 + (now - b.time) * .003) * (3 + strand * 4.5);
-        context.strokeStyle = `rgba(${tones[strand]},${fade * (strand ? .4 : .7)})`;
-        context.lineWidth = strand ? .8 : 1.35;
-        context.beginPath();
-        context.moveTo(a.x + a.nx * waveA, a.y + a.ny * waveA);
-        context.lineTo(b.x + b.nx * waveB, b.y + b.ny * waveB);
-        context.stroke();
-      }
-    }
-  }
-
-  function draw(now) {
-    frame = 0;
-    if (!active()) { stop(); return; }
-    const dt = lastFrame ? Math.min((now - lastFrame) / 1000, .05) : .016;
+    if (!renderer || !visible() || now - lastInput > 5000) { stop(); return; }
+    const dt = lastFrame ? clamp((now - lastFrame) / 1000, .001, .033) : .016;
     lastFrame = now;
-    context.clearRect(0, 0, width, height);
-    context.globalCompositeOperation = 'lighter';
-    context.lineCap = 'round';
-    drawTrail(now);
-    for (let i = particles.length - 1; i >= 0; i--) {
-      const p = particles[i];
-      p.age += dt;
-      if (p.age >= p.life) { particles.splice(i, 1); continue; }
-      const turn = p.spin * dt, cosine = Math.cos(turn), sine = Math.sin(turn);
-      const damping = Math.exp(-1.05 * dt);
-      const vx = (p.vx * cosine - p.vy * sine) * damping;
-      p.vy = (p.vx * sine + p.vy * cosine) * damping - 7 * dt;
-      p.vx = vx;
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
-      const life = p.age / p.life;
-      const opacity = Math.min(1, p.age / .09) * (1 - life) ** 1.25;
-      const tailX = p.x - p.vx * .24, tailY = p.y - p.vy * .24;
-      context.strokeStyle = `rgba(${p.color},${opacity * .5})`;
-      context.lineWidth = p.size * .75;
-      context.beginPath();
-      context.moveTo(tailX, tailY);
-      context.quadraticCurveTo((tailX + p.x) / 2 - p.vy * .018, (tailY + p.y) / 2 + p.vx * .018, p.x, p.y);
-      context.stroke();
-      context.fillStyle = `rgba(${p.color},${opacity * .82})`;
-      context.beginPath();
-      context.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      context.fill();
-      if (p.glint && opacity > .25) {
-        context.strokeStyle = `rgba(${p.color},${opacity * .38})`;
-        context.lineWidth = .6;
-        context.beginPath();
-        context.moveTo(p.x - 3, p.y); context.lineTo(p.x + 3, p.y);
-        context.moveTo(p.x, p.y - 3); context.lineTo(p.x, p.y + 3);
-        context.stroke();
-      }
+    for (const item of inputs.splice(0, 6)) renderer.splat(item);
+    renderer.step(dt); renderer.render();
+    frame = requestAnimationFrame(animate);
+  }
+  function add(point, dx, dy, boost = 1) {
+    if (!renderer || !visible()) return;
+    const phase = .5 + .5 * Math.sin(performance.now() / 2900);
+    const color = [(.035 + .09 * phase) * boost, (.30 - .015 * phase) * boost, (.25 - .04 * phase) * boost];
+    inputs.push({x:point.x, y:point.y, dx:clamp(dx, -900, 900), dy:clamp(dy, -900, 900), color});
+    if (inputs.length > 18) inputs.splice(0, inputs.length - 18);
+    lastInput = performance.now();
+    canvas.dataset.fluidActive = 'true';
+    if (!frame) frame = requestAnimationFrame(animate);
+  }
+  function move(event) {
+    if (!renderer || !visible() || !finePointer.matches || event.pointerType === 'touch') { pointer = null; return; }
+    const point = inside(event), now = performance.now();
+    if (!point) { pointer = null; return; }
+    if (!pointer || now - pointer.time > 250 || Math.hypot(point.x - pointer.x, point.y - pointer.y) > .3) {
+      pointer = {...point, time:now}; return;
     }
-    context.globalCompositeOperation = 'source-over';
-    if (particles.length || trail.length) frame = requestAnimationFrame(draw);
-    else { lastFrame = 0; pointer = null; }
+    const aspect = canvas.width / canvas.height;
+    const dx = (point.x - pointer.x) * (aspect < 1 ? aspect : 1) * 6000;
+    const dy = (point.y - pointer.y) * (aspect > 1 ? 1 / aspect : 1) * 6000;
+    if (Math.hypot(dx, dy) > 1) add(point, dx, dy);
+    pointer = {...point, time:now};
+  }
+  function burst(point) {
+    for (let i = 0; i < 5; i++) {
+      const angle = i * Math.PI * 2 / 5;
+      add({x:point.x + Math.cos(angle) * .01, y:point.y + Math.sin(angle) * .01},
+        Math.cos(angle) * 120, Math.sin(angle) * 120, .55);
+    }
   }
 
-  resize();
-  window.addEventListener('resize', resize, {passive:true});
-  window.addEventListener('pointermove', move, {passive:true});
-  window.addEventListener('pointerout', event => {
-    if (!event.relatedTarget) { pointer = null; sequence++; }
+  canvas.addEventListener('webglcontextlost', event => { event.preventDefault(); stop(); renderer = null; });
+  canvas.addEventListener('webglcontextrestored', initialize);
+  initialize();
+  window.addEventListener('resize', () => {
+    if (!resizeFrame) resizeFrame = requestAnimationFrame(() => { resizeFrame = 0; resize(); });
   }, {passive:true});
+  window.addEventListener('pointermove', move, {passive:true});
+  window.addEventListener('pointerout', event => { if (!event.relatedTarget) pointer = null; }, {passive:true});
   window.addEventListener('pointerdown', event => {
-    if (!active() || editable(event.target)) return;
+    const point = inside(event);
+    if (!point || !visible()) return;
     if (event.pointerType === 'touch') touch = {x:event.clientX, y:event.clientY, id:event.pointerId};
-    else burst(event.clientX, event.clientY);
+    else burst(point);
   }, {passive:true});
   window.addEventListener('pointerup', event => {
     if (!touch || event.pointerId !== touch.id) return;
-    if (active() && !editable(event.target) && Math.hypot(event.clientX - touch.x, event.clientY - touch.y) < 10) {
-      burst(event.clientX, event.clientY);
-    }
+    const point = inside(event);
+    if (point && Math.hypot(event.clientX - touch.x, event.clientY - touch.y) < 10) burst(point);
     touch = null;
   }, {passive:true});
   window.addEventListener('pointercancel', () => { touch = null; }, {passive:true});
-  document.addEventListener('visibilitychange', () => { if (!active()) stop(); });
-  if (motion.addEventListener) motion.addEventListener('change', () => { if (!active()) stop(); });
-  else motion.addListener(() => { if (!active()) stop(); });
-  if (window.MutationObserver) new MutationObserver(() => { if (!active()) stop(); })
+  window.addEventListener('scroll', () => { pointer = null; if (!visible() && frame) stop(); }, {passive:true});
+  document.addEventListener('visibilitychange', () => { if (!visible()) stop(); });
+  if (motion.addEventListener) motion.addEventListener('change', () => { if (!visible()) stop(); });
+  else motion.addListener(() => { if (!visible()) stop(); });
+  if (window.MutationObserver) new MutationObserver(() => { if (!visible()) stop(); })
     .observe(home, {attributes:true, attributeFilter:['class', 'hidden']});
 })();
 </script>

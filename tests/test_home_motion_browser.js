@@ -213,32 +213,40 @@ async function waitReady(url) {
     assert.equal(await reduced.locator('.formation-trace').evaluate(el => getComputedStyle(el).animationName), 'none');
     assert.equal(await reduced.locator('.entrance-cloud-left').evaluate(el => getComputedStyle(el).opacity), '0');
     assert.equal(await reduced.locator('.hero-copy').evaluate(el => getComputedStyle(el).opacity), '1');
+    assert.equal(await reduced.locator('.hero-title-line span').first().evaluate(el => getComputedStyle(el).animationName), 'none');
     await reduced.close();
 
     const ink = await browser.newPage({viewport:{width:1200, height:800}});
     await ink.route('**/api/**', route => route.fulfill({json:{entries:[], boards:[]}, headers:{'Access-Control-Allow-Origin':'*'}}));
     await ink.goto(url);
-    await ink.addStyleTag({content:'* { animation-play-state: paused !important; transition: none !important } #temple-particles { visibility: hidden !important } .entrance-cloud,.entrance-light { opacity: 0 !important } .hero-landscape { animation: none !important; transform: none !important }'});
+    assert.equal(await ink.locator('#splash-cursor').getAttribute('data-fluid'), 'webgl', 'the reference-style fluid should use WebGL');
+    assert.equal(await ink.locator('.hero-title-line span').first().evaluate(el => getComputedStyle(el).animationName), 'hero-letter-in');
+    await ink.addStyleTag({content:'* { animation-play-state: paused !important; transition: none !important } #temple-particles { visibility: hidden !important } .entrance-cloud,.entrance-light { opacity: 0 !important } .hero-landscape { animation: none !important; transform: none !important } .hero-art { transform: none !important }'});
     await ink.waitForTimeout(300);
     const beforeInk = await ink.screenshot();
     await ink.mouse.move(650, 360);
     for (let i = 1; i <= 18; i++) await ink.mouse.move(650 + i * 12, 360 + Math.sin(i / 3) * 45);
     await ink.waitForTimeout(150);
-    assert.equal(beforeInk.equals(await ink.screenshot()), false, 'moving the pointer should leave a visible particle trail');
-    const trailPixels = await ink.locator('#splash-cursor').evaluate(el => {
-      const pixels = el.getContext('2d').getImageData(0, 0, el.width, el.height).data;
-      let visible = 0, opaque = 0;
-      for (let i = 3; i < pixels.length; i += 4) {
-        if (pixels[i] > 10) visible++;
-        if (pixels[i] > 180) opaque++;
-      }
-      return {visible, opaque, total:el.width * el.height};
-    });
-    assert.ok(trailPixels.visible > 100, 'the trail contains visible fine particles and light strands');
-    assert.ok(trailPixels.opaque < trailPixels.total * .002, 'the trail must not accumulate into large opaque blobs');
+    const movingInk = await ink.screenshot();
+    assert.equal(beforeInk.equals(movingInk), false, 'moving the pointer should reveal a fluid trail');
+    await ink.waitForTimeout(300);
+    assert.equal(movingInk.equals(await ink.screenshot()), false, 'the fluid should continue evolving after pointer movement');
+    assert.equal(await ink.locator('#splash-cursor').getAttribute('data-fluid-active'), 'true');
+    assert.equal(await ink.locator('#splash-cursor').evaluate(el => el.getContext('webgl').getError()), 0, 'the fluid renderer should not produce WebGL errors');
+    await ink.locator('#leaderboard').scrollIntoViewIfNeeded();
+    assert.equal(await ink.locator('#splash-cursor').evaluate(el => getComputedStyle(el).position), 'fixed');
+    assert.ok(await ink.locator('.ranking-section').evaluate(el => Number(getComputedStyle(el).zIndex) > Number(getComputedStyle(document.querySelector('#temple-particles')).zIndex)), 'ranking content must sit above decorative effects');
+    await ink.evaluate(() => { Object.defineProperty(document, 'hidden', {configurable:true, value:true}); document.dispatchEvent(new Event('visibilitychange')); });
+    assert.equal(await ink.locator('#splash-cursor').getAttribute('data-fluid-active'), 'false', 'fluid work stops when the page is hidden');
+    await ink.evaluate(() => { Object.defineProperty(document, 'hidden', {configurable:true, value:false}); document.dispatchEvent(new Event('visibilitychange')); });
+    await ink.mouse.move(600, 550);
+    await ink.mouse.move(720, 570, {steps:8});
+    assert.equal(await ink.locator('#splash-cursor').getAttribute('data-fluid-active'), 'true', 'the background effect also responds around the ranking');
     await ink.close();
 
     const inkFallback = await browser.newPage({viewport:{width:900, height:700}});
+    const fallbackErrors = [];
+    inkFallback.on('pageerror', error => fallbackErrors.push(error.message));
     await inkFallback.addInitScript(() => {
       const getContext = HTMLCanvasElement.prototype.getContext;
       HTMLCanvasElement.prototype.getContext = function(type, ...args) {
@@ -248,39 +256,11 @@ async function waitReady(url) {
     });
     await inkFallback.route('**/api/**', route => route.fulfill({json:{entries:[], boards:[]}, headers:{'Access-Control-Allow-Origin':'*'}}));
     await inkFallback.goto(url);
-    await inkFallback.mouse.move(500, 350);
-    await inkFallback.mouse.move(550, 380, {steps:6});
-    await inkFallback.waitForFunction(() => {
-      const el = document.querySelector('#splash-cursor'), context = el.getContext('2d');
-      if (!context) return false;
-      const pixels = context.getImageData(0, 0, el.width, el.height).data;
-      for (let i = 3; i < pixels.length; i += 4) if (pixels[i]) return true;
-      return false;
-    });
-    await inkFallback.evaluate(() => { Object.defineProperty(document, 'hidden', {configurable:true, value:true}); document.dispatchEvent(new Event('visibilitychange')); });
-    assert.equal(await inkFallback.locator('#splash-cursor').evaluate(el => {
-      const pixels = el.getContext('2d').getImageData(0, 0, el.width, el.height).data;
-      for (let i = 3; i < pixels.length; i += 4) if (pixels[i]) return false;
-      return true;
-    }), true, 'particle trails should clear when the page is hidden');
+    assert.equal(await inkFallback.locator('#splash-cursor').getAttribute('data-fluid'), 'unavailable');
+    await inkFallback.locator('.hero-actions [data-action="start"]').click();
+    assert.equal(await inkFallback.locator('#profile-dialog').evaluate(el => el.open), true, 'site controls remain usable without WebGL');
+    assert.deepEqual(fallbackErrors, []);
     await inkFallback.close();
-
-    const noCanvas = await browser.newPage({viewport:{width:900, height:700}});
-    const noCanvasErrors = [];
-    noCanvas.on('pageerror', error => noCanvasErrors.push(error.message));
-    await noCanvas.addInitScript(() => {
-      const getContext = HTMLCanvasElement.prototype.getContext;
-      HTMLCanvasElement.prototype.getContext = function(type, ...args) {
-        if (this.id === 'splash-cursor' && type === '2d') return null;
-        return getContext.call(this, type, ...args);
-      };
-    });
-    await noCanvas.route('**/api/**', route => route.fulfill({json:{entries:[], boards:[]}, headers:{'Access-Control-Allow-Origin':'*'}}));
-    await noCanvas.goto(url);
-    await noCanvas.locator('.hero-actions [data-action="start"]').click();
-    assert.equal(await noCanvas.locator('#profile-dialog').evaluate(el => el.open), true, 'site controls remain usable if the decorative canvas is unavailable');
-    assert.deepEqual(noCanvasErrors, []);
-    await noCanvas.close();
 
     const exam = await browser.newPage({viewport:{width:1440, height:900}});
     const examErrors = [];
@@ -294,6 +274,8 @@ async function waitReady(url) {
     await exam.locator('.hero-actions [data-action="start"]').click();
     await exam.locator('#question-options label').first().click();
     assert.equal(await exam.locator('#answered-count').innerText(), '1', 'an answer should be saved while effects are running');
+    assert.equal(await exam.locator('#question-options label').first().evaluate(el => el.classList.contains('selection-fresh')), true, 'the chosen answer should receive its selection effect');
+    assert.equal(await exam.locator('#question-options label').first().evaluate(el => getComputedStyle(el, '::before').animationName), 'option-selection-light');
     await exam.locator('#next-button').click();
     await exam.locator('#question-card [data-action="previous"]').click();
     assert.equal(await exam.locator('#question-options input').first().isChecked(), true, 'returning to the question should restore its answer');
