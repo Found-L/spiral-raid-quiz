@@ -245,13 +245,29 @@ def badge_statistics(db, context):
                         **counts[badge['id']]} for badge in context['badges']]}
 
 
+def newest_honor_page(db, badge_id, page, context):
+    history_page = context['honor_history_page']
+    first = history_page(db, badge_id, 1, PAGE_SIZE)
+    total = first['total']
+    page, pages = paging(total, page)
+    if not total:
+        return {**first, 'page':page, 'pages':pages, 'entries':[]}
+    start, end = max(0, total-page*PAGE_SIZE), total-(page-1)*PAGE_SIZE
+    source_start, source_end = start//PAGE_SIZE+1, (end-1)//PAGE_SIZE+1
+    chunks = [first if number == 1 else history_page(db,badge_id,number,PAGE_SIZE)
+              for number in range(source_start,source_end+1)]
+    entries = [entry for chunk in chunks for entry in chunk['entries']]
+    offset = start-(source_start-1)*PAGE_SIZE
+    return {**first, 'page':page, 'pages':pages, 'entries':list(reversed(entries[offset:offset+end-start]))}
+
+
 def badge_detail(db, body, context):
     badge_id, page = body.get('badgeId'), page_number(body)
     badge = next((item for item in context['badges'] if item['id'] == badge_id), None)
     if not badge:
         raise AdminError('勋章不存在。', 404)
     if badge_id in context['honor_ids']:
-        history = context['honor_history_page'](db, badge_id, page, PAGE_SIZE)
+        history = newest_honor_page(db, badge_id, page, context)
         return {'badge':badge, 'page':history['page'], 'pages':history['pages'], 'total':history['total'],
                 'record':True, 'entries':[{'nickname':item['nickname'], 'number':item['playerNumber'],
                 'achievedAt':item['achievedAt'], 'current':item['current'],
@@ -284,7 +300,7 @@ def badge_detail(db, body, context):
         if matches:
             achieved[participant] = {'nickname':row['nickname'], 'number':row['number'],
                                      'achievedAt':row['submitted_at'], 'timeSource':'按上传时间', 'current':True}
-    entries = sorted(achieved.values(), key=lambda item:(item['achievedAt'], item['number'] if item['number'] is not None else float('inf'), item['nickname']))
+    entries = sorted(achieved.values(), key=lambda item:(-item['achievedAt'], item['number'] if item['number'] is not None else float('inf'), item['nickname']))
     total = len(entries)
     page, pages = paging(total, page)
     return {'badge':badge, 'page':page, 'pages':pages, 'total':total, 'record':False,

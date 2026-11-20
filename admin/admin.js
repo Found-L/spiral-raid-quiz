@@ -253,7 +253,7 @@
       state.badgePage=data.page;if(!changed(target,data,key))return;
       const heading=el('div','section-head'),title=el('div');
       title.append(el('p','eyebrow','HONOR HOLDERS'),el('h2','',data.badge.name),el('p','',data.badge.description));heading.append(title);
-      const note=el('p','review-note',data.record?'包含历史获得者；时间来自现存答卷推算或纪录留档，删除的记录无法还原。':'按现存答卷和已保存的勋章记录统计，时间为首次达到条件的上传时间。');
+      const note=el('p','review-note',data.record?'包含历史获得者；时间来自现存答卷推算或纪录留档，删除的记录无法还原。按时间从新到旧排列。':'按现存答卷和已保存的勋章记录统计，时间为首次达到条件的上传时间，按时间从新到旧排列。');
       const list=el('div','stack badge-holders');
       if(!data.entries.length)empty(list,'还没有玩家获得这枚勋章。');
       data.entries.forEach(item=>{const row=el('button','holder-row');row.type='button';row.disabled=!item.number;
