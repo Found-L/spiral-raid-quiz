@@ -75,7 +75,6 @@
 .guard-card > summary span { display: grid; gap: 5px; flex: 1; min-width: 0; }
 .guard-card > summary small { color: #d4b47a; font-size: 11px; letter-spacing: .09em; }
 .guard-card > summary strong { color: #f1e6d2; font: 600 18px/1.4 var(--serif); }
-.guard-card > summary em { margin-left: auto; color: #a6c8b9; font-size: 12px; font-style: normal; white-space: nowrap; }
 .guard-card > summary b { color: #dfc58f; font-size: 22px; font-weight: 400; transition: transform .2s; }
 .guard-card[open] > summary b { transform: rotate(45deg); }
 .guard-content { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; padding: 0 22px 24px; align-items: center; }
@@ -98,11 +97,12 @@
 .guard-figure .guard-flame-label { fill: #f1a78e; }
 .guard-assignment { fill: none; stroke: #85dfc9; stroke-width: 2; stroke-dasharray: 4 4; animation: guard-assignment 2s linear infinite; }
 .guard-next { fill: none; stroke: #c5ad7f; stroke-width: 1.5; opacity: .8; }
-.guard-copy p { color: #cad6ce; line-height: 1.8; margin: 0 0 12px; }
-.guard-copy .guard-evidence { color: #e9c780; font-size: 12px; letter-spacing: .04em; }
-.guard-copy a { display: inline-block; margin-top: 4px; color: #efca88; text-decoration: none; }
-.guard-copy a + a { margin-left: 16px; }
-.guard-copy a:hover { text-decoration: underline; }
+.guard-copy { display: grid; gap: 18px; }
+.guard-point { display: grid; grid-template-columns: 31px minmax(0, 1fr); gap: 12px; align-items: start; }
+.guard-point-number { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid #6d6953; border-radius: 50%; background: #272e2b; color: #e4c48b; font: 600 11px/1 var(--serif); }
+.guard-point h3 { color: #f0e5d1; font-size: 15px; line-height: 1.5; margin: 0 0 4px; }
+.guard-point p { color: #cad6ce; line-height: 1.75; margin: 0; }
+.guard-point-danger .guard-point-number { border-color: #916e5c; background: #382b29; color: #f1b4a0; }
 @keyframes guard-warning { 50% { fill-opacity: .32; stroke-opacity: 1; } }
 @keyframes guard-assignment { to { stroke-dashoffset: -16; } }
 @media (max-width: 700px) {
@@ -110,7 +110,6 @@
   .guard-card > summary { position: relative; flex-wrap: wrap; gap: 5px; padding: 16px 44px 16px 16px; }
   .guard-card > summary span { flex-basis: 100%; }
   .guard-card > summary strong { font-size: 16px; }
-  .guard-card > summary em { margin-left: 0; }
   .guard-card > summary b { position: absolute; right: 18px; top: 16px; }
   .guard-figure text { font-size: 20px; }
   .guard-figure .guard-label { font-size: 18px; }
