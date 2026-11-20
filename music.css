@@ -1,0 +1,14 @@
+.music-toggle { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 7px; color: #99b4aa; background: transparent; cursor: pointer; }
+.music-toggle svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.65; stroke-linecap: round; stroke-linejoin: round; }
+.music-toggle .music-waves { display: none; }
+.music-toggle[data-state="playing"], .music-toggle[data-state="loading"], .music-toggle[data-state="suspended"] { color: #e8c990; background: #d6b77912; }
+.music-toggle[data-state="playing"] .music-waves, .music-toggle[data-state="loading"] .music-waves, .music-toggle[data-state="suspended"] .music-waves { display: inline; }
+.music-toggle[data-state="playing"] .music-slash, .music-toggle[data-state="loading"] .music-slash, .music-toggle[data-state="suspended"] .music-slash { display: none; }
+.music-toggle:hover { color: #f5dfb6; background: #34524980; }
+.music-toggle:focus-visible { outline: 2px solid #f4cf8e; outline-offset: 3px; }
+.footer-meta { min-width: 0; }
+.music-credit { margin-top: 5px; color: #95a69d; font-size: 11px; line-height: 1.6; }
+.music-credit a { color: #c0b18f; text-decoration: underline; text-decoration-color: #aa987a80; text-underline-offset: 3px; }
+.music-credit a:hover { color: #f5dfb6; }
+.seo-header-actions { display: flex; flex: none; align-items: center; gap: 10px; }
+@media (max-width: 360px) { .profile-trigger #header-profile { display: none; } }
