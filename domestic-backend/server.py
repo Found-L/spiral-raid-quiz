@@ -833,18 +833,46 @@ def history(db, body):
     authenticated(db, device, secret_hash, '请保存昵称，或恢复原来的身份后再查看记录。')
     clause = ' AND (a.submitted_at, a.id) < (?, ?)' if match else ''
     params = [device, int(match[1]), match[2]] if match else [device]
-    rows = db.execute('''SELECT a.id, a.quiz_version, a.correct_count, a.total_count, a.submitted_at, t.elapsed_seconds
+    rows = db.execute('''SELECT a.id, a.quiz_version, a.correct_count, a.total_count, a.submitted_at, t.elapsed_seconds,
+                                x.attempt_id AS analyzed
                          FROM attempts a LEFT JOIN attempt_timings t ON t.attempt_id = a.id
+                         LEFT JOIN attempt_analysis x ON x.attempt_id = a.id
                          WHERE a.participant_id = ?''' + clause + ' ORDER BY a.submitted_at DESC, a.id DESC LIMIT 21', params).fetchall()
     stats = db.execute('''SELECT COUNT(*) AS count,
                          MAX(CASE WHEN quiz_version = ? THEN 1.0 * correct_count / total_count END) AS best
                          FROM attempts WHERE participant_id = ?''', (VERSION, device)).fetchone()
-    entries = [{'currentVersion': row['quiz_version'] == VERSION, 'quizVersion': row['quiz_version'], 'correctCount': row['correct_count'],
+    entries = [{'attemptId': row['id'], 'reviewAvailable': bool(row['analyzed'] and row['quiz_version'] in BANKS),
+                'currentVersion': row['quiz_version'] == VERSION, 'quizVersion': row['quiz_version'], 'correctCount': row['correct_count'],
                 'totalCount': row['total_count'], 'submittedAt': row['submitted_at'], 'elapsedSeconds': row['elapsed_seconds'],
                 'score': score(row['correct_count'], row['total_count'])} for row in rows[:20]]
     next_cursor = f"{rows[19]['submitted_at']}.{rows[19]['id']}" if len(rows) > 20 else None
     return {'attemptCount': stats['count'], 'bestScore': None if stats['best'] is None else math.floor(stats['best'] * 10000 + 0.5) / 100,
             'nextCursor': next_cursor, 'entries': entries}
+
+
+def history_review(db, body):
+    device, secret_hash = credentials(body)
+    attempt_id = body.get('attemptId')
+    if not isinstance(attempt_id, str) or not re.fullmatch(r'[a-f0-9]{32}', attempt_id):
+        raise ApiError('成绩编号无效。')
+    authenticated(db, device, secret_hash, '请保存昵称，或恢复原来的身份后再查看记录。')
+    attempt = db.execute('''SELECT a.quiz_version, a.correct_count, a.total_count, x.attempt_id AS analyzed
+                            FROM attempts a LEFT JOIN attempt_analysis x ON x.attempt_id = a.id
+                            WHERE a.id = ? AND a.participant_id = ?''', (attempt_id, device)).fetchone()
+    if not attempt:
+        raise ApiError('没有找到这条答题记录。', 404)
+    bank = BANKS.get(attempt['quiz_version'])
+    current = attempt['quiz_version'] == VERSION
+    if not attempt['analyzed'] or not bank:
+        return {'available': False, 'currentVersion': current}
+    wrong = {row['question_id'] for row in db.execute(
+        'SELECT question_id FROM attempt_wrong_questions WHERE attempt_id = ?', (attempt_id,))}
+    questions = [q for q in bank['questions'] if q['id'] in wrong]
+    if len(questions) != len(wrong) or len(wrong) != attempt['total_count'] - attempt['correct_count']:
+        return {'available': False, 'currentVersion': current}
+    fields = ('id', 'section', 'role', 'type', 'question', 'options', 'answer', 'explanation')
+    return {'available': True, 'currentVersion': current,
+            'questions': [{key: question[key] for key in fields if key in question} for question in questions]}
 
 
 def delete_profile(db, body):
@@ -962,7 +990,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         routes = {'/api/profile': profile, '/api/submit': submit, '/api/badges': badges,
                   '/api/badges/select': select_badges,
-                  '/api/history': history, '/api/delete-profile': delete_profile,
+                  '/api/history': history, '/api/history/review': history_review, '/api/delete-profile': delete_profile,
                   '/api/social/view': social.view, '/api/shares': create_share}
         routes.update({f'/api/social/{name}': (lambda db, body, name=name: social.mutate(db, body, name))
                        for name in ('reaction', 'comment', 'like', 'delete', 'hide')})
