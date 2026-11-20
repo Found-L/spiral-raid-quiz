@@ -158,6 +158,20 @@ class AdminTest(unittest.TestCase):
         public = server.honor_history_page(self.db,'quickest',1,20)['entries']
         self.assertEqual([item['achievedAt'] for item in public], sorted(item['achievedAt'] for item in public))
 
+    def test_newest_honor_pages_at_all_boundaries(self):
+        for total in (0,1,19,20,21,39,40,41,101):
+            def history(_db, _badge, page, size):
+                pages = max(1,(total+size-1)//size)
+                page = min(page,pages)
+                return {'page':page,'pages':pages,'total':total,
+                        'entries':list(range((page-1)*size,min(page*size,total)))}
+            context = {'honor_history_page':history}
+            pages = max(1,(total+admin.PAGE_SIZE-1)//admin.PAGE_SIZE)
+            combined = []
+            for page in range(1,pages+1):
+                combined += admin.newest_honor_page(self.db,'quickest',page,context)['entries']
+            self.assertEqual(combined,list(reversed(range(total))),f'count {total}')
+
     def test_report_review_stale_content_and_moderation(self):
         headers, _ = self.login()
         comment = self.db.execute('SELECT id FROM social_comments').fetchone()[0]
